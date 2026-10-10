@@ -73,11 +73,12 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-M0 (esqueleto) hecho en la rama `feat/m0-skeleton`: servidor ASP.NET Core con la clave de acceso, EF Core con la primera migración, almacenamiento de archivos, React + Vite con la llamada de salud, Docker Compose y CI. Falta verificar Docker Compose y el CI en GitHub (ver `docs/pendientes.md`). Siguiente hito: M1, importación.
+M0 (esqueleto) hecho en la rama `feat/m0-skeleton`: servidor ASP.NET Core con la clave de acceso, EF Core con la primera migración, almacenamiento de archivos, React + Vite con la llamada de salud, Docker Compose y CI. Docker Compose verificado; falta ver el CI en verde en GitHub (ver `docs/pendientes.md`). Siguiente hito: M1, importación.
 
 ## Comandos
 
 - Servidor: `dotnet run --project src/Server` (usa LocalDB y aplica las migraciones al arrancar).
 - Frontend: `npm run dev` en `src/web` (Vite reenvía `/api` y `/health` al servidor).
+- Contenedores: Docker está en WSL (`Ubuntu-26.04`), no en Windows. Arrancar el servicio con `wsl -u root service docker start` y correr `docker compose` desde `/mnt/d/Documents/source/repos/presentaciones-interactivas`.
 - Pruebas: `dotnet test` en la raíz; `npm test` y `npm run lint` en `src/web`.
 - Nueva migración: `dotnet ef migrations add <Name> --project src/Server --output-dir Infrastructure/Data/Migrations`.

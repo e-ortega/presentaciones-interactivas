@@ -46,6 +46,8 @@ cp .env.example .env    # y completar los valores
 docker compose up --build   # app en http://localhost:8080
 ```
 
+Con Docker dentro de WSL, correr esos comandos desde la terminal de Ubuntu, en `/mnt/d/.../presentaciones-interactivas`.
+
 **Pruebas:**
 
 ```bash
