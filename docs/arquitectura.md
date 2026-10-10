@@ -1,6 +1,6 @@
 # Arquitectura de implementación — Fase 1
 
-_Propuesta de Claude, 9 oct 2026 (P-13). Pendiente de aprobación de Esteban. Complementa el diseño ([diseno.md](diseno.md) §10 modelo de datos y §11 arquitectura de alto nivel) y el plan ([plan-fase-1.md](plan-fase-1.md))._
+_Propuesta de Claude, 9 oct 2026; aprobada por Esteban (D-48). Complementa el diseño ([diseno.md](diseno.md) §10 modelo de datos y §11 arquitectura de alto nivel) y el plan ([plan-fase-1.md](plan-fase-1.md))._
 
 **Principio:** lo más simple que soporte la Fase 1 sin cerrar las puertas acordadas (pasos para animaciones, tres ventanas, varias réplicas a futuro). Cada punto dice qué se hace ahora y qué cambiaría al crecer.
 

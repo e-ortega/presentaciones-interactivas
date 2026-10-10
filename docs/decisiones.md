@@ -51,6 +51,7 @@ Cada decisión con su fecha y el motivo. Si una decisión cambia, no se borra: s
 | D-45 | 2026-10-09 | Clave de acceso para la zona del profesor mientras no haya login (antes P-11). La app guarda solo el **hash SHA-256** de la clave (`AdminAccess:KeySha256`) y compara en tiempo constante. La clave en texto plano vive en el gestor de contraseñas de Esteban; el hash va en `dotnet user-secrets` en desarrollo y como secreto de Container Apps en Azure. **Nunca en el repositorio** | El repo es público; si la configuración se filtra, el hash de una clave aleatoria de 256 bits no permite recuperarla |
 | D-46 | 2026-10-09 | Identidad visual "Hoja de respuestas" aprobada (antes P-08) | Aprobado por Esteban |
 | D-47 | 2026-10-09 | Infraestructura de Azure aprobada (antes P-01 a P-04): Container Apps (Consumo), Azure SQL Database (oferta gratuita), Blob Storage, GitHub Container Registry, SignalR dentro de la app, un contenedor con LibreOffice, Docker Compose en local | Aprobado por Esteban |
+| D-48 | 2026-10-09 | Arquitectura de implementación de la Fase 1 aprobada (antes P-13): ver [arquitectura.md](arquitectura.md) | Aprobado por Esteban |
 
 ## Propuestas en revisión
 
@@ -69,5 +70,5 @@ Decisiones planteadas por Claude que esperan confirmación de Esteban. Ver [pend
 | ~~P-09~~ | Aprobada → D-39. **Un solo modo, tres ventanas** (revisada el 9 oct, noche): presentador, ventana opcional para compartir o proyectar (sin notas) y estudiante. La ventana para compartir entra en la Fase 1. Roles de cliente `Presenter`, `Display`, `Participant` | En la referencia de Genially el profesor comparte pantalla en la videollamada; sin una ventana limpia, la clase vería sus notas. Ver [diseno.md](diseno.md) §13 |
 | ~~P-10~~ | Aprobada → D-44 | |
 | ~~P-12~~ | Aprobada → D-42 | |
-| P-13 | **Arquitectura de implementación** de la Fase 1: backend por funcionalidades con Minimal APIs y EF Core directo, estado en vivo en memoria con una réplica, contrato del hub SignalR, identidad por cookies firmadas, importación en cola dentro del proceso, archivos servidos por la app, TanStack Query + hook de sesión en React, pruebas con Testcontainers y archivos sintéticos, ramas + PR + GitHub Actions | Ver [arquitectura.md](arquitectura.md) |
+| ~~P-13~~ | Aprobada → D-48 | |
 | ~~P-11~~ | Aprobada → D-45 | |
