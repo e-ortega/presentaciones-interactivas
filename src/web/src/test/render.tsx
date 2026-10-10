@@ -1,13 +1,12 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { render } from '@testing-library/react'
 import type { ReactElement } from 'react'
 import { vi } from 'vitest'
+import { createQueryClient } from '../api/queryClient'
 
-/** Renders a component that uses TanStack Query, with a fresh client and no retries. */
+/** Renders a component that uses TanStack Query, with the app's client, fresh and without retries. */
 export function renderWithQuery(ui: ReactElement) {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  })
+  const queryClient = createQueryClient({ queries: { retry: false }, mutations: { retry: false } })
   return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
 }
 

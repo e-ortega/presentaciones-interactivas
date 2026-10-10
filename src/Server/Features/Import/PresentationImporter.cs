@@ -29,10 +29,11 @@ public class PresentationImporter(
 
         var stopwatch = Stopwatch.StartNew();
         var workDirectory = Directory.CreateTempSubdirectory("pi-import-").FullName;
+        var storedPaths = new List<string>();
         try
         {
             var rendered = await RenderAsync(presentation, workDirectory, cancellationToken);
-            await StoreAsync(presentation, rendered, cancellationToken);
+            await StoreAsync(presentation, rendered, storedPaths, cancellationToken);
             presentation.CompleteImport();
             logger.LogInformation(
                 "Imported presentation {PresentationId}: {SlideCount} slides in {Seconds:0.0} s",
@@ -47,10 +48,11 @@ public class PresentationImporter(
             var failure = ex is SlideRenderException renderException ? renderException.Failure : ImportFailure.Unexpected;
             logger.LogError(ex, "Import of presentation {PresentationId} failed: {Failure}", presentation.Id, failure);
             presentation.FailImport(failure);
+            await DeleteStoredAsync(storedPaths);
         }
         finally
         {
-            Directory.Delete(workDirectory, recursive: true);
+            DeleteWorkDirectory(workDirectory);
         }
 
         await db.SaveChangesAsync(CancellationToken.None);
@@ -69,9 +71,10 @@ public class PresentationImporter(
         return await renderer.RenderAsync(pptxPath, workDirectory, cancellationToken);
     }
 
-    private async Task StoreAsync(Presentation presentation, RenderedPresentation rendered, CancellationToken cancellationToken)
+    private async Task StoreAsync(
+        Presentation presentation, RenderedPresentation rendered, List<string> storedPaths, CancellationToken cancellationToken)
     {
-        await UploadAsync(rendered.PdfPath, PresentationFiles.StudentPdf(presentation.Id), "application/pdf", cancellationToken);
+        await UploadAsync(rendered.PdfPath, PresentationFiles.StudentPdf(presentation.Id), "application/pdf", storedPaths, cancellationToken);
 
         foreach (var renderedSlide in rendered.Slides)
         {
@@ -79,15 +82,52 @@ public class PresentationImporter(
             foreach (var imagePath in renderedSlide.StepImagePaths)
             {
                 var storagePath = PresentationFiles.StepImage(presentation.Id, slide.Index, slide.Steps.Count);
-                await UploadAsync(imagePath, storagePath, "image/png", cancellationToken);
+                await UploadAsync(imagePath, storagePath, "image/png", storedPaths, cancellationToken);
                 slide.AddStep(storagePath);
             }
         }
     }
 
-    private async Task UploadAsync(string localPath, string storagePath, string contentType, CancellationToken cancellationToken)
+    private async Task UploadAsync(
+        string localPath, string storagePath, string contentType, List<string> storedPaths, CancellationToken cancellationToken)
     {
         await using var file = File.OpenRead(localPath);
+        storedPaths.Add(storagePath); // before saving: a failed upload may leave a partial file
         await storage.SaveAsync(storagePath, file, contentType, cancellationToken);
+    }
+
+    /// <summary>
+    /// Removes what a failed import already stored. Best effort: a leftover file is harmless,
+    /// and nothing here may keep the failure from being recorded.
+    /// </summary>
+    private async Task DeleteStoredAsync(List<string> storedPaths)
+    {
+        foreach (var path in storedPaths)
+        {
+            try
+            {
+                await storage.DeleteAsync(path, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Could not delete {Path} after a failed import", path);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Best effort too: after a timeout LibreOffice may still hold files here for a moment,
+    /// and an exception would skip saving the outcome of the import.
+    /// </summary>
+    private void DeleteWorkDirectory(string workDirectory)
+    {
+        try
+        {
+            Directory.Delete(workDirectory, recursive: true);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            logger.LogWarning(ex, "Could not delete the work directory {WorkDirectory}", workDirectory);
+        }
     }
 }
