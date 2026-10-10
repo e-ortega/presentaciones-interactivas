@@ -18,9 +18,9 @@ presentaciones-interactivas/
 ├── src/
 │   ├── Server/            ASP.NET Core: API, hub SignalR, sirve el build de React
 │   │   ├── Domain/        Entidades y reglas
-│   │   ├── Features/      Endpoints por funcionalidad (Import, Presentations, Sessions, Widgets)
+│   │   ├── Features/      Endpoints por funcionalidad (Import, Presentations, Sessions, Widgets, Join)
 │   │   ├── Infrastructure/ EF Core, almacenamiento de archivos, renderizador LibreOffice
-│   │   └── Hubs/          SessionHub (SignalR)
+│   │   └── Realtime/      SessionHub (SignalR), estado en vivo y contratos
 │   └── web/               React + Vite
 ├── tests/
 │   └── Server.Tests/
@@ -33,10 +33,12 @@ Un solo proyecto de servidor con carpetas, no varios proyectos. Los detalles de 
 ## Hitos
 
 ### M0 — Esqueleto
+_Estado (9 oct 2026): hecho en la rama `feat/m0-skeleton`. `docker compose up` verificado con Docker en WSL. Falta ver el CI en verde en GitHub; ver [pendientes.md](pendientes.md)._
+
 - Solución .NET, proyecto `Server`, proyecto de pruebas.
-- React + Vite + TypeScript en `src/web`, con los textos en archivos de recursos (P-10) y los tokens de `design/tokens.css`; en desarrollo, proxy de Vite hacia la API; en producción, el build se copia a `wwwroot`.
+- React + Vite + TypeScript en `src/web`, con los textos en archivos de recursos (D-44) y los tokens de `src/web/src/styles/tokens.css`; en desarrollo, proxy de Vite hacia la API; en producción, el build se copia a `wwwroot`.
 - Docker Compose: app + SQL Server.
-- Zona del profesor protegida por la clave de acceso (D-45): middleware que compara el SHA-256 de la clave ingresada con `AdminAccess:KeySha256` en tiempo constante y deja una cookie. En local, Esteban carga el hash con `dotnet user-secrets`.
+- Zona del profesor protegida por la clave de acceso (D-45): middleware que compara el SHA-256 de la clave ingresada con `AdminAccess:KeySha256` en tiempo constante y deja una cookie. En local, Esteban carga el hash con `dotnet user-secrets`. La pantalla de React para ingresar la clave se hace en el M1, junto con la primera pantalla del profesor.
 - EF Core con la primera migración (entidades de la Fase 1, ver diseño §10).
 - Almacenamiento de archivos detrás de una interfaz: disco local en desarrollo, Blob Storage en Azure.
 - GitHub Actions: compilar y probar backend y frontend en cada pull request.

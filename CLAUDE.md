@@ -17,7 +17,7 @@ Dueño del proyecto: **Esteban Ortega**, ingeniero de software en Costa Rica y p
 | `docs/pendientes.md` | Lo que depende de Esteban |
 | `docs/arquitectura.md` | Arquitectura de implementación: backend, contrato SignalR, identidad, importación, frontend, pruebas, CI/CD |
 | `docs/plan-fase-1.md` | Plan de implementación del MVP, por hitos |
-| `docs/identidad-visual.md` | Identidad visual y principios; tokens CSS en `design/tokens.css` (usarlos, no inventar colores) |
+| `docs/identidad-visual.md` | Identidad visual y principios; tokens CSS en `src/web/src/styles/tokens.css` (usarlos, no inventar colores) |
 | `docs/competencia.md` | Competencia, posicionamiento y monetización |
 | `docs/legal/aviso-privacidad.md` | Aviso de consentimiento Ley 8968 (texto de la interfaz) |
 | `docs/contexto.md` | Cómo se llegó a este diseño y qué se descartó |
@@ -32,7 +32,7 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 3. **Pendientes explícitos.** Al terminar un ciclo, actualizar `docs/pendientes.md` y mostrar a Esteban la lista de lo que depende de él, marcando qué es nuevo o qué cambió desde la última versión.
 4. **Alcance:** respetar las fases de `docs/diseno.md` §12. No construir cosas de fases posteriores "de paso".
 5. **Enseñar React mientras se construye.** Esteban está aprendiendo React. Al escribir frontend: explicar cada concepto nuevo (hooks, estado, efectos, props, contexto) con el ejemplo concreto del código que se está escribiendo, a ritmo pausado, uno a uno, y al final hacer una o dos preguntas para confirmar que lo entendió. Preferir código claro sobre código ingenioso.
-6. **Idioma (D-34):** código, comentarios y documentación técnica en **inglés**; documentación para el usuario y textos de interfaz en **español**. Los textos de la interfaz van en archivos de recursos desde el inicio (P-10) para agregar inglés después. Los documentos de diseño de `docs/` se quedan en español (D-43).
+6. **Idioma (D-34):** código, comentarios y documentación técnica en **inglés**; documentación para el usuario y textos de interfaz en **español**. Los textos de la interfaz van en archivos de recursos desde el inicio (D-44) para agregar inglés después. Los documentos de diseño de `docs/` se quedan en español (D-43).
 
 ## Decisiones que más afectan el código
 
@@ -73,4 +73,12 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-Diseño y plan de la Fase 1 aprobados (D-39, D-40). Repositorio creado, todavía sin código. Siguiente paso: revisar `docs/pendientes.md` con Esteban y empezar `docs/plan-fase-1.md` por el hito M0.
+M0 (esqueleto) hecho en la rama `feat/m0-skeleton`: servidor ASP.NET Core con la clave de acceso, EF Core con la primera migración, almacenamiento de archivos, React + Vite con la llamada de salud, Docker Compose y CI. Docker Compose verificado; falta ver el CI en verde en GitHub (ver `docs/pendientes.md`). Siguiente hito: M1, importación.
+
+## Comandos
+
+- Servidor: `dotnet run --project src/Server` (usa LocalDB y aplica las migraciones al arrancar).
+- Frontend: `npm run dev` en `src/web` (Vite reenvía `/api` y `/health` al servidor).
+- Contenedores: Docker está en WSL (`Ubuntu-26.04`), no en Windows. Arrancar el servicio con `wsl -u root service docker start` y correr `docker compose` desde `/mnt/d/Documents/source/repos/presentaciones-interactivas`.
+- Pruebas: `dotnet test` en la raíz; `npm test` y `npm run lint` en `src/web`.
+- Nueva migración: `dotnet ef migrations add <Name> --project src/Server --output-dir Infrastructure/Data/Migrations`.

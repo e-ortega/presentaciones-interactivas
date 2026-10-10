@@ -208,11 +208,13 @@ Con 1 vCPU y 2 GiB, la concesión gratuita equivale a unas 50 horas al mes de ap
 | **1 — MVP** | Probarlo en una clase real | Importar PPTX (imágenes + notas + PDF), vista del presentador con script, ventana para compartir o proyectar, vista del estudiante adaptable, quiz de opción múltiple, sesión con entrada por código + nombre + correo + consentimiento, sincronización por diapositiva + paso |
 | **2 — El valor** | Lo que diferencia al producto | Sugerencias de la IA con borrador editable, experiencia del estudiante pulida |
 | **3 — Crecer** | Uso continuo en cursos | Grupos con cuentas, apodos, nube de palabras, Q&A, publicar PDF, editor desde cero, analíticas |
-| **Después** | | Animaciones (imágenes por paso), modo en aula con vista de proyección (§13), integración con LMS, gamificación, interfaz en inglés |
+| **Después** | | Animaciones (imágenes por paso), integración con LMS, gamificación, interfaz en inglés |
 
 ## 13. Modos de uso (decidido: D-39)
 
-El diseño original asume **un modo virtual**: el profesor usa una sola pantalla (la vista del presentador) y cada estudiante ve la misma diapositiva en su propia computadora o celular. Al diseñar la identidad visual apareció un segundo uso posible, **en aula**, con un proyector. Esteban no lo había contemplado y le parece buena idea; queda por decidir si se incluye y cuándo.
+**Decisión:** un solo modo con tres ventanas (presentador, para compartir o proyectar, estudiante), y las tres entran en la Fase 1. El resto de la sección explica cómo se llegó ahí.
+
+El diseño original asumía **un modo virtual**: el profesor usa una sola pantalla (la vista del presentador) y cada estudiante ve la misma diapositiva en su propia computadora o celular. Al diseñar la identidad visual apareció un segundo uso posible, **en aula**, con un proyector.
 
 | | **Virtual** (uso principal) | **En aula** |
 |---|---|---|
@@ -227,11 +229,7 @@ El diseño original asume **un modo virtual**: el profesor usa una sola pantalla
 
 **Qué cambia:** solo vistas. El modo en aula agrega la vista de proyección y permite una vista de estudiante más compacta.
 
-**Propuesta (P-09):**
-
-1. **Fase 1 solo con el modo virtual**, que es el uso principal.
-2. **Dejarlo preparado sin costo**, igual que con las animaciones: cada cliente se conecta a la sesión con un **rol** (`Presenter`, `Participant` y, a futuro, `Display`); el hub emite los eventos al grupo de la sesión y no a "los estudiantes"; revelar resultados es un evento de sesión que cada vista dibuja a su manera. Así, el modo en aula después es agregar una vista y una opción al crear la sesión, sin tocar el backend.
-3. Las maquetas de sala de espera y resultados proyectados ya existen y se reutilizan cuando llegue ese modo.
+**Primera propuesta (P-09, reemplazada por la versión revisada de abajo):** Fase 1 solo con el modo virtual y el modo en aula preparado para después. De esa propuesta se conserva la técnica: cada cliente se conecta a la sesión con un **rol** (`Presenter`, `Display`, `Participant`); el hub emite los eventos al grupo de la sesión y no a "los estudiantes"; revelar resultados es un evento de sesión que cada vista dibuja a su manera.
 
 ### Referencia observada: Genially en vivo (9 oct 2026)
 
@@ -242,7 +240,7 @@ Conclusiones:
 - **La voz no es problema de la app:** va por la videollamada (Zoom, Teams, Meet), igual que en Genially.
 - **Muchos profesores van a compartir pantalla por costumbre.** Si comparten la vista del presentador, los estudiantes verían sus notas. Necesitan una **ventana limpia para compartir**: exactamente la misma vista de proyección del modo en aula.
 
-### Propuesta revisada (P-09): un solo modo, tres ventanas
+### Decisión (D-39): un solo modo, tres ventanas
 
 En lugar de dos modos, la sesión funciona siempre igual y el profesor decide qué abre:
 
@@ -252,4 +250,4 @@ En lugar de dos modos, la sesión funciona siempre igual y el profesor decide qu
 | **Para compartir o proyectar** (opcional) | La clase, por videollamada o proyector | Sala de espera con código, diapositiva a pantalla completa, resultados revelados. Sin notas ni controles |
 | **Estudiante** | Cada estudiante, en computadora o celular | Diapositiva y pregunta (adaptable) |
 
-Con esto, clase virtual con pantalla compartida, clase virtual sin compartir y clase en aula con proyector son el mismo flujo. La ventana para compartir es barata: reutiliza la vista del estudiante sin el panel de respuesta y ya tiene maquetas. Por eso se propone **incluirla en la Fase 1**.
+Con esto, clase virtual con pantalla compartida, clase virtual sin compartir y clase en aula con proyector son el mismo flujo. La ventana para compartir es barata: reutiliza la vista del estudiante sin el panel de respuesta y ya tiene maquetas. Por eso **entra en la Fase 1**.

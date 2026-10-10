@@ -1,0 +1,11 @@
+{
+  "app": {
+    "name": "Presentaciones Interactivas",
+    "tagline": "Tu presentación de siempre, convertida en una clase en vivo."
+  },
+  "health": {
+    "checking": "Comprobando la conexión con el servidor…",
+    "up": "El servidor responde.",
+    "down": "No hay conexión con el servidor."
+  }
+}
