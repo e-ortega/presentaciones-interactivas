@@ -31,8 +31,9 @@ public class AppFactory : WebApplicationFactory<Program>
 
         builder.ConfigureTestServices(services =>
         {
-            // The app keeps cookie keys in the database; here they stay in memory.
-            services.AddDataProtection().UseEphemeralDataProtectionProvider();
+            // The app keeps cookie keys in the database. Here they go to a folder: there is no
+            // database, and the key ring is read at startup whether or not a test signs in.
+            services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(_storageRoot, "keys")));
 
             // The import worker looks for unfinished imports in the database at startup.
             var worker = services.Single(service => service.ImplementationType == typeof(ImportWorker));

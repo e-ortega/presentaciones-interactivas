@@ -88,6 +88,8 @@ Antes de subir cambios, correr localmente lo mismo que el CI: `dotnet build` (lo
 - Contenedores: Docker está en WSL (`Ubuntu-26.04`), no en Windows. Arrancar el servicio con `wsl -u root service docker start` y correr `docker compose` desde `/mnt/d/Documents/source/repos/presentaciones-interactivas`.
 - Importar de verdad necesita LibreOffice, que solo está en la imagen Docker: con `dotnet run` en Windows la subida funciona pero la conversión falla. Para probar una importación, usar Docker Compose.
 - Los decks reales de Esteban se leen desde su carpeta para pruebas manuales; **nunca se copian al repo**, que es público.
-- Tipos de la API: al cambiar un endpoint o un DTO, con el servidor encendido correr `npm run generate:api` en `src/web` y guardar `src/api/schema.d.ts` (D-57).
+- Tipos de la API: al cambiar un endpoint o un DTO, correr `PI_UPDATE_OPENAPI=1 dotnet test` (actualiza `src/web/src/api/openapi.json`) y luego `npm run generate:api` en `src/web`; guardar los dos archivos (D-65). Si no, falla una prueba del servidor o el CI.
+- Hooks: `git commit` corre lint-staged (D-64). Si un hook falla, corregir el problema; no saltarlo con `--no-verify`.
+- Dependabot abre pull requests los lunes (D-67): pasan por el mismo CI y la misma revisión que cualquier otro.
 - Pruebas: `dotnet test` en la raíz; `npm test` y `npm run lint` en `src/web`.
 - Nueva migración: `dotnet ef migrations add <Name> --project src/Server --output-dir Infrastructure/Data/Migrations`.

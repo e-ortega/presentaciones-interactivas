@@ -4,7 +4,8 @@
 FROM node:24-alpine AS web
 WORKDIR /web
 COPY src/web/package.json src/web/package-lock.json ./
-RUN npm ci
+# --ignore-scripts: the "prepare" script installs git hooks, which an image build does not need.
+RUN npm ci --ignore-scripts
 COPY src/web/ ./
 RUN npm run build
 

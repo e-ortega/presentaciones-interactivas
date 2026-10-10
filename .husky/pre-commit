@@ -1,0 +1,3 @@
+# Fast checks on the files being committed. Configured in lint-staged.config.mjs.
+# Installed by `npm install` in src/web (see src/web/husky-install.mjs).
+src/web/node_modules/.bin/lint-staged
