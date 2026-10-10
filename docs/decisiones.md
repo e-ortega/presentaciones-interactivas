@@ -52,6 +52,11 @@ Cada decisión con su fecha y el motivo. Si una decisión cambia, no se borra: s
 | D-46 | 2026-10-09 | Identidad visual "Hoja de respuestas" aprobada (antes P-08) | Aprobado por Esteban |
 | D-47 | 2026-10-09 | Infraestructura de Azure aprobada (antes P-01 a P-04): Container Apps (Consumo), Azure SQL Database (oferta gratuita), Blob Storage, GitHub Container Registry, SignalR dentro de la app, un contenedor con LibreOffice, Docker Compose en local | Aprobado por Esteban |
 | D-48 | 2026-10-09 | Arquitectura de implementación de la Fase 1 aprobada (antes P-13): ver [arquitectura.md](arquitectura.md) | Aprobado por Esteban |
+| D-49 | 2026-10-09 | La primera migración incluye solo lo que la Fase 1 usa. Quedan fuera hasta su fase: la entidad `User` y el dueño de la presentación (llegan con el login, D-36), `Group`, el origen IA del widget, apodos y PDF publicado | No construir fases posteriores de paso (regla 4); agregar columnas después es una migración simple |
+| D-50 | 2026-10-09 | `GET /health` solo indica que la app está viva y **no consulta la base** | Las sondas de Container Apps mantendrían despierta la base serverless y gastarían la cuota gratuita |
+| D-51 | 2026-10-09 | Las llaves que firman las cookies (Data Protection) se guardan en la base de datos | Con escala a cero el contenedor se reinicia seguido; sin esto, el profesor y los estudiantes perderían la sesión en cada reinicio |
+| D-52 | 2026-10-09 | En desarrollo, `dotnet run` usa **LocalDB** por defecto; Docker Compose sigue usando SQL Server en contenedor. Las pruebas de integración usan Testcontainers o el servidor indicado en `PI_TEST_SQLSERVER` | Permite trabajar en Windows sin Docker encendido; la cadena de LocalDB no lleva contraseña y puede ir en el repo |
+| D-53 | 2026-10-09 | Herramientas del M0: xUnit v3 sobre Microsoft Testing Platform, oxlint (el linter de la plantilla actual de Vite) y los tokens de diseño en un solo lugar, `src/web/src/styles/tokens.css` (antes `design/tokens.css`) | Son los valores por defecto actuales de .NET 10 y Vite; una sola copia de los tokens evita que se desincronicen |
 
 ## Propuestas en revisión
 

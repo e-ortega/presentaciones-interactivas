@@ -16,8 +16,9 @@ dist/
 npm-debug.log*
 
 # Local storage of uploaded decks and generated files
-storage/
-uploads/
+/storage/
+src/Server/storage/
+/uploads/
 
 # Environment and secrets
 .env
@@ -31,3 +32,6 @@ desktop.ini
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# React build copied into the server for production
+src/Server/wwwroot/

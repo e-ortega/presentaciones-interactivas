@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/wwwroot/
+src/Server/storage/
+.git/
+.github/
+docs/
+tests/
+.env
+.env.*

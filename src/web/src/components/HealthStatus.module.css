@@ -1,0 +1,6 @@
+.status {
+  margin: 0;
+  padding-block: var(--space-3);
+  border-block: 1px solid var(--color-renglon);
+  color: var(--color-grafito-suave);
+}

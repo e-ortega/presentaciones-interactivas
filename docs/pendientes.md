@@ -4,15 +4,18 @@ _Última actualización: 9 oct 2026. Marcados como (Nuevo) o (Cambió) los punto
 
 ## Abiertos
 
-- [ ] **Decidir quién hace `git push`.** Claude Code ahora corre en el Windows de Esteban, con acceso al repo y al remoto. Puede seguir haciendo el push Esteban o Claude puede hacerlo cuando Esteban lo pida. _(Cambió)_
+- [ ] **Subir la rama `feat/m0-skeleton` y abrir el pull request.** Hay dos commits locales sin subir: la corrección de documentos en `main` y el M0 en su rama. Puede hacerlo Esteban o Claude cuando Esteban lo pida. Al subirla corre el CI por primera vez; hay que confirmar que pasa en verde. _(Cambió)_
+- [ ] **Instalar Docker Desktop.** No está en este equipo, así que `docker compose up`, el `Dockerfile` y las pruebas con Testcontainers quedaron escritos pero sin probar localmente. _(Nuevo)_
+- [ ] **Cargar el hash de la clave de acceso:** `dotnet user-secrets set "AdminAccess:KeySha256" "<hash>" --project src/Server` (el hash está en las notas de la entrada de KeePassXC). Sin esto, la zona del profesor rechaza toda clave. _(Nuevo; antes en "Más adelante")_
+- [ ] **Proteger la rama `main` en GitHub** (exigir pull request y CI en verde), como dice [arquitectura.md](arquitectura.md) §8. _(Nuevo)_
+- [ ] **Revisar las decisiones D-49 a D-53** que Claude tomó al implementar el M0 ([decisiones.md](decisiones.md)). _(Nuevo)_
 - [ ] **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes.
 - [ ] **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador.
 - [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
 
 ## Más adelante (sin acción por ahora)
 
-- Al terminar el M0: cargar el hash de la clave con `dotnet user-secrets set "AdminAccess:KeySha256" "<hash>"` (el hash está en las notas de la entrada de KeePassXC).
-- Presentaciones PPTX reales para probar la importación: Esteban las tiene; se piden al llegar al M1.
+- Presentaciones PPTX reales para probar la importación: Esteban las tiene; se piden al empezar el M1, que es el siguiente hito.
 - Inicio de sesión del profesor (D-36).
 - Nombre del producto (D-37).
 - Documentación de uso en inglés, si hace falta (D-43).
@@ -21,6 +24,7 @@ _Última actualización: 9 oct 2026. Marcados como (Nuevo) o (Cambió) los punto
 
 ## Resueltos
 
+- [x] M0 (esqueleto) implementado en la rama `feat/m0-skeleton`. _(Nuevo)_
 - [x] Documentos alineados con las decisiones aprobadas: diseño §12-13 e identidad visual reflejan D-39 y D-46; plan con `Realtime/` y D-44. _(Nuevo)_
 - [x] Arquitectura de implementación aprobada (D-48).
 - [x] Datos de estudiantes nunca van a la IA (D-42).

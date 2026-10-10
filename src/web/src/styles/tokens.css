@@ -1,5 +1,5 @@
 /* Identidad visual "Hoja de respuestas" — ver docs/identidad-visual.md
-   Copiar a src/web/src/styles/tokens.css al crear el frontend (M0/M2). */
+   Única copia de los tokens: usarlos, no inventar colores. */
 @import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap");
 
 :root {

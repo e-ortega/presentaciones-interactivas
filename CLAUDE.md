@@ -17,7 +17,7 @@ Dueño del proyecto: **Esteban Ortega**, ingeniero de software en Costa Rica y p
 | `docs/pendientes.md` | Lo que depende de Esteban |
 | `docs/arquitectura.md` | Arquitectura de implementación: backend, contrato SignalR, identidad, importación, frontend, pruebas, CI/CD |
 | `docs/plan-fase-1.md` | Plan de implementación del MVP, por hitos |
-| `docs/identidad-visual.md` | Identidad visual y principios; tokens CSS en `design/tokens.css` (usarlos, no inventar colores) |
+| `docs/identidad-visual.md` | Identidad visual y principios; tokens CSS en `src/web/src/styles/tokens.css` (usarlos, no inventar colores) |
 | `docs/competencia.md` | Competencia, posicionamiento y monetización |
 | `docs/legal/aviso-privacidad.md` | Aviso de consentimiento Ley 8968 (texto de la interfaz) |
 | `docs/contexto.md` | Cómo se llegó a este diseño y qué se descartó |
@@ -73,4 +73,11 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-Diseño y plan de la Fase 1 aprobados (D-39, D-40). Repositorio creado, todavía sin código. Siguiente paso: revisar `docs/pendientes.md` con Esteban y empezar `docs/plan-fase-1.md` por el hito M0.
+M0 (esqueleto) hecho en la rama `feat/m0-skeleton`: servidor ASP.NET Core con la clave de acceso, EF Core con la primera migración, almacenamiento de archivos, React + Vite con la llamada de salud, Docker Compose y CI. Falta verificar Docker Compose y el CI en GitHub (ver `docs/pendientes.md`). Siguiente hito: M1, importación.
+
+## Comandos
+
+- Servidor: `dotnet run --project src/Server` (usa LocalDB y aplica las migraciones al arrancar).
+- Frontend: `npm run dev` en `src/web` (Vite reenvía `/api` y `/health` al servidor).
+- Pruebas: `dotnet test` en la raíz; `npm test` y `npm run lint` en `src/web`.
+- Nueva migración: `dotnet ef migrations add <Name> --project src/Server --output-dir Infrastructure/Data/Migrations`.

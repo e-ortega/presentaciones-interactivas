@@ -1,6 +1,6 @@
 # Identidad visual: "Hoja de respuestas"
 
-_Propuesta de Claude con la skill frontend-design, 9 oct 2026. Aprobada por Esteban (D-46). Tokens en [`design/tokens.css`](../design/tokens.css). Maquetas en el canvas "Identidad visual — Presentaciones Interactivas" (artifact de Claude)._
+_Propuesta de Claude con la skill frontend-design, 9 oct 2026. Aprobada por Esteban (D-46). Tokens en [`src/web/src/styles/tokens.css`](../src/web/src/styles/tokens.css). Maquetas en el canvas "Identidad visual — Presentaciones Interactivas" (artifact de Claude)._
 
 ## Brief
 

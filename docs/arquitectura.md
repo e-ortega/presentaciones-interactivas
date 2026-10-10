@@ -61,11 +61,12 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 
 | Quién | Cómo se identifica | Detalle |
 |---|---|---|
-| **Profesor** | Clave de acceso (D-45) → cookie firmada, `HttpOnly`, `Secure` | Protege todo `/api/admin/*` y los métodos de presentador del hub |
+| **Profesor** | Clave de acceso (D-45) → cookie firmada, `HttpOnly`, `Secure` | `POST /api/access` cambia la clave por la cookie. Protege todo `/api/admin/*` y los métodos de presentador del hub |
 | **Ventana para compartir** | Token de un solo uso que genera el presentador al abrirla | Evita que alguien con el código abra la ventana del profesor |
 | **Estudiante** | `POST /api/join/{code}` con nombre, correo y consentimiento → crea o reutiliza `Participant` (por correo) y `Attendance` → cookie firmada con el id de la asistencia | La misma cookie autentica la conexión de SignalR; si se recarga la página o se cae el wifi, vuelve como la misma persona |
 
 - **Código de sesión:** 8 dígitos aleatorios (`8888-6666`), únicos entre sesiones activas; deja de servir cuando la sesión termina.
+- **Llaves de las cookies:** se guardan en la base de datos (D-51), para que las cookies sigan valiendo cuando el contenedor se reinicia.
 - **Límite de intentos** (rate limiting de ASP.NET Core) en `join` y en la clave de acceso, por IP, para impedir adivinar códigos o la clave.
 
 ## 4. Importación de presentaciones
@@ -97,12 +98,12 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 | Tipos de la API | Generados desde OpenAPI con `openapi-typescript` | Los tipos de C# y TypeScript no se desincronizan |
 | Textos | `react-i18next`, archivo `es.json` (D-44) | |
 | Estilos | CSS Modules + `tokens.css` (D-46) | Sin librería de componentes: la identidad es propia y los elementos nativos son accesibles |
-| Pruebas | Vitest + Testing Library | |
+| Pruebas | Vitest + Testing Library; lint con oxlint (D-53) | |
 
 ## 7. Pruebas
 
-- **Dominio:** pruebas unitarias con xUnit.
-- **API y hub:** pruebas de integración con `WebApplicationFactory` y **SQL Server real en contenedor (Testcontainers)**.
+- **Dominio:** pruebas unitarias con xUnit v3 (D-53).
+- **API y hub:** pruebas de integración con `WebApplicationFactory` y **SQL Server real en contenedor (Testcontainers)**, o el servidor de `PI_TEST_SQLSERVER` cuando no hay Docker (D-52).
 - **Importación:** pruebas con PPTX de ejemplo que incluyen diapositivas ocultas y fuentes poco comunes. **Los archivos de prueba que van al repo son sintéticos**, creados para eso: el repo es público y las presentaciones reales de Esteban no se suben.
 - **De punta a punta:** un recorrido con Playwright al cerrar el M4 (importar, presentar, unirse, responder, revelar).
 
@@ -116,7 +117,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 ## 9. Observabilidad
 
 - Logging integrado de ASP.NET Core en formato estructurado; en Azure lo recoge Log Analytics. Nunca se registran correos ni respuestas de estudiantes.
-- `GET /health` para las sondas de Container Apps.
+- `GET /health` para las sondas de Container Apps. No consulta la base (D-50).
 - Métricas mínimas en logs: duración de cada importación, sesiones activas, conexiones por sesión.
 
 ## 10. Seguridad (resumen)
