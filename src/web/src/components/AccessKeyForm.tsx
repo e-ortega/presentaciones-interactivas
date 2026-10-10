@@ -53,6 +53,9 @@ export function AccessKeyForm({ onAccepted }: AccessKeyFormProps) {
 }
 
 function errorMessageKey(error: Error): string {
+  if (error instanceof ApiError && error.code === 'AccessKeyNotConfigured') {
+    return 'access.notConfigured'
+  }
   if (error instanceof ApiError && error.status === 401) {
     return 'access.wrongKey'
   }
