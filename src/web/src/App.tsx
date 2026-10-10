@@ -5,6 +5,7 @@ import { AccessGate } from './components/AccessGate'
 import { HealthStatus } from './components/HealthStatus'
 import { PresentationsPage } from './components/PresentationsPage'
 import { PresenterPage } from './presenter/PresenterPage'
+import { PresenterSessionPage } from './session/PresenterSessionPage'
 
 /** Which screen each address shows. Everything under /admin needs the access key. */
 function App() {
@@ -17,6 +18,14 @@ function App() {
         element={
           <AccessGate>
             <PresenterPage />
+          </AccessGate>
+        }
+      />
+      <Route
+        path="/present/:sessionId"
+        element={
+          <AccessGate>
+            <PresenterSessionPage />
           </AccessGate>
         }
       />

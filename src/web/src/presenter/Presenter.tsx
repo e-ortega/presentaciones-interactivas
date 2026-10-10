@@ -1,25 +1,32 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
 import { stepImageUrl } from '../api/presentations'
-import type { PresentationDetail } from '../api/types'
-import { firstPosition, nextPosition, positionForKey, previousPosition, type Position } from './navigation'
+import type { SlideDetail } from '../api/types'
+import { nextPosition, positionForKey, previousPosition, type Position } from './navigation'
 import styles from './Presenter.module.css'
 import { ScriptPanel, type ScriptMode } from './ScriptPanel'
 
 type PresenterProps = {
-  /** A presentation that finished importing, so it has at least one slide. */
-  presentation: PresentationDetail
+  presentationId: string
+  /** The slides of a presentation that finished importing, so there is at least one. */
+  slides: SlideDetail[]
+  /**
+   * Where the presentation is. This component does not keep it: whoever uses it does.
+   * Rehearsing, that is the browser; in a live class, the server.
+   */
+  position: Position
+  /** Asked for by a button or a key. The owner of the position decides what happens. */
+  onNavigate: (position: Position) => void
+  /** What the bar shows after the script options: the way out, the join code, ending the class... */
+  children: ReactNode
 }
 
 /**
  * The presenter view (design §4): the current slide, the script beside it and a bar of
  * controls. Everything is visible at a glance and one click or key press away.
  */
-export function Presenter({ presentation }: PresenterProps) {
+export function Presenter({ presentationId, slides, position, onNavigate, children }: PresenterProps) {
   const { t } = useTranslation()
-  const slides = presentation.slides
-  const [position, setPosition] = useState<Position>(firstPosition)
   const [scriptVisible, setScriptVisible] = useState(true)
   const [scriptMode, setScriptMode] = useState<ScriptMode>('teleprompter')
 
@@ -36,13 +43,13 @@ export function Presenter({ presentation }: PresenterProps) {
         return
       }
       event.preventDefault() // the arrows and the space bar would scroll the page
-      setPosition(target)
+      onNavigate(target)
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-    // The listener reads `slides` and `position`, so it is replaced whenever they change.
-  }, [slides, position])
+    // The listener reads these three, so it is replaced whenever one of them changes.
+  }, [slides, position, onNavigate])
 
   const next = nextPosition(slides, position)
   const previous = previousPosition(slides, position)
@@ -53,11 +60,11 @@ export function Presenter({ presentation }: PresenterProps) {
       <main className={styles.stage}>
         <img
           className={styles.slide}
-          src={stepImageUrl(presentation.id, position)}
+          src={stepImageUrl(presentationId, position)}
           alt={t('presenter.slideAlt', { number: position.slideIndex + 1, total: slides.length })}
         />
         {/* Loads the next image ahead of time, so moving forward does not flash. */}
-        {next && <img hidden src={stepImageUrl(presentation.id, next)} alt="" />}
+        {next && <img hidden src={stepImageUrl(presentationId, next)} alt="" />}
       </main>
 
       {scriptVisible && <ScriptPanel slides={slides} currentSlideIndex={position.slideIndex} mode={scriptMode} />}
@@ -71,7 +78,7 @@ export function Presenter({ presentation }: PresenterProps) {
           className={styles.navigate}
           type="button"
           aria-disabled={previous === null}
-          onClick={() => previous && setPosition(previous)}
+          onClick={() => previous && onNavigate(previous)}
         >
           {t('presenter.controls.previous')}
         </button>
@@ -79,7 +86,7 @@ export function Presenter({ presentation }: PresenterProps) {
           className={styles.navigate}
           type="button"
           aria-disabled={next === null}
-          onClick={() => next && setPosition(next)}
+          onClick={() => next && onNavigate(next)}
         >
           {t('presenter.controls.next')}
         </button>
@@ -108,9 +115,7 @@ export function Presenter({ presentation }: PresenterProps) {
           >
             {t('presenter.controls.script')}
           </button>
-          <Link className={styles.option} to="/admin">
-            {t('presenter.controls.exit')}
-          </Link>
+          {children}
         </div>
       </nav>
     </div>

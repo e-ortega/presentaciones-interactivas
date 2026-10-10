@@ -45,7 +45,7 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 - **Los datos de estudiantes nunca van a servicios de IA** (D-42).
 - **Sin login de profesor en la Fase 1** (D-36). La zona del profesor pide una clave de acceso (D-45): la app solo conoce su hash SHA-256 en `AdminAccess:KeySha256` (user-secrets en local, secreto de Container Apps en Azure) y compara en tiempo constante. **Nunca escribir la clave ni su hash en el repositorio**: es público.
 - **El correo es la identidad** del participante (D-16).
-- **Privacidad en la sesión:** los nombres de los estudiantes los ve solo el profesor; la ventana para compartir muestra cuántos hay, no quiénes (D-78). Las notas del orador nunca viajan por el hub (D-80). Nunca registrar correos ni nombres en los logs.
+- **Privacidad en la sesión:** los nombres de los estudiantes se ven en la clase, como en una videollamada (D-85); el correo y las respuestas individuales, solo el profesor. Las notas del orador nunca viajan por el hub (D-80). Nunca registrar correos ni nombres en los logs.
 - **El contrato del hub** vive en `src/Server/Realtime/Contracts.cs` y, a mano, en `src/web/src/realtime/contracts.ts`: se cambian juntos.
 - **Ley 8968:** el formulario de nombre y correo lleva aviso de consentimiento y se guarda la fecha del consentimiento (D-29).
 
@@ -75,7 +75,7 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-M0, M1 y M2 terminados: la app importa un PPTX (imágenes, notas y PDF); la zona del profesor permite entrar con la clave, subir presentaciones y ver su estado; y la vista del presentador recorre una presentación con sus notas como guion, por botones o teclado. M3 (sesión en vivo): el servidor está hecho (sesiones, entrada con código, hub de SignalR); faltan las pantallas del profesor, del estudiante y la ventana para compartir (`docs/plan-fase-1.md`).
+M0, M1 y M2 terminados: la app importa un PPTX (imágenes, notas y PDF); la zona del profesor permite entrar con la clave, subir presentaciones y ver su estado; y la vista del presentador recorre una presentación con sus notas como guion, por botones o teclado. M3 (sesión en vivo): hechos el servidor (sesiones, entrada con código, hub de SignalR) y las pantallas del profesor (iniciar clase, sala de espera, presentador en vivo); faltan las del estudiante y la ventana para compartir (`docs/plan-fase-1.md`).
 
 ## Flujo de trabajo
 
@@ -93,6 +93,6 @@ Antes de subir cambios, correr localmente lo mismo que el CI: `dotnet build` (lo
 - Tipos de la API: al cambiar un endpoint o un DTO, correr `PI_UPDATE_OPENAPI=1 dotnet test` (actualiza `src/web/src/api/openapi.json`) y luego `npm run generate:api` en `src/web`; guardar los dos archivos (D-65). Si no, falla una prueba del servidor o el CI.
 - Hooks: `git commit` corre lint-staged (D-64). Si un hook falla, corregir el problema; no saltarlo con `--no-verify`.
 - Dependabot abre pull requests los lunes (D-67). Claude los revisa y fusiona los seguros; ante la duda, avisa a Esteban (D-68). Node y sus tipos (`@types/node`) se quedan en la 24 LTS (D-69, D-75).
-- Las capturas de pantalla sirven para ver lo que las pruebas no ven (un botón sin texto pasó 46 pruebas): al cambiar estilos, mirar la pantalla en el navegador.
+- Las capturas de pantalla sirven para ver lo que las pruebas no ven (un botón sin texto pasó 46 pruebas): al cambiar estilos, mirar la pantalla en el navegador. Con Edge sin ventana, en páginas con conexión en vivo usar `--timeout`, no `--virtual-time-budget`: el tiempo virtual no espera a la red y la página sale a medio conectar.
 - Pruebas: `dotnet test` en la raíz; `npm test` y `npm run lint` en `src/web`.
 - Nueva migración: `dotnet ef migrations add <Name> --project src/Server --output-dir Infrastructure/Data/Migrations`.

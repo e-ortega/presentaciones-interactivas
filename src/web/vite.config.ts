@@ -11,6 +11,8 @@ export default defineConfig({
     proxy: {
       '/api': server,
       '/health': server,
+      // The live session hub. ws: true also forwards its WebSocket connection.
+      '/hubs': { target: server, ws: true },
     },
   },
   test: {

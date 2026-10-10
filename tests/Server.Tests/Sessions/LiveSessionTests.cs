@@ -48,7 +48,7 @@ public sealed class LiveSessionTests(SqlServerFixture sql) : IAsyncDisposable
     }
 
     [Fact]
-    public async Task A_student_who_joins_shows_up_for_the_presenter_by_name_and_for_the_display_as_a_count()
+    public async Task A_student_who_joins_shows_up_by_name_for_the_presenter_and_on_the_shared_window()
     {
         var scenario = await StartScenarioAsync();
         var presenter = await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Presenter);
@@ -60,9 +60,10 @@ public sealed class LiveSessionTests(SqlServerFixture sql) : IAsyncDisposable
         var attendee = Assert.Single(forPresenter.Attendees!);
         Assert.Equal(("Ana Mora", true), (attendee.DisplayName, attendee.Connected));
 
-        // The consent text promises only the teacher sees names: the shared window gets a number.
+        // Names are visible to the class, as in a video call (D-85). Emails are not part of the message.
         var forDisplay = await display.NextAsync<AttendanceUpdate>(update => update.ConnectedCount == 1);
-        Assert.Null(forDisplay.Attendees);
+        Assert.Equal(["Ana Mora"], forDisplay.Attendees.Select(a => a.DisplayName));
+        Assert.DoesNotContain(typeof(Attendee).GetProperties(), property => property.Name.Contains("Email", StringComparison.Ordinal));
 
         var studentSnapshot = await student.NextAsync<SessionSnapshot>();
         Assert.Equal(SessionStatus.Lobby, studentSnapshot.Status);
@@ -403,7 +404,7 @@ public sealed class LiveSessionTests(SqlServerFixture sql) : IAsyncDisposable
         var display = await projector.ConnectAsync(scenario.Session.Id, ClientRole.Display);
         var snapshot = await display.NextAsync<SessionSnapshot>();
         Assert.Equal(scenario.Session.Code, snapshot.Code); // the waiting room shows the code
-        Assert.Null(snapshot.Attendance!.Attendees);
+        Assert.Empty(snapshot.Attendance!.Attendees);
         Assert.Equal(HttpStatusCode.OK, (await projector.GetAsync(SlideUrl(scenario, 0))).StatusCode);
 
         // The link works once, and the display cookie is not a presenter's.

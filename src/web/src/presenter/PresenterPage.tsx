@@ -1,12 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
 import { ApiError } from '../api/http'
 import { getPresentation } from '../api/presentations'
+import type { PresentationDetail } from '../api/types'
+import { firstPosition } from './navigation'
 import { Presenter } from './Presenter'
+import presenterStyles from './Presenter.module.css'
 import styles from './PresenterPage.module.css'
 
-/** Loads the presentation named in the address and shows its presenter view. */
+/** Rehearsal: loads the presentation named in the address and shows its presenter view, with no students. */
 export function PresenterPage() {
   const { t } = useTranslation()
   const { presentationId = '' } = useParams()
@@ -33,11 +37,25 @@ export function PresenterPage() {
     return <Message text={t('presenter.notReady')} />
   }
 
-  return <Presenter presentation={presentation.data} />
+  return <Rehearsal presentation={presentation.data} />
+}
+
+/** The presenter view on its own: the position lives in this browser and goes nowhere else. */
+function Rehearsal({ presentation }: { presentation: PresentationDetail }) {
+  const { t } = useTranslation()
+  const [position, setPosition] = useState(firstPosition)
+
+  return (
+    <Presenter presentationId={presentation.id} slides={presentation.slides} position={position} onNavigate={setPosition}>
+      <Link className={presenterStyles.option} to="/admin">
+        {t('presenter.controls.exit')}
+      </Link>
+    </Presenter>
+  )
 }
 
 /** A full-page notice with the way back to the list. */
-function Message({ text }: { text: string }) {
+export function Message({ text }: { text: string }) {
   const { t } = useTranslation()
 
   return (

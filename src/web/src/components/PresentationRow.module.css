@@ -39,24 +39,56 @@
   margin: var(--space-2) 0 0;
 }
 
-/* Ink: the main action of the row. */
-.present {
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.start,
+.rehearse {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 44px;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Ink: the main action of the row. */
+.start {
+  border: 0;
   background: var(--color-tinta);
   color: var(--color-blanco);
   font-weight: 700;
-  text-decoration: none;
 }
 
-.present:hover {
+.start:hover:not(:disabled) {
   background: var(--color-tinta-hover);
 }
 
-.present:focus-visible {
+.start:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Quieter: going through the deck alone, with no students. */
+.rehearse {
+  border: 2px solid var(--color-renglon);
+  background: var(--color-blanco);
+  color: var(--color-grafito);
+}
+
+.rehearse:hover {
+  border-color: var(--color-grafito-suave);
+}
+
+.start:focus-visible,
+.rehearse:focus-visible {
   outline: 3px solid var(--color-tinta);
   outline-offset: 2px;
 }
@@ -66,8 +98,13 @@
     grid-template-columns: 6rem 1fr;
   }
 
-  .present {
+  .actions {
     grid-column: 1 / -1;
-    justify-content: center;
+    justify-content: stretch;
+  }
+
+  .start,
+  .rehearse {
+    flex: 1;
   }
 }
