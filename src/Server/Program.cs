@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Server.Features.AdminAccess;
 using Server.Features.Import;
+using Server.Features.Join;
 using Server.Features.Presentations;
+using Server.Features.Sessions;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Storage;
+using Server.Realtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +33,13 @@ builder.Services.AddSingleton<ImportQueue>();
 builder.Services.AddScoped<PresentationImporter>();
 builder.Services.AddHostedService<ImportWorker>();
 
+// Live sessions: who may be in one, who is connected right now, and the hub itself.
+builder.Services.AddSessionAccess();
+builder.Services.AddSingleton<ILiveSessionStore, InMemoryLiveSessionStore>();
+builder.Services.AddSingleton<DisplayTokenStore>();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
 builder.Services.AddSingleton(TimeProvider.System);
 // Enums travel as their names ("Ready"), not as numbers.
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -47,6 +57,12 @@ builder.Services.AddRateLimiter(options =>
         RateLimitPartition.GetFixedWindowLimiter(
             http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1) }));
+    // Per IP too, but generous: a whole classroom often shares one public address, and forty
+    // students join within the same minute. Still far too slow to guess an 8-digit code.
+    options.AddPolicy(JoinEndpoints.RateLimitPolicy, http =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions { PermitLimit = 300, Window = TimeSpan.FromMinutes(1) }));
 });
 
 builder.Services.AddProblemDetails();
@@ -90,6 +106,9 @@ var admin = app.MapGroup("/api/admin").RequireAuthorization(AdminAccessEndpoints
 app.MapAdminAccessEndpoints(admin);
 admin.MapPresentationEndpoints(
     app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<ImportOptions>>().Value);
+app.MapSessionEndpoints(admin);
+app.MapJoinEndpoints();
+app.MapHub<SessionHub>(SessionHub.Path);
 
 // Unknown API routes are a 404, not the React page.
 app.Map("/api/{**rest}", () => Results.Problem(statusCode: StatusCodes.Status404NotFound));

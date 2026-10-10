@@ -4,16 +4,17 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Abiertos
 
+- [ ] **Revisar a posteriori las decisiones D-77 a D-82** del servidor del M3 ([decisiones.md](decisiones.md)). La que más pide tu criterio es la **D-78**: la ventana para compartir muestra cuántos están conectados y no sus nombres, porque el texto de consentimiento promete que solo el profesor los ve. _(Nuevo)_
 - [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
 
 ## Antes de salir a producción
 
-- **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes. Obligatorio antes de usar la app con estudiantes reales. _(Cambió: pospuesto por Esteban hasta este momento)_
-- **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador. _(Cambió: pospuesto por Esteban hasta este momento)_
+- **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes. Obligatorio antes de usar la app con estudiantes reales.
+- **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador.
 
 ## Más adelante (sin acción por ahora)
 
-- **Experiencia de uso de la vista del presentador** y un guion que se desplace como teleprompter real (velocidad, tamaño de letra). Hoy el guion es estático (D-76). Referencia: el teleprompter HTML de `repos/teleprompter` que menciona el diseño §4. _(Nuevo)_
+- **Experiencia de uso de la vista del presentador** y un guion que se desplace como teleprompter real (velocidad, tamaño de letra). Hoy el guion es estático (D-76). Referencia: el teleprompter HTML de `repos/teleprompter` que menciona el diseño §4.
 - Un deck real con **diapositivas ocultas** y otro con **fuentes poco comunes**, para probar esos dos casos con material real. Los seis decks usados no tienen ninguno de los dos; hoy solo están cubiertos con archivos sintéticos.
 - **Borrar una presentación.** Hoy no se puede: las importaciones fallidas y las de prueba se quedan en la lista.
 - **Recordar las preferencias del presentador** (guion visible, modo) entre visitas, y la diapositiva al recargar la página. Lo segundo lo resuelve el M3, donde el servidor guarda la posición.
@@ -26,11 +27,12 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Resueltos
 
-- [x] Decisiones D-49 a D-71 aprobadas por Esteban (D-72). _(Nuevo)_
-- [x] Revisión de código: Claude antes de fusionar, Esteban a posteriori; sin Copilot (D-73). _(Nuevo)_
-- [x] Voseo confirmado en los textos de la interfaz (D-74). _(Nuevo)_
-- [x] Tipos de Node de vuelta en la versión 24 (D-75). _(Nuevo)_
-- [x] Vista del presentador probada por Esteban y aceptada como punto de partida (D-76). _(Nuevo)_
+- [x] M3, parte del servidor: sesiones, entrada de estudiantes y hub de SignalR. _(Nuevo)_
+- [x] Decisiones D-49 a D-71 aprobadas por Esteban (D-72).
+- [x] Revisión de código: Claude antes de fusionar, Esteban a posteriori; sin Copilot (D-73).
+- [x] Voseo confirmado en los textos de la interfaz (D-74).
+- [x] Tipos de Node de vuelta en la versión 24 (D-75).
+- [x] Vista del presentador probada por Esteban y aceptada como punto de partida (D-76).
 - [x] M2 (vista del presentador) terminado: diapositiva, guion en dos modos, ocultable, y navegación por botones y teclado.
 - [x] Hooks de pre-commit activos también en la copia de Esteban (`npm install` hecho).
 - [x] Dependabot: Claude revisa y fusiona los seguros (D-68). Primera tanda: Node 25 rechazado (D-69); TypeScript 7 y tipos de Node 26 fusionados por Esteban.

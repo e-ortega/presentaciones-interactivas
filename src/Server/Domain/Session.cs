@@ -2,6 +2,7 @@ namespace Server.Domain;
 
 public enum SessionStatus
 {
+    /// <summary>Waiting room: the code is shown and students come in.</summary>
     Lobby,
     Live,
     Ended,
@@ -36,4 +37,46 @@ public class Session
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? StartedAt { get; private set; }
     public DateTimeOffset? EndedAt { get; private set; }
+
+    /// <summary>Students can come in during the lobby and after the class started, never once it ended.</summary>
+    public bool CanBeJoined => Status != SessionStatus.Ended;
+
+    public void Start(DateTimeOffset now)
+    {
+        if (Status != SessionStatus.Lobby)
+        {
+            throw new InvalidOperationException($"Only a session in the lobby can start; this one is {Status}.");
+        }
+
+        Status = SessionStatus.Live;
+        StartedAt = now;
+    }
+
+    /// <summary>
+    /// Moves to a slide and step (D-26). The caller checks that the position exists in the deck;
+    /// the session only knows that it must be live.
+    /// </summary>
+    public void GoTo(int slideIndex, int stepIndex)
+    {
+        if (Status != SessionStatus.Live)
+        {
+            throw new InvalidOperationException($"Only a live session can change slide; this one is {Status}.");
+        }
+
+        ArgumentOutOfRangeException.ThrowIfNegative(slideIndex);
+        ArgumentOutOfRangeException.ThrowIfNegative(stepIndex);
+        CurrentSlideIndex = slideIndex;
+        CurrentStepIndex = stepIndex;
+    }
+
+    public void End(DateTimeOffset now)
+    {
+        if (Status == SessionStatus.Ended)
+        {
+            throw new InvalidOperationException("The session has already ended.");
+        }
+
+        Status = SessionStatus.Ended;
+        EndedAt = now;
+    }
 }
