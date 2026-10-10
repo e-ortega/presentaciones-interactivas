@@ -110,7 +110,9 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 ## 8. Flujo de trabajo y CI/CD
 
 - **Ramas:** `main` protegida con el ruleset `pr_main`: pull request obligatorio, los tres trabajos del CI en verde y solo fusión "squash". Cada hito o tarea va en una rama corta (`feat/m1-import`) con pull request. Commits en formato convencional (`feat:`, `fix:`, `docs:`).
-- **GitHub Actions** en cada pull request: compilar y probar .NET, `npm ci`, lint, pruebas y build del frontend.
+- **GitHub Actions** en cada pull request: compilar y probar .NET, `npm ci`, lint, pruebas y build del frontend, y la prueba de humo de la imagen Docker.
+- **Verificaciones estrictas (D-60):** en el servidor, todo aviso del compilador o de los analizadores detiene la compilación (`Directory.Build.props`) y el CI comprueba el formato con `dotnet format --verify-no-changes`. En el frontend, `oxlint --type-aware --deny-warnings`. Apagar una regla exige dejar el motivo escrito junto a ella.
+- **Revisión antes de fusionar (D-61):** el diff de cada pull request lo revisa alguien o algo distinto de quien lo escribió; los hallazgos se corrigen o se anotan en el pull request. La plantilla `.github/pull_request_template.md` lleva la lista.
 - **Despliegue (M5):** al fusionar en `main`, se construye la imagen, se publica en GitHub Container Registry y se actualiza Container Apps. Autenticación a Azure con **OIDC** (credenciales federadas): sin secretos de Azure guardados en GitHub.
 - **Secretos:** `dotnet user-secrets` en local; secretos de Container Apps en Azure. Nunca en el repo.
 

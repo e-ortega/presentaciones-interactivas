@@ -22,7 +22,8 @@ export function jsonResponse(body: unknown, status = 200): Response {
  */
 export function stubFetch(routes: Record<string, Response | (() => Response)>) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-    const key = `${init?.method ?? 'GET'} ${String(input)}`
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const key = `${init?.method ?? 'GET'} ${url}`
     const route = routes[key]
     if (route === undefined) {
       throw new Error(`Unexpected request in test: ${key}`)

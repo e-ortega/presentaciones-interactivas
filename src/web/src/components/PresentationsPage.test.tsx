@@ -68,7 +68,11 @@ test('uploads the chosen file and shows it in the list while it is converted', a
 
   expect(await screen.findByText('Semana 02')).toBeInTheDocument()
   expect(screen.getByText(/En cola para convertir/)).toBeInTheDocument()
-  const body = fetchMock.mock.calls.find(([, init]) => init?.method === 'POST')![1]!.body as FormData
+  const post = fetchMock.mock.calls.find(([, init]) => init?.method === 'POST')
+  const body = post?.[1]?.body
+  if (!(body instanceof FormData)) {
+    throw new Error('The upload did not send a form.')
+  }
   expect(body.get('file')).toEqual(pptx)
 })
 

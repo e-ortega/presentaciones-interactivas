@@ -1,0 +1,11 @@
+<Project>
+  <!-- Applies to every project in the repository. -->
+  <PropertyGroup>
+    <!-- A warning is a defect waiting to be noticed: the build fails instead. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- .NET code analyzers (correctness, security, performance), recommended set. -->
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <!-- Code style rules from .editorconfig are checked by the compiler too. -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+</Project>
