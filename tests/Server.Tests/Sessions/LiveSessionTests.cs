@@ -175,13 +175,14 @@ public sealed class LiveSessionTests(SqlServerFixture sql) : IAsyncDisposable
         var scenario = await StartScenarioAsync();
         var (studentBrowser, _) = await scenario.JoinedStudentAsync("Ana", "ana@example.com");
 
-        // A student asking to be the presenter or the display: the server closes the connection.
-        await (await studentBrowser.ConnectAsync(scenario.Session.Id, ClientRole.Presenter)).ClosedAsync();
-        await (await studentBrowser.ConnectAsync(scenario.Session.Id, ClientRole.Display)).ClosedAsync();
+        // A student asking to be the presenter or the display: the server closes the connection
+        // and says why, so the page does not keep retrying.
+        await (await studentBrowser.ConnectAsync(scenario.Session.Id, ClientRole.Presenter)).AssertRefusedAsync(HubErrors.NotAllowed);
+        await (await studentBrowser.ConnectAsync(scenario.Session.Id, ClientRole.Display)).AssertRefusedAsync(HubErrors.NotAllowed);
 
         // The teacher has not joined as a student, and a session that does not exist has no one.
-        await (await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Participant)).ClosedAsync();
-        await (await scenario.Teacher.ConnectAsync(Guid.NewGuid(), ClientRole.Presenter)).ClosedAsync();
+        await (await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Participant)).AssertRefusedAsync(HubErrors.NotAllowed);
+        await (await scenario.Teacher.ConnectAsync(Guid.NewGuid(), ClientRole.Presenter)).AssertRefusedAsync(HubErrors.NotAllowed);
 
         // No cookie at all does not even get to connect.
         await Assert.ThrowsAsync<HttpRequestException>(
@@ -211,25 +212,54 @@ public sealed class LiveSessionTests(SqlServerFixture sql) : IAsyncDisposable
         await other.NextAsync<HubProbe.SlideChanged>();
         await Assert.ThrowsAsync<TimeoutException>(() => student.NextAsync<HubProbe.SlideChanged>().WaitAsync(TimeSpan.FromMilliseconds(500), TestContext.Current.CancellationToken));
 
-        // And it cannot get back in: not by reconnecting, not by joining again, not to the slides.
-        await (await browser.ConnectAsync(scenario.Session.Id, ClientRole.Participant)).ClosedAsync();
+        // And it cannot get back in: not by reconnecting (it is told why), not by joining again,
+        // not to the slides.
+        await (await browser.ConnectAsync(scenario.Session.Id, ClientRole.Participant)).AssertRefusedAsync(HubErrors.Removed);
         var rejoin = await browser.JoinAsync(scenario.Session.Code, "Ana", "ana@example.com");
         Assert.Equal(HttpStatusCode.Forbidden, rejoin.StatusCode);
         Assert.Equal(nameof(JoinError.Removed), await TestBrowser.ErrorCodeAsync(rejoin));
-        Assert.Equal(HttpStatusCode.NotFound, (await browser.GetAsync(SlideUrl(scenario, 0))).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await browser.GetAsync(SlideUrl(scenario, 1))).StatusCode);
     }
 
     [Fact]
-    public async Task The_same_email_is_the_same_person_whatever_the_capitals_and_may_fix_their_name()
+    public async Task The_same_email_is_the_same_person_whatever_the_capitals()
     {
         var scenario = await StartScenarioAsync();
         var presenter = await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Presenter);
-        await scenario.JoinedStudentAsync("Anna", "ana@example.com");
+        await scenario.JoinedStudentAsync("Ana", "ana@example.com");
 
-        await scenario.JoinedStudentAsync("Ana Mora", "  ANA@Example.com ");
+        await scenario.JoinedStudentAsync("Ana", "  ANA@Example.com "); // her phone, after her laptop
 
-        var update = await presenter.NextAsync<AttendanceUpdate>(u => u.Attendees is [{ DisplayName: "Ana Mora" }]);
+        var update = await presenter.NextAsync<AttendanceUpdate>(u => u.Attendees is [{ Connected: true }] && u.ConnectedCount == 1);
         Assert.Single(update.Attendees!);
+    }
+
+    [Fact]
+    public async Task A_student_can_fix_their_own_name_from_the_browser_they_joined_with()
+    {
+        var scenario = await StartScenarioAsync();
+        var presenter = await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Presenter);
+        var (browser, _) = await scenario.JoinedStudentAsync("Anna Mroa", "ana@example.com");
+
+        (await browser.JoinAsync(scenario.Session.Code, "Ana Mora", "ana@example.com")).EnsureSuccessStatusCode();
+        await browser.ConnectAsync(scenario.Session.Id, ClientRole.Participant);
+
+        await presenter.NextAsync<AttendanceUpdate>(u => u.Attendees is [{ DisplayName: "Ana Mora" }]);
+    }
+
+    [Fact]
+    public async Task Someone_else_typing_a_classmates_email_cannot_change_the_name_the_teacher_sees()
+    {
+        var scenario = await StartScenarioAsync();
+        var presenter = await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Presenter);
+        await scenario.JoinedStudentAsync("Ana Mora", "ana@example.com");
+        await presenter.NextAsync<AttendanceUpdate>(u => u.ConnectedCount == 1);
+
+        // Emails are not verified per session (D-18), so this gets in as Ana; it must not rename her.
+        await scenario.JoinedStudentAsync("Something rude", "ana@example.com");
+
+        var update = await presenter.NextAsync<AttendanceUpdate>();
+        Assert.Equal(["Ana Mora"], update.Attendees!.Select(attendee => attendee.DisplayName));
     }
 
     [Theory]
@@ -300,14 +330,71 @@ public sealed class LiveSessionTests(SqlServerFixture sql) : IAsyncDisposable
         Assert.Equal(HttpStatusCode.Unauthorized, (await outsider.GetAsync(SlideUrl(scenario, 1))).StatusCode);
 
         await presenter.Connection.InvokeAsync(nameof(SessionHub.StartSession), TestContext.Current.CancellationToken);
+        await presenter.Connection.InvokeAsync(nameof(SessionHub.GoTo), 1, 0, TestContext.Current.CancellationToken);
 
         var image = await student.GetAsync(SlideUrl(scenario, 1));
         Assert.Equal(HttpStatusCode.OK, image.StatusCode);
         Assert.Equal(FakeSlideRenderer.ImageBytes(1), await image.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken));
-        Assert.Equal(HttpStatusCode.NotFound, (await student.GetAsync(SlideUrl(scenario, 9))).StatusCode);
 
         await presenter.Connection.InvokeAsync(nameof(SessionHub.EndSession), TestContext.Current.CancellationToken);
         Assert.Equal(HttpStatusCode.NotFound, (await student.GetAsync(SlideUrl(scenario, 1))).StatusCode);
+    }
+
+    [Fact]
+    public async Task A_student_can_only_fetch_the_slide_on_screen_never_the_ones_not_shown_yet()
+    {
+        var scenario = await StartScenarioAsync();
+        var presenter = await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Presenter);
+        var (student, _) = await scenario.JoinedStudentAsync("Ana", "ana@example.com");
+        await presenter.Connection.InvokeAsync(nameof(SessionHub.StartSession), TestContext.Current.CancellationToken);
+
+        // On slide 0: the next slides may hold the answers to an exercise.
+        Assert.Equal(HttpStatusCode.OK, (await student.GetAsync(SlideUrl(scenario, 0))).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await student.GetAsync(SlideUrl(scenario, 1))).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await student.GetAsync(SlideUrl(scenario, 2))).StatusCode);
+
+        await presenter.Connection.InvokeAsync(nameof(SessionHub.GoTo), 2, 0, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, (await student.GetAsync(SlideUrl(scenario, 2))).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await student.GetAsync(SlideUrl(scenario, 0))).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await student.GetAsync(SlideUrl(scenario, 9))).StatusCode);
+
+        // The teacher, and the window the teacher shares, are not tied to the current slide.
+        Assert.Equal(HttpStatusCode.OK, (await scenario.Teacher.GetAsync(SlideUrl(scenario, 0))).StatusCode);
+    }
+
+    [Fact]
+    public async Task Once_the_class_ends_its_former_members_only_learn_that_it_ended()
+    {
+        var scenario = await StartScenarioAsync();
+        var projector = scenario.NewBrowser();
+        var token = (await TestBrowser.ReadAsync<DisplayToken>(
+            await scenario.Teacher.PostAsync($"/api/admin/sessions/{scenario.Session.Id}/display-token"))).Token;
+        (await projector.PostAsync("/api/display/access", new RedeemDisplayTokenRequest(token))).EnsureSuccessStatusCode();
+        var presenter = await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Presenter);
+        var (student, studentHub) = await scenario.JoinedStudentAsync("Ana", "ana@example.com");
+        await presenter.Connection.InvokeAsync(nameof(SessionHub.StartSession), TestContext.Current.CancellationToken);
+        await presenter.Connection.InvokeAsync(nameof(SessionHub.EndSession), TestContext.Current.CancellationToken);
+        await studentHub.NextAsync<HubProbe.Ended>();
+        await studentHub.Connection.StopAsync(TestContext.Current.CancellationToken);
+
+        // Reloading the page afterwards: both are told the class ended, and nothing else.
+        var studentAgain = await (await student.ConnectAsync(scenario.Session.Id, ClientRole.Participant)).NextAsync<SessionSnapshot>();
+        var displayAgain = await (await projector.ConnectAsync(scenario.Session.Id, ClientRole.Display)).NextAsync<SessionSnapshot>();
+        foreach (var snapshot in new[] { studentAgain, displayAgain })
+        {
+            Assert.Equal(SessionStatus.Ended, snapshot.Status);
+            Assert.Null(snapshot.Code); // free for another session now
+            Assert.Null(snapshot.Attendance);
+        }
+
+        Assert.Equal(HttpStatusCode.NotFound, (await projector.GetAsync(SlideUrl(scenario, 0))).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await scenario.Teacher.GetAsync(SlideUrl(scenario, 0))).StatusCode);
+
+        // And the server keeps nothing in memory for a class that is over.
+        var store = Assert.IsType<InMemoryLiveSessionStore>(
+            scenario.Factory.Services.GetService(typeof(ILiveSessionStore)));
+        Assert.Equal(0, store.TrackedSessions);
     }
 
     [Fact]

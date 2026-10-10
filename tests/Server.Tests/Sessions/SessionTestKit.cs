@@ -124,7 +124,7 @@ public sealed class HubProbe
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
 
     private readonly Channel<object> _messages = Channel.CreateUnbounded<object>();
-    private readonly TaskCompletionSource _closed = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource<string?> _closed = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly TaskCompletionSource _ready = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     public HubProbe(HubConnection connection)
@@ -140,9 +140,9 @@ public sealed class HubProbe
         connection.On(nameof(ISessionClient.SessionEnded), () => Record(new Ended()));
         connection.On<AttendanceUpdate>(nameof(ISessionClient.AttendanceChanged), Record);
         connection.On(nameof(ISessionClient.RemovedFromSession), () => Record(new Removed()));
-        connection.Closed += _ =>
+        connection.Closed += error =>
         {
-            _closed.TrySetResult();
+            _closed.TrySetResult(error?.Message);
             return Task.CompletedTask;
         };
     }
@@ -187,8 +187,18 @@ public sealed class HubProbe
     public Task ReadyOrClosedAsync() =>
         Task.WhenAny(_ready.Task, _closed.Task).WaitAsync(Timeout, TestContext.Current.CancellationToken);
 
-    /// <summary>Completes when the server closes the connection, as it does to a client it refuses.</summary>
-    public Task ClosedAsync() => _closed.Task.WaitAsync(Timeout, TestContext.Current.CancellationToken);
+    /// <summary>
+    /// Completes when the server closes the connection, as it does to a client it refuses, with
+    /// the reason it gave (one of <see cref="HubErrors"/>, inside the close message).
+    /// </summary>
+    public Task<string?> ClosedAsync() => _closed.Task.WaitAsync(Timeout, TestContext.Current.CancellationToken);
+
+    /// <summary>Asserts the server refused this connection for that reason.</summary>
+    public async Task AssertRefusedAsync(string reason)
+    {
+        var message = await ClosedAsync();
+        Assert.Contains(reason, message ?? "(closed without a reason)", StringComparison.Ordinal);
+    }
 
     private void Record(object message) => _messages.Writer.TryWrite(message);
 }

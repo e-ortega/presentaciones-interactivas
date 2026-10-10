@@ -26,31 +26,21 @@ public class SessionHub(AppDbContext db, ILiveSessionStore live, TimeProvider ti
     public static string DisplayGroup(Guid sessionId) => $"session:{sessionId}:display";
     private static string AttendanceGroup(Guid attendanceId) => $"attendance:{attendanceId}";
 
+    /// <summary>
+    /// A refused connection is closed with a HubException: its message (see <see cref="HubErrors"/>)
+    /// reaches the client, which can then say "you were removed" instead of retrying forever.
+    /// </summary>
     public override async Task OnConnectedAsync()
     {
-        var connection = await ResolveConnectionAsync();
-        if (connection is null)
-        {
-            Context.Abort(); // wrong session, or a role this browser has no right to
-            return;
-        }
-
+        var (connection, status) = await ResolveConnectionAsync();
         Context.Items[ConnectionKey] = connection;
-        await Groups.AddToGroupAsync(Context.ConnectionId, SessionGroup(connection.SessionId));
 
-        switch (connection.Role)
+        // An ended session has nothing left to follow: its former members get the snapshot
+        // that says so, and are not registered anywhere. The teacher can still look at it.
+        var follows = status != SessionStatus.Ended || connection.Role == ClientRole.Presenter;
+        if (follows)
         {
-            case ClientRole.Presenter:
-                await Groups.AddToGroupAsync(Context.ConnectionId, PresenterGroup(connection.SessionId));
-                break;
-            case ClientRole.Display:
-                await Groups.AddToGroupAsync(Context.ConnectionId, DisplayGroup(connection.SessionId));
-                break;
-            case ClientRole.Participant:
-                await Groups.AddToGroupAsync(Context.ConnectionId, AttendanceGroup(connection.AttendanceId!.Value));
-                live.Connect(connection.SessionId, connection.AttendanceId.Value, Context.ConnectionId);
-                await BroadcastAttendanceAsync(connection.SessionId);
-                break;
+            await JoinGroupsAsync(connection);
         }
 
         await Clients.Caller.SessionSnapshot(await BuildSnapshotAsync(connection));
@@ -58,7 +48,7 @@ public class SessionHub(AppDbContext db, ILiveSessionStore live, TimeProvider ti
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        if (Context.Items[ConnectionKey] is Connection { Role: ClientRole.Participant } connection)
+        if (CurrentConnection() is { Role: ClientRole.Participant } connection)
         {
             live.Disconnect(connection.SessionId, connection.AttendanceId!.Value, Context.ConnectionId);
             await BroadcastAttendanceAsync(connection.SessionId);
@@ -89,7 +79,11 @@ public class SessionHub(AppDbContext db, ILiveSessionStore live, TimeProvider ti
             throw new HubException(HubErrors.InvalidState);
         }
 
-        var stepCounts = await StepCountsAsync(session.PresentationId);
+        var stepCounts = await db.Slides
+            .Where(s => s.PresentationId == session.PresentationId)
+            .OrderBy(s => s.Index)
+            .Select(s => s.Steps.Count)
+            .ToListAsync();
         if (slideIndex < 0 || slideIndex >= stepCounts.Count || stepIndex < 0 || stepIndex >= stepCounts[slideIndex])
         {
             throw new HubException(HubErrors.InvalidPosition);
@@ -135,38 +129,88 @@ public class SessionHub(AppDbContext db, ILiveSessionStore live, TimeProvider ti
 
     // --- Helpers ---------------------------------------------------------------------------
 
-    /// <summary>Reads the session and role the client asked for, and checks its cookies allow them.</summary>
-    private async Task<Connection?> ResolveConnectionAsync()
+    private Connection? CurrentConnection() =>
+        Context.Items.TryGetValue(ConnectionKey, out var value) ? value as Connection : null;
+
+    /// <summary>
+    /// Reads the session and role the client asked for and checks its cookies allow them.
+    /// Throws a HubException with the reason when they do not.
+    /// </summary>
+    private async Task<(Connection Connection, SessionStatus Status)> ResolveConnectionAsync()
     {
         var query = Context.GetHttpContext()?.Request.Query;
         if (query is null
             || !Guid.TryParse(query["sessionId"], out var sessionId)
             || !Enum.TryParse<ClientRole>(query["role"], ignoreCase: false, out var role)
             || !Enum.IsDefined(role)
-            || Context.User is not { } user
-            || !await db.Sessions.AnyAsync(s => s.Id == sessionId))
+            || Context.User is not { } user)
         {
-            return null;
+            throw new HubException(HubErrors.NotAllowed);
         }
+
+        // The same answer for "no such session" and "not yours": no hint about which exist.
+        var status = await db.Sessions.Where(s => s.Id == sessionId).Select(s => (SessionStatus?)s.Status).FirstOrDefaultAsync()
+            ?? throw new HubException(HubErrors.NotAllowed);
 
         switch (role)
         {
             case ClientRole.Presenter when SessionAccess.IsTeacher(user):
             case ClientRole.Display when SessionAccess.IsDisplayOf(user, sessionId):
-                return new Connection(sessionId, role, AttendanceId: null);
+                return (new Connection(sessionId, role, AttendanceId: null), status);
 
             case ClientRole.Participant when SessionAccess.AttendanceIn(user, sessionId) is { } attendanceId:
-                var admitted = await db.Attendances.AnyAsync(a => a.Id == attendanceId && a.SessionId == sessionId && a.Admitted);
-                return admitted ? new Connection(sessionId, role, attendanceId) : null;
+                if (!await IsAdmittedAsync(sessionId, attendanceId))
+                {
+                    throw new HubException(HubErrors.Removed);
+                }
+
+                return (new Connection(sessionId, role, attendanceId), status);
 
             default:
-                return null;
+                throw new HubException(HubErrors.NotAllowed);
         }
     }
 
+    private async Task JoinGroupsAsync(Connection connection)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, SessionGroup(connection.SessionId));
+
+        switch (connection.Role)
+        {
+            case ClientRole.Presenter:
+                await Groups.AddToGroupAsync(Context.ConnectionId, PresenterGroup(connection.SessionId));
+                break;
+
+            case ClientRole.Display:
+                await Groups.AddToGroupAsync(Context.ConnectionId, DisplayGroup(connection.SessionId));
+                break;
+
+            case ClientRole.Participant:
+                var attendanceId = connection.AttendanceId!.Value;
+                await Groups.AddToGroupAsync(Context.ConnectionId, AttendanceGroup(attendanceId));
+                live.Connect(connection.SessionId, attendanceId, Context.ConnectionId);
+
+                // The teacher may have removed this participant between the check on connecting
+                // and the line above. From here on the store knows this connection, so a removal
+                // finds it; a removal that already happened is caught by looking once more.
+                if (!await IsAdmittedAsync(connection.SessionId, attendanceId))
+                {
+                    live.Disconnect(connection.SessionId, attendanceId, Context.ConnectionId);
+                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, SessionGroup(connection.SessionId));
+                    throw new HubException(HubErrors.Removed);
+                }
+
+                await BroadcastAttendanceAsync(connection.SessionId);
+                break;
+        }
+    }
+
+    private Task<bool> IsAdmittedAsync(Guid sessionId, Guid attendanceId) =>
+        db.Attendances.AnyAsync(a => a.Id == attendanceId && a.SessionId == sessionId && a.Admitted);
+
     private async Task<Session> LoadSessionAsPresenterAsync()
     {
-        if (Context.Items[ConnectionKey] is not Connection { Role: ClientRole.Presenter } connection)
+        if (CurrentConnection() is not { Role: ClientRole.Presenter } connection)
         {
             throw new HubException(HubErrors.NotAllowed);
         }
@@ -177,27 +221,30 @@ public class SessionHub(AppDbContext db, ILiveSessionStore live, TimeProvider ti
 
     private async Task<SessionSnapshot> BuildSnapshotAsync(Connection connection)
     {
-        var session = await db.Sessions.AsNoTracking().FirstAsync(s => s.Id == connection.SessionId);
-        var title = await db.Presentations.Where(p => p.Id == session.PresentationId).Select(p => p.Title).FirstAsync();
-        var isParticipant = connection.Role == ClientRole.Participant;
+        var session = await db.Sessions
+            .Where(s => s.Id == connection.SessionId)
+            .Select(s => new { s.Status, s.CurrentSlideIndex, s.CurrentStepIndex, s.Code, s.PresentationId })
+            .FirstAsync();
+        var presentation = await db.Presentations
+            .Where(p => p.Id == session.PresentationId)
+            .Select(p => new { p.Title, StepCounts = p.Slides.OrderBy(s => s.Index).Select(s => s.Steps.Count).ToList() })
+            .FirstAsync();
+
+        // Students are already in and need neither. Once the session ended its code is free for
+        // another session, so only the teacher still sees it.
+        var isPresenter = connection.Role == ClientRole.Presenter;
+        var seesLobbyData = isPresenter || (connection.Role == ClientRole.Display && session.Status != SessionStatus.Ended);
 
         return new SessionSnapshot(
-            session.Id,
+            connection.SessionId,
             session.Status,
-            title,
+            presentation.Title,
             session.CurrentSlideIndex,
             session.CurrentStepIndex,
-            await StepCountsAsync(session.PresentationId),
-            Code: isParticipant ? null : session.Code,
-            Attendance: isParticipant ? null : await BuildAttendanceAsync(session.Id, withNames: connection.Role == ClientRole.Presenter));
+            presentation.StepCounts,
+            Code: seesLobbyData ? session.Code : null,
+            Attendance: seesLobbyData ? await BuildAttendanceAsync(connection.SessionId, withNames: isPresenter) : null);
     }
-
-    private async Task<IReadOnlyList<int>> StepCountsAsync(Guid presentationId) =>
-        await db.Slides
-            .Where(s => s.PresentationId == presentationId)
-            .OrderBy(s => s.Index)
-            .Select(s => s.Steps.Count)
-            .ToListAsync();
 
     private async Task BroadcastAttendanceAsync(Guid sessionId)
     {

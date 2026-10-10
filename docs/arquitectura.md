@@ -42,7 +42,7 @@ _Propuesta de Claude, 9 oct 2026; aprobada por Esteban (D-48). Complementa el di
 
 | Dirección | Mensaje | Quién | Nota |
 |---|---|---|---|
-| Conexión | `/hubs/session?sessionId=…&role=Presenter\|Display\|Participant` | Todos | El servidor comprueba que las cookies den ese rol; si no, cierra la conexión (D-82) |
+| Conexión | `/hubs/session?sessionId=…&role=Presenter\|Display\|Participant` | Todos | El servidor comprueba que las cookies den ese rol; si no, cierra la conexión diciendo el motivo, `NotAllowed` o `Removed` (D-82) |
 | Cliente → servidor | `GoTo(slideIndex, stepIndex)` | Presentador | Solo con la sesión en vivo y hacia una posición que exista |
 | | `LaunchWidget(widgetId)` / `CloseLaunch(launchId)` / `RevealResults(launchId)` | Presentador | |
 | | `StartSession()` / `EndSession()` / `RemoveParticipant(attendanceId)` | Presentador | |
@@ -65,7 +65,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 |---|---|---|
 | **Profesor** | Clave de acceso (D-45) → cookie firmada, `HttpOnly`, `Secure` | `POST /api/access` cambia la clave por la cookie. Protege todo `/api/admin/*` y los métodos de presentador del hub |
 | **Ventana para compartir** | Token de un solo uso que genera el presentador al abrirla (`POST /api/admin/sessions/{id}/display-token`), válido 2 minutos; la ventana lo cambia por su cookie en `POST /api/display/access` | Evita que alguien con el código abra la ventana del profesor. En el mismo navegador del profesor basta su cookie |
-| **Estudiante** | `GET /api/join/{code}` le muestra a qué clase va a entrar; `POST /api/join/{code}` con nombre, correo y consentimiento → crea o reutiliza `Participant` (por correo) y `Attendance` → cookie firmada con el id de la asistencia | La misma cookie autentica la conexión de SignalR; si se recarga la página o se cae el wifi, vuelve como la misma persona. Queda admitido al entrar; el profesor puede sacarlo (D-77) |
+| **Estudiante** | `GET /api/join/{code}` le muestra a qué clase va a entrar; `POST /api/join/{code}` con nombre, correo y consentimiento → crea o reutiliza `Participant` (por correo) y `Attendance` → cookie firmada con el id de la asistencia | La misma cookie autentica la conexión de SignalR; si se recarga la página o se cae el wifi, vuelve como la misma persona. Queda admitido al entrar; el profesor puede sacarlo (D-77). El correo no se verifica por sesión: ver la limitación en D-84 |
 
 - **Código de sesión:** 8 dígitos aleatorios (`8888-6666`), únicos entre sesiones activas; deja de servir cuando la sesión termina.
 - **Llaves de las cookies:** se guardan en la base de datos (D-51), para que las cookies sigan valiendo cuando el contenedor se reinicia.
@@ -86,7 +86,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 ## 5. Archivos
 
 - Interfaz `IFileStorage`: disco local en desarrollo, Blob Storage **privado** en Azure.
-- Las imágenes de los pasos se sirven **a través de la app** (`GET /api/sessions/{id}/slides/{n}/steps/{m}`), que verifica que quien pide sea el presentador, la ventana para compartir o un estudiante admitido de esa sesión; al estudiante, solo mientras la clase está en vivo (D-82). Con caché del navegador.
+- Las imágenes de los pasos se sirven **a través de la app** (`GET /api/sessions/{id}/slides/{n}/steps/{m}`), que verifica quién pide: el presentador ve cualquier paso; la ventana para compartir de esa sesión, cualquiera hasta que termina; un estudiante admitido, **solo el paso que está en pantalla** y solo con la clase en vivo (D-83). Con caché del navegador.
 - El PDF de estudiante se sirve igual, solo si el profesor lo publicó.
 - **Al crecer:** URLs firmadas de corta duración o una CDN, para no pasar las imágenes por el contenedor.
 

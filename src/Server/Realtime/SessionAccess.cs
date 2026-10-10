@@ -49,6 +49,16 @@ public static class SessionAccess
     public static bool IsDisplayOf(ClaimsPrincipal user, Guid sessionId) =>
         IsTeacher(user) || IdentityFor(user, DisplayScheme, sessionId) is not null;
 
+    /// <summary>
+    /// The attendance this browser already joined the session with, read from its participant
+    /// cookie. For endpoints that anyone may call, where that cookie is not read automatically.
+    /// </summary>
+    public static async Task<Guid?> ParticipantAttendanceAsync(HttpContext http, Guid sessionId)
+    {
+        var result = await http.AuthenticateAsync(ParticipantScheme);
+        return result.Principal is { } principal ? AttendanceIn(principal, sessionId) : null;
+    }
+
     /// <summary>The attendance this browser joined the session with, if it did.</summary>
     public static Guid? AttendanceIn(ClaimsPrincipal user, Guid sessionId) =>
         Guid.TryParse(IdentityFor(user, ParticipantScheme, sessionId)?.FindFirst(AttendanceIdClaim)?.Value, out var attendanceId)

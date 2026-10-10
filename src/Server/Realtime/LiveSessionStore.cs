@@ -28,14 +28,23 @@ public interface ILiveSessionStore
 
 public class InMemoryLiveSessionStore : ILiveSessionStore
 {
+    // One lock for everything: a few dozen operations per class do not need more, and it
+    // lets a session's entry disappear with its last connection without racing a new one.
+    private readonly Lock _gate = new();
+
     // Per session: attendance -> its open connections (a student may have two tabs).
-    private readonly ConcurrentDictionary<Guid, Dictionary<Guid, HashSet<string>>> _sessions = new();
+    // Only sessions with someone connected have an entry, so nothing accumulates.
+    private readonly Dictionary<Guid, Dictionary<Guid, HashSet<string>>> _sessions = [];
 
     public void Connect(Guid sessionId, Guid attendanceId, string connectionId)
     {
-        var session = _sessions.GetOrAdd(sessionId, _ => []);
-        lock (session)
+        lock (_gate)
         {
+            if (!_sessions.TryGetValue(sessionId, out var session))
+            {
+                _sessions[sessionId] = session = [];
+            }
+
             if (!session.TryGetValue(attendanceId, out var connections))
             {
                 session[attendanceId] = connections = [];
@@ -47,49 +56,68 @@ public class InMemoryLiveSessionStore : ILiveSessionStore
 
     public void Disconnect(Guid sessionId, Guid attendanceId, string connectionId)
     {
-        if (!_sessions.TryGetValue(sessionId, out var session))
+        lock (_gate)
         {
-            return;
-        }
-
-        lock (session)
-        {
-            if (session.TryGetValue(attendanceId, out var connections)
+            if (_sessions.TryGetValue(sessionId, out var session)
+                && session.TryGetValue(attendanceId, out var connections)
                 && connections.Remove(connectionId)
                 && connections.Count == 0)
             {
                 session.Remove(attendanceId);
+                ForgetIfEmpty(sessionId, session);
             }
         }
     }
 
     public IReadOnlySet<Guid> ConnectedAttendances(Guid sessionId)
     {
-        if (!_sessions.TryGetValue(sessionId, out var session))
+        lock (_gate)
         {
-            return new HashSet<Guid>();
-        }
-
-        lock (session)
-        {
-            return session.Keys.ToHashSet();
+            return _sessions.TryGetValue(sessionId, out var session) ? session.Keys.ToHashSet() : [];
         }
     }
 
     public IReadOnlyList<string> Remove(Guid sessionId, Guid attendanceId)
     {
-        if (!_sessions.TryGetValue(sessionId, out var session))
+        lock (_gate)
         {
-            return [];
-        }
+            if (!_sessions.TryGetValue(sessionId, out var session) || !session.Remove(attendanceId, out var connections))
+            {
+                return [];
+            }
 
-        lock (session)
-        {
-            return session.Remove(attendanceId, out var connections) ? [.. connections] : [];
+            ForgetIfEmpty(sessionId, session);
+            return [.. connections];
         }
     }
 
-    public void Forget(Guid sessionId) => _sessions.TryRemove(sessionId, out _);
+    public void Forget(Guid sessionId)
+    {
+        lock (_gate)
+        {
+            _sessions.Remove(sessionId);
+        }
+    }
+
+    /// <summary>How many sessions have an entry. For tests: it must go back to zero.</summary>
+    public int TrackedSessions
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _sessions.Count;
+            }
+        }
+    }
+
+    private void ForgetIfEmpty(Guid sessionId, Dictionary<Guid, HashSet<string>> session)
+    {
+        if (session.Count == 0)
+        {
+            _sessions.Remove(sessionId);
+        }
+    }
 }
 
 /// <summary>

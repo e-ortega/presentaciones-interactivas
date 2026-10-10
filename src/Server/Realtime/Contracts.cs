@@ -60,10 +60,17 @@ public record AttendanceUpdate(int ConnectedCount, IReadOnlyList<Attendee>? Atte
 
 public record Attendee(Guid AttendanceId, string DisplayName, bool Connected);
 
-/// <summary>Reasons the hub refuses a call, sent as the message of a HubException.</summary>
+/// <summary>
+/// Reasons the hub refuses a connection or a call, sent as the message of a HubException.
+/// A refused connection is closed with one of these, so the client knows not to retry.
+/// </summary>
 public static class HubErrors
 {
+    /// <summary>These cookies do not give that role in that session, or there is no such session.</summary>
     public const string NotAllowed = "NotAllowed";
+
+    /// <summary>The teacher removed this participant from the session.</summary>
+    public const string Removed = "Removed";
     public const string InvalidPosition = "InvalidPosition";
     public const string InvalidState = "InvalidState";
     public const string NotFound = "NotFound";

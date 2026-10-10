@@ -60,6 +60,20 @@ public class LiveSessionStoreTests
     }
 
     [Fact]
+    public void A_session_with_nobody_connected_takes_no_memory()
+    {
+        var store = new InMemoryLiveSessionStore();
+        store.Connect(Session, Ana, "phone");
+        store.Connect(Session, Luis, "luis-phone");
+        Assert.Equal(1, store.TrackedSessions);
+
+        store.Disconnect(Session, Ana, "phone");
+        store.Remove(Session, Luis);
+
+        Assert.Equal(0, store.TrackedSessions);
+    }
+
+    [Fact]
     public void Sessions_do_not_see_each_others_participants()
     {
         var store = new InMemoryLiveSessionStore();

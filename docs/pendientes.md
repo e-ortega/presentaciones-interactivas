@@ -4,7 +4,7 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Abiertos
 
-- [ ] **Revisar a posteriori las decisiones D-77 a D-82** del servidor del M3 ([decisiones.md](decisiones.md)). La que más pide tu criterio es la **D-78**: la ventana para compartir muestra cuántos están conectados y no sus nombres, porque el texto de consentimiento promete que solo el profesor los ve. _(Nuevo)_
+- [ ] **Revisar a posteriori las decisiones D-77 a D-84** del servidor del M3 ([decisiones.md](decisiones.md)). La que más pide tu criterio es la **D-78**: la ventana para compartir muestra cuántos están conectados y no sus nombres, porque el texto de consentimiento promete que solo el profesor los ve. _(Nuevo)_
 - [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
 
 ## Antes de salir a producción
@@ -14,6 +14,8 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Más adelante (sin acción por ahora)
 
+- **Suplantación por correo (D-84).** Sin verificar el correo, alguien con el código puede entrar como un compañero. Lo resuelven las cuentas y grupos de la Fase 3; mientras tanto ayudaría el candado para cerrar la entrada. Conviene tenerlo presente antes de usar las respuestas para calificar. _(Nuevo)_
+- **Carga al entrar toda la clase.** Cada estudiante que se conecta cuesta unas 7 consultas pequeñas a la base y reenvía la lista de asistencia al profesor. Con 40 estudiantes es aceptable; medirlo en la prueba de carga del M3 y agrupar los avisos si hace falta. _(Nuevo)_
 - **Experiencia de uso de la vista del presentador** y un guion que se desplace como teleprompter real (velocidad, tamaño de letra). Hoy el guion es estático (D-76). Referencia: el teleprompter HTML de `repos/teleprompter` que menciona el diseño §4.
 - Un deck real con **diapositivas ocultas** y otro con **fuentes poco comunes**, para probar esos dos casos con material real. Los seis decks usados no tienen ninguno de los dos; hoy solo están cubiertos con archivos sintéticos.
 - **Borrar una presentación.** Hoy no se puede: las importaciones fallidas y las de prueba se quedan en la lista.

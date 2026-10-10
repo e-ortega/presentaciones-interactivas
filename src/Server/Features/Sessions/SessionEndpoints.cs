@@ -153,10 +153,11 @@ public static class SessionEndpoints
     {
         var session = await db.Sessions
             .Where(s => s.Id == id)
-            .Select(s => new { s.PresentationId, s.Status })
+            .Select(s => new { s.PresentationId, s.Status, s.CurrentSlideIndex, s.CurrentStepIndex })
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (session is null || !await MaySeeSlidesAsync(http, db, id, session.Status, cancellationToken))
+        var isOnScreen = session is not null && session.CurrentSlideIndex == slideIndex && session.CurrentStepIndex == stepIndex;
+        if (session is null || !await MaySeeStepAsync(http, db, id, session.Status, isOnScreen, cancellationToken))
         {
             // The same answer for "no such session" and "not yours": no hint about which exist.
             return Results.Problem(statusCode: StatusCodes.Status404NotFound);
@@ -175,24 +176,34 @@ public static class SessionEndpoints
             return Results.Problem(statusCode: StatusCodes.Status404NotFound);
         }
 
-        // "private": only this browser keeps it. Not "immutable" here: who may see it can change.
+        // "private": only this browser keeps it, and only what it was allowed to see.
         http.Response.Headers.CacheControl = "private, max-age=3600";
         return Results.Stream(stream, "image/png");
     }
 
     /// <summary>
-    /// The teacher always; the display window of this session; and a student who joined it and
-    /// was not removed, only while the class is live.
+    /// Who may see a step of a session's deck:
+    /// - the teacher, any step, always;
+    /// - the display window of this session, any step, until the session ends;
+    /// - a student who joined and was not removed: only the step on screen right now, while
+    ///   the class is live. Their view is tied to the teacher's (D-12), so slides not shown
+    ///   yet, which may hold the answers to an exercise, cannot be fetched ahead of time.
     /// </summary>
-    private static async Task<bool> MaySeeSlidesAsync(
-        HttpContext http, AppDbContext db, Guid sessionId, SessionStatus status, CancellationToken cancellationToken)
+    private static async Task<bool> MaySeeStepAsync(
+        HttpContext http, AppDbContext db, Guid sessionId, SessionStatus status, bool isOnScreen, CancellationToken cancellationToken)
     {
-        if (SessionAccess.IsDisplayOf(http.User, sessionId)) // includes the teacher
+        if (SessionAccess.IsTeacher(http.User))
         {
             return true;
         }
 
+        if (SessionAccess.IsDisplayOf(http.User, sessionId))
+        {
+            return status != SessionStatus.Ended;
+        }
+
         return status == SessionStatus.Live
+            && isOnScreen
             && SessionAccess.AttendanceIn(http.User, sessionId) is { } attendanceId
             && await db.Attendances.AnyAsync(a => a.Id == attendanceId && a.SessionId == sessionId && a.Admitted, cancellationToken);
     }

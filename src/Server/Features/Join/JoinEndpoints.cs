@@ -100,13 +100,12 @@ public static class JoinEndpoints
             attendance = new Attendance(session.Id, participant.Id, name, consentedAt: time.GetUtcNow(), NoticeVersion);
             db.Attendances.Add(attendance);
         }
-        else if (!attendance.Admitted)
+        else if (await SessionAccess.ParticipantAttendanceAsync(http, session.Id) == attendance.Id)
         {
-            return Problem(JoinError.Removed);
-        }
-        else
-        {
-            attendance.Rename(name); // same person coming back, perhaps from another device
+            // The same browser that joined before: it may fix its own name. Emails are not
+            // verified (D-18), so someone else typing this email gets in as this participant,
+            // but cannot change the name the teacher already sees.
+            attendance.Rename(name);
         }
 
         try
@@ -119,6 +118,12 @@ public static class JoinEndpoints
             db.Entry(attendance).State = EntityState.Detached;
             attendance = await db.Attendances
                 .FirstAsync(a => a.SessionId == session.Id && a.ParticipantId == participant.Id, cancellationToken);
+        }
+
+        // Checked last, on the attendance that is really in the database.
+        if (!attendance.Admitted)
+        {
+            return Problem(JoinError.Removed);
         }
 
         await SessionAccess.SignInParticipantAsync(http, session.Id, attendance.Id);
