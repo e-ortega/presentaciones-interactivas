@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # 1. Build the React app.
-FROM node:24-alpine AS web
+FROM node:25-alpine AS web
 WORKDIR /web
 COPY src/web/package.json src/web/package-lock.json ./
 # --ignore-scripts: the "prepare" script installs git hooks, which an image build does not need.
