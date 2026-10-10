@@ -54,7 +54,7 @@ _Propuesta de Claude, 9 oct 2026; aprobada por Esteban (D-48). Complementa el di
 | | `ResponseCount(launchId, answered, connected)` | Presentador y ventana para compartir | **Agrupado**: como máximo cada ~300 ms, no un mensaje por respuesta |
 | | `LiveTallies(launchId, tallies)` | Solo presentador | Antes de revelar |
 | | `ResultsRevealed(launchId, tallies, correctOption)` | Todos | |
-| | `AttendanceChanged(conectados, lista)` | Presentador y ventana para compartir | La ventana para compartir recibe solo el número; los nombres, solo el presentador (D-78) |
+| | `AttendanceChanged(conectados, lista)` | Presentador y ventana para compartir | Con los nombres para ambos (D-85); nunca el correo |
 | | `SessionEnded()` / `RemovedFromSession()` | Todos / el estudiante expulsado | |
 
 Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar en cada lado: `Realtime/Contracts.cs` y `src/web/src/realtime/contracts.ts`. Hay que mantenerlos iguales a mano; una prueba de integración conecta un cliente real y verifica los mensajes.
@@ -95,9 +95,9 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 | Tema | Propuesta | Por qué |
 |---|---|---|
 | Base | Vite + React + TypeScript (D-31, D-33) | |
-| Rutas | React Router: `/admin` (presentaciones, importar, widgets) y `/admin/presentations/:id/present` (presentador sin sesión, D-70) ya existen; con las sesiones llegan `/present/:sessionId`, `/display/:sessionId`, `/join` y `/s/:code` | Una ruta por ventana |
+| Rutas | React Router: ya existen `/admin` (presentaciones, importar, widgets), `/admin/presentations/:id/present` (ensayar sin sesión, D-70) y `/present/:sessionId` (sala de espera y presentador en vivo); faltan `/display/:sessionId`, `/join` y `/s/:code` | Una ruta por ventana |
 | Datos del servidor | **TanStack Query** para las llamadas REST | Caché, reintentos y estados de carga resueltos |
-| Tiempo real | Un hook `useLiveSession(sessionId, role)` que envuelve `@microsoft/signalr`, maneja la reconexión y expone el estado del último `SessionSnapshot` | Los componentes no tocan SignalR directamente; buen punto para aprender hooks |
+| Tiempo real | Un hook `useLiveSession(sessionId, role)` que envuelve `@microsoft/signalr`, maneja la reconexión (sin rendirse nunca) y expone el estado del último `SessionSnapshot` más los cambios posteriores. En las pruebas, un hub falso (`src/test/fakeHub.ts`) hace de servidor | Los componentes no tocan SignalR directamente; buen punto para aprender hooks |
 | Estado global | **Sin Redux.** Estado local de React + el hook de sesión | No hace falta en la Fase 1 |
 | Tipos de la API | Generados con `openapi-typescript` desde `src/api/openapi.json`, el contrato guardado en el repo y verificado contra el servidor por una prueba (D-65) | Los tipos de C# y TypeScript no se desincronizan |
 | Textos | `react-i18next`, archivo `es.json` (D-44) | |

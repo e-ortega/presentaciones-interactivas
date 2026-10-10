@@ -1,8 +1,11 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import App from './App'
+import { hub } from './test/fakeHub'
 import { jsonResponse, renderWithQuery, stubFetch } from './test/render'
+
+vi.mock('@microsoft/signalr', async () => (await import('./test/fakeHub')).fakeSignalR)
 
 const access = new Response(null, { status: 204 })
 const healthy = new Response('Healthy')
@@ -28,7 +31,7 @@ test('the home address leads to the teacher area', async () => {
   expect(await screen.findByRole('heading', { name: 'Mis presentaciones' })).toBeInTheDocument()
 })
 
-test('"Presentar" opens the presenter view of that presentation', async () => {
+test('"Ensayar" opens the presenter view of that presentation, with no students', async () => {
   stubFetch({
     'GET /api/admin/access': access,
     'GET /health': healthy,
@@ -44,10 +47,40 @@ test('"Presentar" opens the presenter view of that presentation', async () => {
   const user = userEvent.setup()
 
   renderWithQuery(<App />, '/admin')
-  await user.click(await screen.findByRole('link', { name: 'Presentar' }))
+  await user.click(await screen.findByRole('link', { name: 'Ensayar Semana 01' }))
 
   expect(await screen.findByRole('img', { name: 'Diapositiva 1 de 2' })).toBeInTheDocument()
   expect(screen.getByRole('complementary', { name: 'Guion' })).toHaveTextContent('Primera nota')
+})
+
+test('"Iniciar clase" opens a session and goes to its lobby', async () => {
+  const session = { id: 'session-1', code: '12345678', status: 'Lobby', presentationId: 'deck-1', title: 'Semana 01' }
+  const fetchMock = stubFetch({
+    'GET /api/admin/access': access,
+    'GET /health': healthy,
+    'GET /api/admin/presentations': jsonResponse([deck]),
+    'POST /api/admin/sessions': jsonResponse(session, 201),
+    'GET /api/admin/sessions/session-1': jsonResponse({ ...session, slideIndex: 0, stepIndex: 0, slides: [] }),
+  })
+  const user = userEvent.setup()
+
+  renderWithQuery(<App />, '/admin')
+  await user.click(await screen.findByRole('button', { name: 'Iniciar clase con Semana 01' }))
+
+  expect(await screen.findByText('Conectando con la clase…')).toBeInTheDocument()
+  expect(fetchMock).toHaveBeenCalledWith(
+    '/api/admin/sessions',
+    expect.objectContaining({ method: 'POST', body: JSON.stringify({ presentationId: 'deck-1' }) }),
+  )
+  expect(hub().url).toBe('/hubs/session?sessionId=session-1&role=Presenter')
+})
+
+test('the live session of a class asks for the access key too', async () => {
+  stubFetch({ 'GET /api/admin/access': new Response(null, { status: 401 }) })
+
+  renderWithQuery(<App />, '/present/session-1')
+
+  expect(await screen.findByLabelText('Clave de acceso')).toBeInTheDocument()
 })
 
 test('the presenter view asks for the access key too', async () => {

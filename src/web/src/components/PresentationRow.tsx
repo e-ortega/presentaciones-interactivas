@@ -1,6 +1,8 @@
+import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { stepImageUrl } from '../api/presentations'
+import { createSession } from '../api/sessions'
 import type { PresentationSummary } from '../api/types'
 import { firstPosition } from '../presenter/navigation'
 import styles from './PresentationRow.module.css'
@@ -11,9 +13,15 @@ type PresentationRowProps = {
 
 const dateFormat = new Intl.DateTimeFormat('es-CR', { dateStyle: 'medium', timeStyle: 'short' })
 
-/** One line of the presentation list: first slide, title, import status and the way to present it. */
+/** One line of the presentation list: first slide, title, import status and what to do with it. */
 export function PresentationRow({ presentation }: PresentationRowProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  // Starting a class opens a session, with its own join code, and goes to its lobby.
+  const startClass = useMutation({
+    mutationFn: () => createSession(presentation.id),
+    onSuccess: (session) => void navigate(`/present/${session.id}`),
+  })
   const isReady = presentation.status === 'Ready'
   const statusText = isReady
     ? t('presentations.slides', { count: presentation.slideCount })
@@ -31,12 +39,32 @@ export function PresentationRow({ presentation }: PresentationRowProps) {
           {statusText} · {dateFormat.format(new Date(presentation.createdAt))}
         </p>
         {presentation.failure && <p className={styles.failure}>{t(`presentations.failure.${presentation.failure}`)}</p>}
+        {startClass.isError && (
+          <p className={styles.failure} role="alert">
+            {t('presentations.startFailed')}
+          </p>
+        )}
       </div>
 
       {isReady && (
-        <Link className={styles.present} to={`/admin/presentations/${presentation.id}/present`}>
-          {t('presentations.present')}
-        </Link>
+        <div className={styles.actions}>
+          <button
+            className={styles.start}
+            type="button"
+            disabled={startClass.isPending}
+            onClick={() => startClass.mutate()}
+            aria-label={t('presentations.startLabel', { title: presentation.title })}
+          >
+            {t('presentations.start')}
+          </button>
+          <Link
+            className={styles.rehearse}
+            to={`/admin/presentations/${presentation.id}/present`}
+            aria-label={t('presentations.rehearseLabel', { title: presentation.title })}
+          >
+            {t('presentations.rehearse')}
+          </Link>
+        </div>
       )}
     </li>
   )

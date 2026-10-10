@@ -20,7 +20,7 @@ _Borrador preparado por Claude el 9 oct 2026 a partir del texto de la Ley 8968, 
 
 Va justo encima de los campos de nombre y correo, en letra legible (no más pequeña que el texto base):
 
-> **Antes de unirte:** para registrar tu participación en esta clase guardamos tu nombre, tu correo y tus respuestas. Tu profesor o profesora los verá; nadie más. Se guardan en servidores de Microsoft Azure, que pueden estar fuera de Costa Rica. Sin estos datos no podés unirte a la sesión. Podés consultarlos, corregirlos o pedir que los borremos escribiendo a [CORREO DE CONTACTO]. Detalles en el [Aviso de privacidad](#2-aviso-de-privacidad-completo).
+> **Antes de unirte:** para registrar tu participación en esta clase guardamos tu nombre, tu correo y tus respuestas. Tu nombre lo verán tu profesor o profesora y las demás personas de la sesión, como en una videollamada; tu correo y tus respuestas, solo tu profesor o profesora. Se guardan en servidores de Microsoft Azure, que pueden estar fuera de Costa Rica. Sin estos datos no podés unirte a la sesión. Podés consultarlos, corregirlos o pedir que los borremos escribiendo a [CORREO DE CONTACTO]. Detalles en el [Aviso de privacidad](#2-aviso-de-privacidad-completo).
 
 Casilla obligatoria, sin marcar por defecto:
 
@@ -67,7 +67,7 @@ No pedimos otros datos personales, no usamos tu ubicación y no te pedimos acces
 - [Si aplica: la institución educativa que contrató la plataforma, solo para los cursos de esa institución.]
 - Microsoft Azure, como proveedor que aloja la plataforma, sin acceso para usar los datos con fines propios.
 
-Las demás personas de la clase pueden ver los **resultados agregados** de una pregunta (por ejemplo, cuántas personas eligieron cada opción), pero no tu respuesta individual.
+Las demás personas de la clase pueden ver tu **nombre** en la lista de quienes están en la sesión, como en una videollamada, y los **resultados agregados** de una pregunta (por ejemplo, cuántas personas eligieron cada opción). No ven tu correo ni tu respuesta individual.
 
 ### ¿Es obligatorio darlos?
 

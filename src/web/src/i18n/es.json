@@ -22,7 +22,11 @@
   },
   "presentations": {
     "title": "Mis presentaciones",
-    "present": "Presentar",
+    "start": "Iniciar clase",
+    "startLabel": "Iniciar clase con {{title}}",
+    "startFailed": "No se pudo iniciar la clase. Probá de nuevo.",
+    "rehearse": "Ensayar",
+    "rehearseLabel": "Ensayar {{title}}",
     "loading": "Cargando presentaciones…",
     "loadFailed": "No se pudieron cargar las presentaciones.",
     "empty": "Todavía no hay presentaciones. Subí tu primer PowerPoint.",
@@ -63,6 +67,37 @@
       "staticNotes": "Notas fijas",
       "exit": "Salir"
     }
+  },
+  "lobby": {
+    "waiting": "Sala de espera",
+    "howToJoin": "Cómo unirse",
+    "codeLabel": "Código de la clase",
+    "qrTitle": "Código QR para unirse a la clase",
+    "attendance_one": "Lista de asistencia · {{count}} persona",
+    "attendance_other": "Lista de asistencia · {{count}} personas",
+    "nobodyYet": "Todavía no ha entrado nadie. Compartí el código o el QR.",
+    "disconnected": "sin conexión",
+    "remove": "Sacar",
+    "removeLabel": "Sacar a {{name}}",
+    "removeConfirm": "¿Sacar a {{name}} de la clase? No podrá volver a entrar con ese correo.",
+    "start": "Empezar la clase",
+    "cancel": "Cancelar la clase",
+    "cancelConfirm": "¿Cancelar la clase? El código dejará de servir."
+  },
+  "session": {
+    "loading": "Cargando la clase…",
+    "connecting": "Conectando con la clase…",
+    "notFound": "Esa clase no existe.",
+    "loadFailed": "No se pudo cargar la clase.",
+    "refused": "No tenés acceso a esta clase.",
+    "ended": "La clase terminó.",
+    "reconnecting": "Sin conexión. Reconectando…",
+    "actionFailed": "No se pudo hacer eso. Revisá la conexión y probá de nuevo.",
+    "code": "Código",
+    "connected_one": "{{count}} conectado",
+    "connected_other": "{{count}} conectados",
+    "end": "Terminar la clase",
+    "endConfirm": "¿Terminar la clase? Los estudiantes dejarán de ver las diapositivas."
   },
   "notFound": {
     "title": "Esta página no existe.",

@@ -245,23 +245,18 @@ public class SessionHub(AppDbContext db, ILiveSessionStore live, TimeProvider ti
             session.CurrentStepIndex,
             presentation.StepCounts,
             Code: seesLobbyData ? session.Code : null,
-            Attendance: seesLobbyData ? await BuildAttendanceAsync(connection.SessionId, withNames: isPresenter) : null);
+            Attendance: seesLobbyData ? await BuildAttendanceAsync(connection.SessionId) : null);
     }
 
     private async Task BroadcastAttendanceAsync(Guid sessionId)
     {
-        await Clients.Group(PresenterGroup(sessionId)).AttendanceChanged(await BuildAttendanceAsync(sessionId, withNames: true));
-        await Clients.Group(DisplayGroup(sessionId)).AttendanceChanged(await BuildAttendanceAsync(sessionId, withNames: false));
+        var attendance = await BuildAttendanceAsync(sessionId);
+        await Clients.Groups(PresenterGroup(sessionId), DisplayGroup(sessionId)).AttendanceChanged(attendance);
     }
 
-    private async Task<AttendanceUpdate> BuildAttendanceAsync(Guid sessionId, bool withNames)
+    private async Task<AttendanceUpdate> BuildAttendanceAsync(Guid sessionId)
     {
         var connected = live.ConnectedAttendances(sessionId);
-        if (!withNames)
-        {
-            return new AttendanceUpdate(connected.Count, Attendees: null);
-        }
-
         var attendees = await db.Attendances
             .Where(a => a.SessionId == sessionId && a.Admitted)
             .OrderBy(a => a.JoinedAt)

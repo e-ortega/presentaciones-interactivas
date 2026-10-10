@@ -31,7 +31,7 @@ public interface ISessionClient
 
     Task SessionEnded();
 
-    /// <summary>Presenter and display only. The display gets the count without the names.</summary>
+    /// <summary>Presenter and display only: students do not get the list.</summary>
     Task AttendanceChanged(AttendanceUpdate attendance);
 
     /// <summary>Sent only to a participant the teacher removed.</summary>
@@ -51,12 +51,13 @@ public record SessionSnapshot(
     string? Code,
     AttendanceUpdate? Attendance);
 
+/// <summary>
+/// Who is in the session, for the presenter and for the window the class sees: names are
+/// visible to the class, as in a video call (D-85). Emails never leave the server.
+/// </summary>
 /// <param name="ConnectedCount">Participants with at least one open connection.</param>
-/// <param name="Attendees">
-/// Everyone who joined and was not removed. Presenter only: the consent text says only the
-/// teacher sees names, so the shared window gets null here and shows the count.
-/// </param>
-public record AttendanceUpdate(int ConnectedCount, IReadOnlyList<Attendee>? Attendees);
+/// <param name="Attendees">Everyone who joined and was not removed, in the order they joined.</param>
+public record AttendanceUpdate(int ConnectedCount, IReadOnlyList<Attendee> Attendees);
 
 public record Attendee(Guid AttendanceId, string DisplayName, bool Connected);
 
