@@ -69,6 +69,8 @@ _Estado: terminado el 10 oct 2026. Probado en pantalla con un deck real de Esteb
 - **Listo cuando:** Esteban puede recorrer su presentación con sus notas en pantalla.
 
 ### M3 — Sesión en vivo
+_Estado (10 oct 2026): servidor hecho (sesiones, entrada de estudiantes, hub de SignalR, ventana para compartir con token), probado con clientes SignalR reales y por WebSockets en el contenedor. Faltan las pantallas: las del profesor y luego las del estudiante y la ventana para compartir._
+
 - Crear sesión: código tipo `8888-6666`, enlace y QR.
 - `SessionHub` (SignalR): grupo por sesión; cada cliente se une con un rol (`Presenter`, `Display`, `Participant`); el profesor envía `(slideIndex, stepIndex)` y el hub lo emite al grupo de la sesión.
 - Vista del estudiante adaptable, primero computadora (D-35; maqueta en el canvas de identidad visual).
@@ -90,7 +92,7 @@ _Estado: terminado el 10 oct 2026. Probado en pantalla con un deck real de Esteb
 - Clave de acceso de la zona del profesor (D-45): cargar el hash como secreto de Container Apps (`AdminAccess__KeySha256`).
 - Imagen en GitHub Container Registry; Azure Container Apps (Consumo, una réplica máxima); Azure SQL Database (oferta gratuita); Blob Storage.
 - Alerta sobre la métrica "Free amount remaining" de la base.
-- **Encabezados del proxy:** activar `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`. En Container Apps todas las peticiones llegan con la IP del proxy; sin esto, el límite de intentos de la clave de acceso es uno solo para todo el mundo y cualquiera podría dejar al profesor sin poder entrar. Probar que dos clientes distintos tienen cada uno su propio límite.
+- **Encabezados del proxy:** activar `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`. En Container Apps todas las peticiones llegan con la IP del proxy; sin esto, los límites de intentos (el de la clave de acceso y el de entrar con código) son uno solo para todo el mundo: cualquiera podría dejar al profesor sin poder entrar, o a toda una clase sin poder unirse. Probar que dos clientes distintos tienen cada uno su propio límite.
 - **Listo cuando:** la app funciona en Azure desde un celular fuera de la red local.
 
 ### M6 — Prueba en clase

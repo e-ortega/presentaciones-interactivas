@@ -23,7 +23,7 @@ public class ArchitectureTests
         // Entities hold the rules; they must be testable and readable without a database or a web server.
         var result = Types.InAssembly(ServerAssembly)
             .That().ResideInNamespace(Domain)
-            .ShouldNot().HaveDependencyOnAny(Features, Infrastructure, "Microsoft.EntityFrameworkCore", "Microsoft.AspNetCore")
+            .ShouldNot().HaveDependencyOnAny(Features, Infrastructure, "Server.Realtime", "Microsoft.EntityFrameworkCore", "Microsoft.AspNetCore")
             .GetResult();
 
         AssertPasses(result);

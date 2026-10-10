@@ -45,6 +45,8 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 - **Los datos de estudiantes nunca van a servicios de IA** (D-42).
 - **Sin login de profesor en la Fase 1** (D-36). La zona del profesor pide una clave de acceso (D-45): la app solo conoce su hash SHA-256 en `AdminAccess:KeySha256` (user-secrets en local, secreto de Container Apps en Azure) y compara en tiempo constante. **Nunca escribir la clave ni su hash en el repositorio**: es público.
 - **El correo es la identidad** del participante (D-16).
+- **Privacidad en la sesión:** los nombres de los estudiantes los ve solo el profesor; la ventana para compartir muestra cuántos hay, no quiénes (D-78). Las notas del orador nunca viajan por el hub (D-80). Nunca registrar correos ni nombres en los logs.
+- **El contrato del hub** vive en `src/Server/Realtime/Contracts.cs` y, a mano, en `src/web/src/realtime/contracts.ts`: se cambian juntos.
 - **Ley 8968:** el formulario de nombre y correo lleva aviso de consentimiento y se guarda la fecha del consentimiento (D-29).
 
 ## Stack
@@ -73,7 +75,7 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-M0, M1 y M2 terminados: la app importa un PPTX (imágenes, notas y PDF); la zona del profesor permite entrar con la clave, subir presentaciones y ver su estado; y la vista del presentador recorre una presentación con sus notas como guion, por botones o teclado. Siguiente hito: M3, sesión en vivo con SignalR (`docs/plan-fase-1.md`).
+M0, M1 y M2 terminados: la app importa un PPTX (imágenes, notas y PDF); la zona del profesor permite entrar con la clave, subir presentaciones y ver su estado; y la vista del presentador recorre una presentación con sus notas como guion, por botones o teclado. M3 (sesión en vivo): el servidor está hecho (sesiones, entrada con código, hub de SignalR); faltan las pantallas del profesor, del estudiante y la ventana para compartir (`docs/plan-fase-1.md`).
 
 ## Flujo de trabajo
 

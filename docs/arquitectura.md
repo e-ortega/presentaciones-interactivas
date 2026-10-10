@@ -29,9 +29,9 @@ _Propuesta de Claude, 9 oct 2026; aprobada por Esteban (D-48). Complementa el di
 
 ### Estado en vivo
 
-- Se guarda **en memoria** (`LiveSessionStore`, un diccionario concurrente por sesión), con una sola réplica (D-47).
-- Los hechos durables se escriben **en la base al momento**: cada lanzamiento con su copia exacta de la pregunta, cada respuesta, cada asistencia y la última diapositiva y paso (para "empezar donde quedaste").
-- Si el contenedor se reinicia, el estado en vivo se reconstruye desde la base al primer acceso.
+- Los hechos durables viven **en la base** y se escriben al momento: el estado de la sesión, la diapositiva y paso actuales, cada asistencia, y (M4) cada lanzamiento con su copia exacta de la pregunta y cada respuesta. Se leen de ahí cada vez (D-79).
+- **En memoria** (`ILiveSessionStore`) queda solo lo que es cierto mientras hay gente conectada: quién tiene una conexión abierta. Con una sola réplica (D-47).
+- Si el contenedor se reinicia no se pierde nada: los clientes se reconectan y reciben el estado desde la base.
 - **Al crecer a varias réplicas:** Azure SignalR Service (Standard) y el estado en vivo en Redis o en la base. Por eso todo acceso al estado pasa por la interfaz `ILiveSessionStore`.
 
 ### Grupos
@@ -42,17 +42,19 @@ _Propuesta de Claude, 9 oct 2026; aprobada por Esteban (D-48). Complementa el di
 
 | Dirección | Mensaje | Quién | Nota |
 |---|---|---|---|
-| Cliente → servidor | `GoTo(slideIndex, stepIndex)` | Presentador | |
+| Conexión | `/hubs/session?sessionId=…&role=Presenter\|Display\|Participant` | Todos | El servidor comprueba que las cookies den ese rol; si no, cierra la conexión diciendo el motivo, `NotAllowed` o `Removed` (D-82) |
+| Cliente → servidor | `GoTo(slideIndex, stepIndex)` | Presentador | Solo con la sesión en vivo y hacia una posición que exista |
 | | `LaunchWidget(widgetId)` / `CloseLaunch(launchId)` / `RevealResults(launchId)` | Presentador | |
 | | `StartSession()` / `EndSession()` / `RemoveParticipant(attendanceId)` | Presentador | |
 | | `SubmitResponse(launchId, payload)` | Estudiante | Una por estudiante y lanzamiento (índice único) |
-| Servidor → cliente | `SessionSnapshot(estado completo)` | Todos | Al conectarse y al **reconectarse**: así nadie queda desfasado |
+| Servidor → cliente | `SessionSnapshot(estado completo)` | Todos | Al conectarse y al **reconectarse**: así nadie queda desfasado. Sin notas del orador para nadie; sin código ni asistencia para el estudiante (D-80) |
+| | `SessionStarted(slideIndex, stepIndex)` | Todos | Del lobby a en vivo |
 | | `SlideChanged(slideIndex, stepIndex)` | Todos | |
 | | `LaunchOpened(launch)` / `LaunchClosed(launchId)` | Todos | `launch` lleva la copia exacta de la pregunta |
 | | `ResponseCount(launchId, answered, connected)` | Presentador y ventana para compartir | **Agrupado**: como máximo cada ~300 ms, no un mensaje por respuesta |
 | | `LiveTallies(launchId, tallies)` | Solo presentador | Antes de revelar |
 | | `ResultsRevealed(launchId, tallies, correctOption)` | Todos | |
-| | `AttendanceChanged(lista)` | Presentador y ventana para compartir | Lista de asistencia del lobby |
+| | `AttendanceChanged(conectados, lista)` | Presentador y ventana para compartir | La ventana para compartir recibe solo el número; los nombres, solo el presentador (D-78) |
 | | `SessionEnded()` / `RemovedFromSession()` | Todos / el estudiante expulsado | |
 
 Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar en cada lado: `Realtime/Contracts.cs` y `src/web/src/realtime/contracts.ts`. Hay que mantenerlos iguales a mano; una prueba de integración conecta un cliente real y verifica los mensajes.
@@ -62,12 +64,12 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 | Quién | Cómo se identifica | Detalle |
 |---|---|---|
 | **Profesor** | Clave de acceso (D-45) → cookie firmada, `HttpOnly`, `Secure` | `POST /api/access` cambia la clave por la cookie. Protege todo `/api/admin/*` y los métodos de presentador del hub |
-| **Ventana para compartir** | Token de un solo uso que genera el presentador al abrirla | Evita que alguien con el código abra la ventana del profesor |
-| **Estudiante** | `POST /api/join/{code}` con nombre, correo y consentimiento → crea o reutiliza `Participant` (por correo) y `Attendance` → cookie firmada con el id de la asistencia | La misma cookie autentica la conexión de SignalR; si se recarga la página o se cae el wifi, vuelve como la misma persona |
+| **Ventana para compartir** | Token de un solo uso que genera el presentador al abrirla (`POST /api/admin/sessions/{id}/display-token`), válido 2 minutos; la ventana lo cambia por su cookie en `POST /api/display/access` | Evita que alguien con el código abra la ventana del profesor. En el mismo navegador del profesor basta su cookie |
+| **Estudiante** | `GET /api/join/{code}` le muestra a qué clase va a entrar; `POST /api/join/{code}` con nombre, correo y consentimiento → crea o reutiliza `Participant` (por correo) y `Attendance` → cookie firmada con el id de la asistencia | La misma cookie autentica la conexión de SignalR; si se recarga la página o se cae el wifi, vuelve como la misma persona. Queda admitido al entrar; el profesor puede sacarlo (D-77). El correo no se verifica por sesión: ver la limitación en D-84 |
 
 - **Código de sesión:** 8 dígitos aleatorios (`8888-6666`), únicos entre sesiones activas; deja de servir cuando la sesión termina.
 - **Llaves de las cookies:** se guardan en la base de datos (D-51), para que las cookies sigan valiendo cuando el contenedor se reinicia.
-- **Límite de intentos** (rate limiting de ASP.NET Core) en `join` y en la clave de acceso, por IP, para impedir adivinar códigos o la clave. Detrás del proxy de Azure la IP real viene en un encabezado: hay que activar los encabezados reenviados en el M5 (ver el plan).
+- **Límite de intentos** (rate limiting de ASP.NET Core) en `join` y en la clave de acceso, por IP, para impedir adivinar códigos o la clave. El de `join` es amplio, 300 por minuto, porque un aula comparte una sola IP (D-81). Detrás del proxy de Azure la IP real viene en un encabezado: hay que activar los encabezados reenviados en el M5 (ver el plan).
 - **Sesión vencida:** cuando cualquier petición del profesor recibe un 401, la interfaz vuelve a pedir la clave.
 
 ## 4. Importación de presentaciones
@@ -84,7 +86,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 ## 5. Archivos
 
 - Interfaz `IFileStorage`: disco local en desarrollo, Blob Storage **privado** en Azure.
-- Las imágenes de los pasos se sirven **a través de la app** (`GET /api/sessions/{id}/slides/{n}/steps/{m}`), que verifica que quien pide sea el presentador, la ventana para compartir o un estudiante de esa sesión. Con caché del navegador.
+- Las imágenes de los pasos se sirven **a través de la app** (`GET /api/sessions/{id}/slides/{n}/steps/{m}`), que verifica quién pide: el presentador ve cualquier paso; la ventana para compartir de esa sesión, cualquiera hasta que termina; un estudiante admitido, **solo el paso que está en pantalla** y solo con la clase en vivo (D-83). Con caché del navegador.
 - El PDF de estudiante se sirve igual, solo si el profesor lo publicó.
 - **Al crecer:** URLs firmadas de corta duración o una CDN, para no pasar las imágenes por el contenedor.
 
@@ -107,6 +109,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 - **Dominio:** pruebas unitarias con xUnit v3 (D-53).
 - **Arquitectura:** las reglas de dependencias entre `Domain`, `Features` e `Infrastructure` son pruebas (NetArchTest.eNhancedEdition, D-66).
 - **Contrato de la API:** una prueba compara el documento OpenAPI del servidor con `src/web/src/api/openapi.json` (D-65).
+- **Hub:** las pruebas conectan clientes SignalR reales a la app en memoria (por *long polling*, porque ese servidor no tiene sockets); la prueba de humo del contenedor corre una sesión por WebSockets reales.
 - **API y hub:** pruebas de integración con `WebApplicationFactory` y **SQL Server real en contenedor (Testcontainers)**, o el servidor de `PI_TEST_SQLSERVER` cuando no hay Docker (D-52).
 - **Importación:** los PPTX de prueba son **sintéticos** y los genera el propio código de pruebas (`SyntheticDeck`), con diapositivas ocultas y sin notas: el repo es público y las presentaciones reales de Esteban no se suben. La conversión real con LibreOffice se prueba dentro del contenedor con una prueba de humo en el CI (D-56).
 - **De punta a punta:** un recorrido con Playwright al cerrar el M4 (importar, presentar, unirse, responder, revelar).
