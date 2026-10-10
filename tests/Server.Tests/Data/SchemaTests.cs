@@ -21,7 +21,7 @@ public class MigrationsTests
     }
 }
 
-public class SchemaTests(SqlServerFixture sql) : IClassFixture<SqlServerFixture>
+public class SchemaTests(SqlServerFixture sql)
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
     private static readonly DateTimeOffset Now = new(2026, 10, 9, 15, 0, 0, TimeSpan.Zero);
@@ -29,7 +29,7 @@ public class SchemaTests(SqlServerFixture sql) : IClassFixture<SqlServerFixture>
     [Fact]
     public async Task Participant_email_is_unique()
     {
-        await using var context = sql.CreateContext();
+        await using var context = await sql.CreateContextAsync();
         context.Participants.Add(new Participant("ana@example.com", "Ana"));
         context.Participants.Add(new Participant("ana@example.com", "Another Ana"));
 
@@ -39,8 +39,8 @@ public class SchemaTests(SqlServerFixture sql) : IClassFixture<SqlServerFixture>
     [Fact]
     public async Task Session_code_is_unique_among_sessions_that_have_not_ended()
     {
-        await using var context = sql.CreateContext();
-        var presentation = new Presentation("Deck", "presentations/deck.pptx", Now);
+        await using var context = await sql.CreateContextAsync();
+        var presentation = new Presentation("Deck", Now);
         context.Presentations.Add(presentation);
         context.Sessions.Add(new Session(presentation.Id, "12345678", Now));
         await context.SaveChangesAsync(Ct);
@@ -53,8 +53,8 @@ public class SchemaTests(SqlServerFixture sql) : IClassFixture<SqlServerFixture>
     [Fact]
     public async Task A_participant_answers_a_launch_only_once()
     {
-        await using var context = sql.CreateContext();
-        var presentation = new Presentation("Deck", "presentations/deck2.pptx", Now);
+        await using var context = await sql.CreateContextAsync();
+        var presentation = new Presentation("Deck", Now);
         var slide = new Slide(presentation.Id, 0, "notes");
         var widget = new Widget(slide.Id, WidgetType.MultipleChoice, "{}");
         var session = new Session(presentation.Id, "87654321", Now);

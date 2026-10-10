@@ -3,68 +3,81 @@ using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
 using Testcontainers.MsSql;
 
+// One SQL Server for the whole test run.
+[assembly: AssemblyFixture(typeof(Server.Tests.Data.SqlServerFixture))]
+
 namespace Server.Tests.Data;
 
 /// <summary>
 /// A real SQL Server with the migrations applied, in a database created for this run.
 /// Uses the server in PI_TEST_SQLSERVER when set (e.g. LocalDB), otherwise a container.
 /// Without either, the tests that use it are skipped locally; in CI they must run.
+/// It starts on first use, so runs that do not touch the database do not pay for it.
 /// </summary>
-public sealed class SqlServerFixture : IAsyncLifetime
+public sealed class SqlServerFixture : IAsyncDisposable
 {
-    private MsSqlContainer? _container;
-    private string? _connectionString;
-    private string? _unavailableReason;
+    private readonly Lazy<Task<Database>> _database = new(StartAsync);
 
-    public async ValueTask InitializeAsync()
+    private sealed record Database(string? ConnectionString, MsSqlContainer? Container, string? UnavailableReason);
+
+    /// <summary>Skips the calling test when there is no SQL Server to talk to.</summary>
+    public async Task<string> GetConnectionStringAsync()
+    {
+        var database = await _database.Value;
+        Assert.SkipWhen(database.ConnectionString is null, database.UnavailableReason ?? "");
+        return database.ConnectionString!;
+    }
+
+    public async Task<AppDbContext> CreateContextAsync() => CreateContext(await GetConnectionStringAsync());
+
+    private static AppDbContext CreateContext(string connectionString) =>
+        new(new DbContextOptionsBuilder<AppDbContext>().UseSqlServer(connectionString).Options);
+
+    private static async Task<Database> StartAsync()
     {
         var server = Environment.GetEnvironmentVariable("PI_TEST_SQLSERVER");
+        MsSqlContainer? container = null;
         try
         {
             if (server is null)
             {
-                _container = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
-                await _container.StartAsync();
-                server = _container.GetConnectionString();
+                container = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
+                await container.StartAsync();
+                server = container.GetConnectionString();
             }
         }
         catch (Exception ex) when (Environment.GetEnvironmentVariable("CI") is null)
         {
-            _container = null;
-            _unavailableReason = $"Docker is not available and PI_TEST_SQLSERVER is not set: {ex.Message}";
-            return;
+            return new Database(null, null, $"Docker is not available and PI_TEST_SQLSERVER is not set: {ex.Message}");
         }
 
-        _connectionString = new SqlConnectionStringBuilder(server)
+        var connectionString = new SqlConnectionStringBuilder(server)
         {
             InitialCatalog = "pi_tests_" + Guid.NewGuid().ToString("N"),
         }.ConnectionString;
 
-        await using var context = CreateContext();
+        await using var context = CreateContext(connectionString);
         await context.Database.MigrateAsync();
-    }
-
-    public AppDbContext CreateContext()
-    {
-        Assert.SkipWhen(_unavailableReason is not null, _unavailableReason ?? "");
-
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlServer(_connectionString)
-            .Options;
-        return new AppDbContext(options);
+        return new Database(connectionString, container, null);
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_connectionString is not null)
+        if (!_database.IsValueCreated)
         {
-            await using var context = CreateContext();
+            return;
+        }
+
+        var database = await _database.Value;
+        if (database.ConnectionString is not null)
+        {
+            await using var context = CreateContext(database.ConnectionString);
             await context.Database.EnsureDeletedAsync();
         }
 
-        if (_container is not null)
+        if (database.Container is not null)
         {
-            await _container.DisposeAsync();
+            await database.Container.DisposeAsync();
         }
     }
 }

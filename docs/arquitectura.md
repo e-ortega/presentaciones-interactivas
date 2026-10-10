@@ -71,10 +71,10 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 
 ## 4. Importación de presentaciones
 
-1. `POST /api/admin/presentations` (multipart). Validaciones: extensión `.pptx` (se rechaza `.pptm`, con macros), firma de archivo ZIP, **tamaño máximo 100 MB**, máximo 300 diapositivas.
+1. `POST /api/admin/presentations` (multipart). Validaciones: extensión `.pptx` (se rechaza `.pptm`, con macros), firma de archivo ZIP, **tamaño máximo 100 MB**, que el Open XML SDK pueda abrirlo, al menos una diapositiva visible y máximo 300. Un rechazo responde 400 con un código (`NotPptx`, `TooLarge`, `Unreadable`, `NoVisibleSlides`, `TooManySlides`) que la interfaz traduce (D-54).
 2. Se guarda el original y se crea la `Presentation` en estado `Pending`.
 3. Una **cola en el mismo proceso** (`Channel<ImportJob>` + `BackgroundService`) procesa **una importación a la vez**, porque LibreOffice no tolera conversiones simultáneas con el mismo perfil.
-4. LibreOffice corre con un perfil temporal propio, en una carpeta temporal, con **tiempo máximo de 2 minutos**; si se pasa, se termina el proceso y la importación queda en `Failed` con un mensaje claro.
+4. LibreOffice corre con un perfil temporal propio, en una carpeta temporal, con **tiempo máximo de 2 minutos**; si se pasa, se termina el proceso y la importación queda en `Failed` con su motivo como código (D-54). Las imágenes salen en PNG de 1600 px de ancho (D-55).
 5. El frontend consulta el estado cada pocos segundos (`GET /api/admin/presentations/{id}`). En la Fase 1 no hace falta SignalR para esto.
 6. Al arrancar, las importaciones que quedaron en `Pending` o `Processing` se vuelven a encolar.
 - **Al crecer:** la cola pasa a Azure Storage Queues y el procesamiento a un Container Apps Job, sin cambiar `ISlideRenderer`.
@@ -104,7 +104,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 
 - **Dominio:** pruebas unitarias con xUnit v3 (D-53).
 - **API y hub:** pruebas de integración con `WebApplicationFactory` y **SQL Server real en contenedor (Testcontainers)**, o el servidor de `PI_TEST_SQLSERVER` cuando no hay Docker (D-52).
-- **Importación:** pruebas con PPTX de ejemplo que incluyen diapositivas ocultas y fuentes poco comunes. **Los archivos de prueba que van al repo son sintéticos**, creados para eso: el repo es público y las presentaciones reales de Esteban no se suben.
+- **Importación:** los PPTX de prueba son **sintéticos** y los genera el propio código de pruebas (`SyntheticDeck`), con diapositivas ocultas y sin notas: el repo es público y las presentaciones reales de Esteban no se suben. La conversión real con LibreOffice se prueba dentro del contenedor con una prueba de humo en el CI (D-56).
 - **De punta a punta:** un recorrido con Playwright al cerrar el M4 (importar, presentar, unirse, responder, revelar).
 
 ## 8. Flujo de trabajo y CI/CD

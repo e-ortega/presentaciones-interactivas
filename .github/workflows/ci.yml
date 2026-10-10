@@ -44,9 +44,29 @@ jobs:
       - run: npm test
       - run: npm run build
 
+  # The ruleset on main requires this job by name: rename it there too if it changes here.
   image:
     name: Docker image
     runs-on: ubuntu-latest
+    env:
+      # Throwaway values for containers that only live during this job. Not secrets.
+      MSSQL_SA_PASSWORD: Ci_Only_Passw0rd_1
+      PI_SMOKE_URL: http://localhost:8080
+      PI_SMOKE_KEY: ci-smoke-key
     steps:
       - uses: actions/checkout@v7
-      - run: docker build --tag presentaciones-interactivas:ci .
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Build the image and start the app with SQL Server
+        run: |
+          export ADMIN_ACCESS_KEY_SHA256=$(printf '%s' "$PI_SMOKE_KEY" | sha256sum | cut -d' ' -f1)
+          docker compose up --build --detach
+          curl --fail --silent --retry 30 --retry-delay 2 --retry-all-errors "$PI_SMOKE_URL/health"
+      # The only test of the real conversion: LibreOffice, pdftoppm and the fonts in the image.
+      # -failSkips: a skipped smoke test here would mean nothing was checked.
+      - name: Import a deck in the container
+        run: dotnet run --project tests/Server.Tests -- -class "Server.Tests.Import.ContainerSmokeTests" -failSkips
+      - name: Show container logs
+        if: failure()
+        run: docker compose logs --no-color

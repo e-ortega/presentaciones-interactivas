@@ -34,7 +34,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.Property(p => p.Title).HasMaxLength(200);
             e.Property(p => p.PptxPath).HasMaxLength(400);
             e.Property(p => p.PdfPath).HasMaxLength(400);
-            e.Property(p => p.FailureReason).HasMaxLength(1000);
             e.HasMany(p => p.Slides).WithOne().HasForeignKey(s => s.PresentationId);
         });
 

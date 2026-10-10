@@ -73,7 +73,7 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-M0 (esqueleto) terminado y en `main`. Siguiente hito: M1, importación del PPTX (`docs/plan-fase-1.md`).
+M0 terminado. M1 (importación): el servidor está hecho y probado con decks reales; faltan las pantallas de React (ingresar la clave, subir un PPTX, ver el estado). Ver `docs/plan-fase-1.md`.
 
 ## Flujo de trabajo
 
@@ -84,5 +84,7 @@ M0 (esqueleto) terminado y en `main`. Siguiente hito: M1, importación del PPTX 
 - Servidor: `dotnet run --project src/Server` (usa LocalDB y aplica las migraciones al arrancar).
 - Frontend: `npm run dev` en `src/web` (Vite reenvía `/api` y `/health` al servidor).
 - Contenedores: Docker está en WSL (`Ubuntu-26.04`), no en Windows. Arrancar el servicio con `wsl -u root service docker start` y correr `docker compose` desde `/mnt/d/Documents/source/repos/presentaciones-interactivas`.
+- Importar de verdad necesita LibreOffice, que solo está en la imagen Docker: con `dotnet run` en Windows la subida funciona pero la conversión falla. Para probar una importación, usar Docker Compose.
+- Los decks reales de Esteban se leen desde su carpeta para pruebas manuales; **nunca se copian al repo**, que es público.
 - Pruebas: `dotnet test` en la raíz; `npm test` y `npm run lint` en `src/web`.
 - Nueva migración: `dotnet ef migrations add <Name> --project src/Server --output-dir Infrastructure/Data/Migrations`.
