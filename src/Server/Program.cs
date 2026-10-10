@@ -63,7 +63,7 @@ if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
 
 if (!app.Services.GetRequiredService<AdminKeyVerifier>().IsConfigured)
 {
-    app.Logger.LogWarning("AdminAccess:KeySha256 is missing or invalid. The teacher area will reject every key.");
+    app.Logger.LogWarning("AdminAccess:KeySha256 is missing or invalid. The teacher area will answer that it is not configured.");
 }
 
 app.UseExceptionHandler();
