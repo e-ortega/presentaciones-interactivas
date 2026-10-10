@@ -25,6 +25,11 @@ updates:
     groups:
       npm-minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # The types must match the Node version the project runs on (24 LTS, D-69).
+      # They move by hand, together with Node itself.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
@@ -40,3 +45,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    ignore:
+      # Node stays on an LTS version (D-69); moving to the next one is done by hand.
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]

@@ -77,7 +77,7 @@ M0, M1 y M2 terminados: la app importa un PPTX (imágenes, notas y PDF); la zona
 
 ## Flujo de trabajo
 
-`main` está protegida (ruleset `pr_main`): no se puede subir directo, ni documentación. Cada cambio va en una rama corta (`feat/...`, `fix/...`, `docs/...`) con pull request; se fusiona con "squash" cuando pasan los tres trabajos del CI (`Server (.NET)`, `Web (React)`, `Docker image`). Si se renombra un trabajo en `.github/workflows/ci.yml`, hay que actualizar el ruleset o los pull requests quedan bloqueados. Claude puede fusionar sus propios pull requests cuando el CI esté en verde (D-59), pero **antes debe hacer revisar el diff con `/code-review`** y corregir o anotar los hallazgos en el pull request (D-61).
+`main` está protegida (ruleset `pr_main`): no se puede subir directo, ni documentación. Cada cambio va en una rama corta (`feat/...`, `fix/...`, `docs/...`) con pull request; se fusiona con "squash" cuando pasan los tres trabajos del CI (`Server (.NET)`, `Web (React)`, `Docker image`). Si se renombra un trabajo en `.github/workflows/ci.yml`, hay que actualizar el ruleset o los pull requests quedan bloqueados. Claude puede fusionar sus propios pull requests cuando el CI esté en verde (D-59), pero **antes debe hacer revisar el diff con `/code-review`** y corregir o anotar los hallazgos en el pull request (D-61). Esteban revisa después, a posteriori (D-73): por eso la descripción de cada pull request debe decir con claridad qué cambió, cómo se verificó y qué no se verificó.
 
 Antes de subir cambios, correr localmente lo mismo que el CI: `dotnet build` (los avisos son errores), `dotnet format --verify-no-changes`, `dotnet test`; y en `src/web`: `npm run lint`, `npm test`, `npm run build` (D-60). No apagar una regla del linter o de los analizadores sin dejar el motivo escrito junto a ella.
 
@@ -90,7 +90,7 @@ Antes de subir cambios, correr localmente lo mismo que el CI: `dotnet build` (lo
 - Los decks reales de Esteban se leen desde su carpeta para pruebas manuales; **nunca se copian al repo**, que es público.
 - Tipos de la API: al cambiar un endpoint o un DTO, correr `PI_UPDATE_OPENAPI=1 dotnet test` (actualiza `src/web/src/api/openapi.json`) y luego `npm run generate:api` en `src/web`; guardar los dos archivos (D-65). Si no, falla una prueba del servidor o el CI.
 - Hooks: `git commit` corre lint-staged (D-64). Si un hook falla, corregir el problema; no saltarlo con `--no-verify`.
-- Dependabot abre pull requests los lunes (D-67). Claude los revisa y fusiona los seguros; ante la duda, avisa a Esteban (D-68). Node se queda en la 24 LTS (D-69).
+- Dependabot abre pull requests los lunes (D-67). Claude los revisa y fusiona los seguros; ante la duda, avisa a Esteban (D-68). Node y sus tipos (`@types/node`) se quedan en la 24 LTS (D-69, D-75).
 - Las capturas de pantalla sirven para ver lo que las pruebas no ven (un botón sin texto pasó 46 pruebas): al cambiar estilos, mirar la pantalla en el navegador.
 - Pruebas: `dotnet test` en la raíz; `npm test` y `npm run lint` en `src/web`.
 - Nueva migración: `dotnet ef migrations add <Name> --project src/Server --output-dir Infrastructure/Data/Migrations`.
