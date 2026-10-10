@@ -20,7 +20,7 @@ App web que convierte una presentación de PowerPoint que el profesor **ya tiene
 
 ## Estado
 
-Fase 1 en construcción. Hecho el hito M0 (esqueleto): servidor, base de datos, clave de acceso del profesor, página de React y CI. Sigue el M1, la importación del PPTX. Ver [docs/plan-fase-1.md](docs/plan-fase-1.md).
+Fase 1 en construcción. Terminado el hito M0 (esqueleto): servidor, base de datos, clave de acceso del profesor, página de React y CI. Sigue el M1, la importación del PPTX. Ver [docs/plan-fase-1.md](docs/plan-fase-1.md).
 
 ## Cómo correrlo
 

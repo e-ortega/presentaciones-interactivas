@@ -109,7 +109,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 
 ## 8. Flujo de trabajo y CI/CD
 
-- **Ramas:** `main` protegida; cada hito o tarea en una rama corta (`feat/m1-import`) con pull request. Commits en formato convencional (`feat:`, `fix:`, `docs:`).
+- **Ramas:** `main` protegida con el ruleset `pr_main`: pull request obligatorio, los tres trabajos del CI en verde y solo fusión "squash". Cada hito o tarea va en una rama corta (`feat/m1-import`) con pull request. Commits en formato convencional (`feat:`, `fix:`, `docs:`).
 - **GitHub Actions** en cada pull request: compilar y probar .NET, `npm ci`, lint, pruebas y build del frontend.
 - **Despliegue (M5):** al fusionar en `main`, se construye la imagen, se publica en GitHub Container Registry y se actualiza Container Apps. Autenticación a Azure con **OIDC** (credenciales federadas): sin secretos de Azure guardados en GitHub.
 - **Secretos:** `dotnet user-secrets` en local; secretos de Container Apps en Azure. Nunca en el repo.

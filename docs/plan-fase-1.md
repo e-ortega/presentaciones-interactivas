@@ -33,7 +33,7 @@ Un solo proyecto de servidor con carpetas, no varios proyectos. Los detalles de 
 ## Hitos
 
 ### M0 — Esqueleto
-_Estado (9 oct 2026): hecho en la rama `feat/m0-skeleton`. `docker compose up` verificado con Docker en WSL. Falta ver el CI en verde en GitHub; ver [pendientes.md](pendientes.md)._
+_Estado: terminado el 10 oct 2026 (pull request #1)._
 
 - Solución .NET, proyecto `Server`, proyecto de pruebas.
 - React + Vite + TypeScript en `src/web`, con los textos en archivos de recursos (D-44) y los tokens de `src/web/src/styles/tokens.css`; en desarrollo, proxy de Vite hacia la API; en producción, el build se copia a `wwwroot`.
