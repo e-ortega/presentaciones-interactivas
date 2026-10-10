@@ -57,6 +57,9 @@ Cada decisión con su fecha y el motivo. Si una decisión cambia, no se borra: s
 | D-51 | 2026-10-09 | Las llaves que firman las cookies (Data Protection) se guardan en la base de datos | Con escala a cero el contenedor se reinicia seguido; sin esto, el profesor y los estudiantes perderían la sesión en cada reinicio |
 | D-52 | 2026-10-09 | En desarrollo, `dotnet run` usa **LocalDB** por defecto; Docker Compose sigue usando SQL Server en contenedor. Las pruebas de integración usan Testcontainers o el servidor indicado en `PI_TEST_SQLSERVER` | Permite trabajar en Windows sin Docker encendido; la cadena de LocalDB no lleva contraseña y puede ir en el repo |
 | D-53 | 2026-10-09 | Herramientas del M0: xUnit v3 sobre Microsoft Testing Platform, oxlint (el linter de la plantilla actual de Vite) y los tokens de diseño en un solo lugar, `src/web/src/styles/tokens.css` (antes `design/tokens.css`) | Son los valores por defecto actuales de .NET 10 y Vite; una sola copia de los tokens evita que se desincronicen |
+| D-54 | 2026-10-10 | Los motivos de fallo de una importación y de rechazo de un archivo viajan como **códigos** (`ConversionTimedOut`, `NotPptx`...), no como texto; la interfaz los traduce | Los textos viven en los archivos de traducción (D-44); el servidor no escribe mensajes para el usuario |
+| D-55 | 2026-10-10 | Las imágenes de las diapositivas son PNG de **1600 px de ancho** (el alto sigue la proporción del deck) | Nítidas en una pantalla Full HD y al proyectar, con unos 100 a 150 KB por diapositiva en los decks de prueba |
+| D-56 | 2026-10-10 | La conversión real con LibreOffice se prueba **dentro del contenedor**, con una prueba de humo que sube un deck sintético a la app en Docker Compose (trabajo `Docker image` del CI). Las demás pruebas usan un renderizador falso | Prueba la imagen que se despliega, con sus fuentes; y las pruebas normales no necesitan LibreOffice instalado |
 
 ## Propuestas en revisión
 

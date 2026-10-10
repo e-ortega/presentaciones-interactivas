@@ -25,6 +25,14 @@ public class Slide
 
     public IReadOnlyList<SlideStep> Steps => _steps;
     public IReadOnlyList<Widget> Widgets => _widgets;
+
+    /// <summary>Adds the next step, in build order.</summary>
+    public SlideStep AddStep(string imagePath)
+    {
+        var step = new SlideStep(Id, _steps.Count, imagePath);
+        _steps.Add(step);
+        return step;
+    }
 }
 
 /// <summary>

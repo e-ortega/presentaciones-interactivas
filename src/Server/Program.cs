@@ -1,7 +1,10 @@
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using Server.Features.AdminAccess;
+using Server.Features.Import;
+using Server.Features.Presentations;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Storage;
 
@@ -20,6 +23,17 @@ builder.Services.AddDataProtection()
 
 builder.Services.AddFileStorage(builder.Configuration);
 builder.Services.AddAdminAccess(builder.Configuration);
+
+builder.Services.Configure<ImportOptions>(builder.Configuration.GetSection(ImportOptions.SectionName));
+builder.Services.AddSingleton<ISlideRenderer, LibreOfficeSlideRenderer>();
+builder.Services.AddSingleton<ImportQueue>();
+builder.Services.AddScoped<PresentationImporter>();
+builder.Services.AddHostedService<ImportWorker>();
+
+builder.Services.AddSingleton(TimeProvider.System);
+// Enums travel as their names ("Ready"), not as numbers.
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -69,6 +83,8 @@ app.MapHealthChecks("/health");
 
 var admin = app.MapGroup("/api/admin").RequireAuthorization(AdminAccessEndpoints.TeacherPolicy);
 app.MapAdminAccessEndpoints(admin);
+admin.MapPresentationEndpoints(
+    app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<ImportOptions>>().Value);
 
 // Unknown API routes are a 404, not the React page.
 app.Map("/api/{**rest}", () => Results.Problem(statusCode: StatusCodes.Status404NotFound));
