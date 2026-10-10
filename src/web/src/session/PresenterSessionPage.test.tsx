@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -275,6 +275,75 @@ test('quick presses with a slow server end on the slide the teacher asked for', 
   hub().receive('SlideChanged', 2, 0)
   await hub().answerCalls()
   expect(screen.getByRole('img', { name: 'Diapositiva 3 de 3' })).toBeInTheDocument()
+})
+
+test('the window to share opens from the lobby and from the class, in this browser', async () => {
+  const open = vi.spyOn(window, 'open').mockReturnValue(null)
+  const user = await openSession()
+  hub().receive('SessionSnapshot', snapshot())
+
+  await user.click(await screen.findByRole('button', { name: 'Abrir ventana para compartir' }))
+  expect(open).toHaveBeenLastCalledWith('/display/session-1', 'display-session-1')
+
+  hub().receive('SessionStarted', 0, 0)
+  await user.click(await screen.findByRole('button', { name: 'Ventana para compartir' }))
+  expect(open).toHaveBeenCalledTimes(2)
+})
+
+test('for a projector on another computer, a one-time link is copied to the clipboard', async () => {
+  const user = await openSession()
+  // Added after the page opened: openSession() set up the stubs for what the page loads first.
+  stubFetch({
+    'GET /api/admin/sessions/session-1': jsonResponse(details),
+    'POST /api/admin/sessions/session-1/display-token': jsonResponse({ token: 'ONE-TIME' }),
+  })
+  hub().receive('SessionSnapshot', snapshot())
+
+  await user.click(await screen.findByRole('button', { name: 'Copiar enlace para otro equipo' }))
+
+  expect(await screen.findByText(/Enlace copiado\. Sirve una sola vez/)).toBeInTheDocument()
+  expect(await navigator.clipboard.readText()).toBe(`${window.location.origin}/display/session-1#token=ONE-TIME`)
+})
+
+test('when the browser does not allow copying, the link is shown to be copied by hand', async () => {
+  const user = await openSession()
+  stubFetch({
+    'GET /api/admin/sessions/session-1': jsonResponse(details),
+    'POST /api/admin/sessions/session-1/display-token': jsonResponse({ token: 'ONE-TIME' }),
+  })
+  vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('NotAllowedError'))
+  hub().receive('SessionSnapshot', snapshot())
+
+  await user.click(await screen.findByRole('button', { name: 'Copiar enlace para otro equipo' }))
+
+  expect(await screen.findByDisplayValue(`${window.location.origin}/display/session-1#token=ONE-TIME`)).toBeInTheDocument()
+  expect(screen.getByText(/Copiá este enlace y abrilo en el otro equipo/)).toBeInTheDocument()
+  expect(screen.queryByText(/Enlace copiado/)).not.toBeInTheDocument()
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument() // not reported as a failure
+})
+
+test('the copied-link notice goes away when the link expires', async () => {
+  // Fake clock from the start, so the two-minute timer is created on it. It still follows
+  // real time by itself, which keeps everything else in the test working as usual.
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  const user = await openSession()
+  stubFetch({
+    'GET /api/admin/sessions/session-1': jsonResponse(details),
+    'POST /api/admin/sessions/session-1/display-token': jsonResponse({ token: 'ONE-TIME' }),
+  })
+  hub().receive('SessionSnapshot', snapshot())
+  await user.click(await screen.findByRole('button', { name: 'Copiar enlace para otro equipo' }))
+  await screen.findByText(/Enlace copiado/)
+
+  act(() => {
+    vi.advanceTimersByTime(2 * 60 * 1000 - 1000)
+  })
+  expect(screen.getByText(/Enlace copiado/)).toBeInTheDocument() // still valid, still offered
+
+  act(() => {
+    vi.advanceTimersByTime(2000)
+  })
+  expect(screen.queryByText(/Enlace copiado/)).not.toBeInTheDocument()
 })
 
 test('a session that does not exist says so', async () => {

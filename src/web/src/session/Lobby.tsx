@@ -12,10 +12,32 @@ type LobbyProps = {
   onStart: () => void
   onRemove: (attendanceId: string) => void
   onCancel: () => void
+  /** Opens the window to share or project, in this browser. */
+  onOpenDisplay: () => void
+  /** Copies a one-time link that opens that window on another computer. */
+  onCopyDisplayLink: () => void
+  /** The link just made, while it is still valid. */
+  displayLink: DisplayLink | null
+}
+
+export type DisplayLink = {
+  url: string
+  /** False when the browser did not allow copying: the link is then shown to be copied by hand. */
+  copied: boolean
 }
 
 /** The teacher's waiting room: how to join, who has come in, and the button to begin. */
-export function Lobby({ title, code, attendance, onStart, onRemove, onCancel }: LobbyProps) {
+export function Lobby({
+  title,
+  code,
+  attendance,
+  onStart,
+  onRemove,
+  onCancel,
+  onOpenDisplay,
+  onCopyDisplayLink,
+  displayLink,
+}: LobbyProps) {
   const { t } = useTranslation()
 
   return (
@@ -32,6 +54,28 @@ export function Lobby({ title, code, attendance, onStart, onRemove, onCancel }: 
           <p className={styles.address}>{joinUrl(code)}</p>
         </div>
         <QRCodeSVG className={styles.qr} value={joinUrl(code)} size={176} marginSize={2} title={t('lobby.qrTitle')} />
+      </section>
+
+      <section className={styles.display} aria-labelledby="display-heading">
+        <h2 id="display-heading" className={styles.heading}>
+          {t('lobby.display.heading')}
+        </h2>
+        <p className={styles.hint}>{t('lobby.display.hint')}</p>
+        <div className={styles.displayActions}>
+          <button className={styles.cancel} type="button" onClick={onOpenDisplay}>
+            {t('lobby.display.open')}
+          </button>
+          <button className={styles.cancel} type="button" onClick={onCopyDisplayLink}>
+            {t('lobby.display.copyLink')}
+          </button>
+        </div>
+        {displayLink?.copied && <p role="status">{t('lobby.display.linkCopied')}</p>}
+        {displayLink && !displayLink.copied && (
+          <label className={styles.linkToCopy}>
+            <span role="status">{t('lobby.display.copyByHand')}</span>
+            <input readOnly value={displayLink.url} onFocus={(event) => event.target.select()} />
+          </label>
+        )}
       </section>
 
       <section aria-labelledby="attendance-heading">

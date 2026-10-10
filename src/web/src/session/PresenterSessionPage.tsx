@@ -4,14 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
 import { ApiError } from '../api/http'
 import { accessQueryKey } from '../api/queryClient'
+import { createDisplayLink } from '../api/join'
 import { formatSessionCode, getSession } from '../api/sessions'
 import type { SessionDetail } from '../api/types'
 import { Presenter } from '../presenter/Presenter'
 import presenterStyles from '../presenter/Presenter.module.css'
 import { Message } from '../presenter/PresenterPage'
 import { useLiveSession } from '../realtime/useLiveSession'
-import { Lobby } from './Lobby'
+import { Lobby, type DisplayLink } from './Lobby'
 import styles from './PresenterSessionPage.module.css'
+
+/** How long a one-time display link is valid on the server, and so how long it is offered here. */
+const displayLinkLifetime = 2 * 60 * 1000
 
 /** The teacher's window of a live session: the lobby first, then the presenter view. */
 export function PresenterSessionPage() {
@@ -42,6 +46,8 @@ function PresenterSession({ details }: { details: SessionDetail }) {
   const queryClient = useQueryClient()
   const live = useLiveSession(details.id, 'Presenter')
   const [actionFailed, setActionFailed] = useState(false)
+  // The one-time link last made for another computer, and whether the browser let us copy it.
+  const [displayLink, setDisplayLink] = useState<DisplayLink | null>(null)
 
   // The hub refuses a presenter only when the teacher cookie is gone, typically because it
   // expired with this tab open. Checking access again brings the access key form back.
@@ -51,6 +57,16 @@ function PresenterSession({ details }: { details: SessionDetail }) {
       void queryClient.invalidateQueries({ queryKey: accessQueryKey })
     }
   }, [refused, queryClient])
+
+  // The link stops working after two minutes: do not keep offering it.
+  // (Hooks go before any early return: React needs them called in the same order every time.)
+  useEffect(() => {
+    if (displayLink === null) {
+      return undefined
+    }
+    const timer = setTimeout(() => setDisplayLink(null), displayLinkLifetime)
+    return () => clearTimeout(timer)
+  }, [displayLink])
 
   /** Runs something the teacher asked for and says so if the server could not do it. */
   function run(action: Promise<void>, then?: () => void) {
@@ -85,6 +101,27 @@ function PresenterSession({ details }: { details: SessionDetail }) {
   const attendance = session.attendance ?? { connectedCount: 0, attendees: [] }
   const code = session.code ?? details.code
 
+  /** The window to share on a video call or drag to the projector. Same browser, so it just opens. */
+  function openDisplay() {
+    window.open(`/display/${details.id}`, `display-${details.id}`)
+  }
+
+  /** For a projector on another computer: a link that works once, for two minutes. */
+  function copyDisplayLink() {
+    setDisplayLink(null)
+    run(
+      createDisplayLink(details.id).then(async (url) => {
+        // Some browsers only allow the clipboard right at the click, not after a request:
+        // when they refuse, the link is shown instead, to be copied by hand.
+        const copied = await navigator.clipboard.writeText(url).then(
+          () => true,
+          () => false,
+        )
+        setDisplayLink({ url, copied })
+      }),
+    )
+  }
+
   function endSession(confirmation: string, then?: () => void) {
     if (window.confirm(confirmation)) {
       run(live.endSession(), then)
@@ -107,6 +144,9 @@ function PresenterSession({ details }: { details: SessionDetail }) {
             }
           }}
           onCancel={() => endSession(t('lobby.cancelConfirm'), () => void navigate('/admin'))}
+          onOpenDisplay={openDisplay}
+          onCopyDisplayLink={copyDisplayLink}
+          displayLink={displayLink}
         />
       </>
     )
@@ -126,6 +166,9 @@ function PresenterSession({ details }: { details: SessionDetail }) {
           <span className={styles.codeLabel}>{t('session.code')}</span> {formatSessionCode(code)}
         </p>
         <p className={styles.connected}>{t('session.connected', { count: attendance.connectedCount })}</p>
+        <button className={presenterStyles.option} type="button" onClick={openDisplay}>
+          {t('session.openDisplay')}
+        </button>
         <button className={presenterStyles.option} type="button" onClick={() => endSession(t('session.endConfirm'))}>
           {t('session.end')}
         </button>

@@ -1,0 +1,65 @@
+.message {
+  max-width: 34rem;
+  margin-inline: auto;
+  padding: var(--space-8) var(--space-5);
+}
+
+.kicker {
+  margin: 0;
+  color: var(--color-grafito-suave);
+}
+
+.heading {
+  margin: var(--space-1) 0 var(--space-3);
+  font-size: var(--text-xl);
+  line-height: 1.15;
+}
+
+.link {
+  color: var(--color-tinta);
+  font-weight: 700;
+}
+
+/*
+ * Designed for a computer first (D-35): the slide takes the window, often half a screen beside
+ * a video call. On a phone the same rules stack it at the top. The question of a quiz will go
+ * beside the slide on a wide window and under it on a narrow one.
+ */
+.live {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  justify-items: center;
+  gap: var(--space-3);
+  height: 100dvh;
+  padding: var(--space-4);
+}
+
+.classTitle {
+  margin: 0;
+  color: var(--color-grafito-suave);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+/* The teacher's slide sits in a white frame: it is their content, shown as it is. */
+.slide {
+  max-width: 100%;
+  max-height: 100%;
+  border: 1px solid var(--color-renglon);
+  background: var(--color-blanco);
+  object-fit: contain;
+}
+
+.reconnecting {
+  position: fixed;
+  top: var(--space-3);
+  left: 50%;
+  z-index: 1;
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border: 2px solid var(--color-grafito);
+  border-radius: var(--radius);
+  background: var(--color-blanco);
+  font-weight: 700;
+  transform: translateX(-50%);
+}
