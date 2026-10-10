@@ -7,17 +7,25 @@ namespace Server.Features.Import;
 /// <summary>Reads what the importer needs straight from the PPTX with the Open XML SDK.</summary>
 public static class PptxReader
 {
+    /// <inheritdoc cref="ReadVisibleSlideNotes(Stream)"/>
+    public static IReadOnlyList<string> ReadVisibleSlideNotes(string pptxPath)
+    {
+        using var file = File.OpenRead(pptxPath);
+        return ReadVisibleSlideNotes(file);
+    }
+
     /// <summary>
     /// Speaker notes of every <b>visible</b> slide, in deck order ("" when a slide has none).
     /// Hidden slides are skipped because LibreOffice leaves them out of the PDF: including
     /// them would shift every later note onto the wrong image.
     /// </summary>
+    /// <param name="pptx">A seekable stream. It is left open.</param>
     /// <exception cref="InvalidDataException">The file is not a readable presentation.</exception>
-    public static IReadOnlyList<string> ReadVisibleSlideNotes(string pptxPath)
+    public static IReadOnlyList<string> ReadVisibleSlideNotes(Stream pptx)
     {
         try
         {
-            using var document = PresentationDocument.Open(pptxPath, isEditable: false);
+            using var document = PresentationDocument.Open(pptx, isEditable: false);
             var presentationPart = document.PresentationPart
                 ?? throw new InvalidDataException("The file has no presentation part.");
             var slideIds = presentationPart.Presentation?.SlideIdList?.Elements<SlideId>() ?? [];

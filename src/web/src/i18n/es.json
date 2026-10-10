@@ -47,10 +47,11 @@
     "error": {
       "NoFile": "Elegí un archivo primero.",
       "NotPptx": "Ese archivo no es un .pptx. Si es un .ppt o un .pptm, guardalo como .pptx desde PowerPoint.",
-      "TooLarge": "El archivo pesa más de 100 MB.",
+      "TooLarge": "El archivo pesa más de {{limit}} MB.",
+      "tooLargeForServer": "El archivo es demasiado grande para subirlo.",
       "Unreadable": "No pudimos leer ese archivo como una presentación.",
       "NoVisibleSlides": "La presentación no tiene diapositivas visibles.",
-      "TooManySlides": "La presentación tiene más de 300 diapositivas.",
+      "TooManySlides": "La presentación tiene más de {{limit}} diapositivas.",
       "generic": "No se pudo subir el archivo. Probá de nuevo."
     }
   }

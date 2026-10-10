@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expect, test } from 'vitest'
 import { jsonResponse, renderWithQuery, stubFetch } from '../test/render'
 import { AccessGate } from './AccessGate'
+import { PresentationsPage } from './PresentationsPage'
 
 function renderGate() {
   renderWithQuery(
@@ -65,6 +66,23 @@ test('does not blame the key when the server has no key configured', async () =>
   const alert = await screen.findByRole('alert')
   expect(alert).toHaveTextContent('no está configurada en este servidor')
   expect(alert).not.toHaveTextContent('no es correcta')
+})
+
+test('asks for the key again when the session expired while the page was open', async () => {
+  stubFetch({
+    'GET /api/admin/access': new Response(null, { status: 204 }),
+    // The cookie ran out between the access check and this request.
+    'GET /api/admin/presentations': new Response(null, { status: 401 }),
+  })
+
+  renderWithQuery(
+    <AccessGate>
+      <PresentationsPage />
+    </AccessGate>,
+  )
+
+  expect(await screen.findByLabelText('Clave de acceso')).toBeInTheDocument()
+  expect(screen.queryByText('No se pudieron cargar las presentaciones.')).not.toBeInTheDocument()
 })
 
 test('explains the wait when there were too many attempts', async () => {

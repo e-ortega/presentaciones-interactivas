@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -60,39 +61,35 @@ public static class PresentationEndpoints
     {
         if (file is null)
         {
-            return UploadProblem(UploadError.NoFile);
+            return UploadProblem(UploadError.NoFile, options.Value);
         }
 
-        // Checked on a local copy: the Open XML SDK needs a seekable file.
-        var tempPath = Path.GetTempFileName();
+        // ASP.NET Core has already buffered the upload, so this stream is seekable:
+        // it is read once to validate and once more to store.
+        await using var content = file.OpenReadStream();
+        if (PptxUpload.Validate(file.FileName, content, options.Value) is { } error)
+        {
+            return UploadProblem(error, options.Value);
+        }
+
+        var presentation = new Presentation(PptxUpload.TitleFrom(file.FileName), time.GetUtcNow());
+        content.Position = 0;
+        await storage.SaveAsync(presentation.PptxPath, content, PptxUpload.ContentType, cancellationToken);
+
         try
         {
-            await using (var temp = File.Create(tempPath))
-            {
-                await file.CopyToAsync(temp, cancellationToken);
-            }
-
-            if (PptxUpload.Validate(file.FileName, tempPath, options.Value) is { } error)
-            {
-                return UploadProblem(error);
-            }
-
-            var presentation = new Presentation(PptxUpload.TitleFrom(file.FileName), time.GetUtcNow());
-            await using (var temp = File.OpenRead(tempPath))
-            {
-                await storage.SaveAsync(presentation.PptxPath, temp, PptxUpload.ContentType, cancellationToken);
-            }
-
             db.Presentations.Add(presentation);
             await db.SaveChangesAsync(cancellationToken);
-            queue.Enqueue(presentation.Id);
-
-            return Results.Accepted($"/api/admin/presentations/{presentation.Id}", ToSummary(presentation, slideCount: 0));
         }
-        finally
+        catch
         {
-            File.Delete(tempPath);
+            // Without its row nothing would ever point at the file again.
+            await storage.DeleteAsync(presentation.PptxPath, CancellationToken.None);
+            throw;
         }
+
+        queue.Enqueue(presentation.Id);
+        return Results.Accepted($"/api/admin/presentations/{presentation.Id}", ToSummary(presentation, slideCount: 0));
     }
 
     private static async Task<IReadOnlyList<PresentationSummary>> List(AppDbContext db, CancellationToken cancellationToken) =>
@@ -137,9 +134,15 @@ public static class PresentationEndpoints
             .Select(step => step.ImagePath)
             .FirstOrDefaultAsync(cancellationToken);
 
-        // The image of a step never changes once imported. "private": only this browser keeps it.
-        http.Response.Headers.CacheControl = "private, max-age=86400, immutable";
-        return await FileOrNotFound(storage, imagePath, "image/png", cancellationToken);
+        var result = await FileOrNotFound(storage, imagePath, "image/png", cancellationToken);
+        if (result is not ProblemHttpResult)
+        {
+            // The image of a step never changes once imported. "private": only this browser keeps it.
+            // Never on a 404: the browser would keep answering "not found" after the image exists.
+            http.Response.Headers.CacheControl = "private, max-age=86400, immutable";
+        }
+
+        return result;
     }
 
     private static async Task<IResult> FileOrNotFound(IFileStorage storage, string? path, string contentType, CancellationToken cancellationToken)
@@ -153,10 +156,25 @@ public static class PresentationEndpoints
     private static PresentationSummary ToSummary(Presentation p, int slideCount) =>
         new(p.Id, p.Title, p.Status, p.Failure, slideCount, p.CreatedAt);
 
-    /// <summary>400 with a machine-readable "code" the interface turns into a message.</summary>
-    private static IResult UploadProblem(UploadError error) =>
-        Results.Problem(
+    /// <summary>
+    /// 400 with a machine-readable "code" the interface turns into a message and, when the
+    /// file is over a limit, that "limit": megabytes for TooLarge, slides for TooManySlides.
+    /// </summary>
+    private static IResult UploadProblem(UploadError error, ImportOptions options)
+    {
+        var extensions = new Dictionary<string, object?> { ["code"] = error.ToString() };
+        if (error == UploadError.TooLarge)
+        {
+            extensions["limit"] = options.MaxFileBytes / (1024 * 1024);
+        }
+        else if (error == UploadError.TooManySlides)
+        {
+            extensions["limit"] = options.MaxSlides;
+        }
+
+        return Results.Problem(
             statusCode: StatusCodes.Status400BadRequest,
             title: "The file cannot be imported.",
-            extensions: new Dictionary<string, object?> { ["code"] = error.ToString() });
+            extensions: extensions);
+    }
 }

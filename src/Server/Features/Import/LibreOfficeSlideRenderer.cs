@@ -18,6 +18,9 @@ public class ImportOptions
     /// <summary>Width of the slide images in pixels; the height follows the deck's aspect ratio.</summary>
     public int ImageWidth { get; set; } = 1600;
 
+    /// <summary>Wait before retrying an import that could not run, e.g. while the database wakes up.</summary>
+    public TimeSpan RetryDelay { get; set; } = TimeSpan.FromSeconds(30);
+
     public long MaxFileBytes { get; set; } = 100 * 1024 * 1024;
     public int MaxSlides { get; set; } = 300;
 }
@@ -128,6 +131,7 @@ public class LibreOfficeSlideRenderer(IOptions<ImportOptions> options, ILogger<L
             catch (OperationCanceledException)
             {
                 process.Kill(entireProcessTree: true);
+                await WaitForExitAfterKillAsync(process);
                 cancellationToken.ThrowIfCancellationRequested(); // the app is shutting down
                 throw new SlideRenderException(
                     ImportFailure.ConversionTimedOut,
@@ -141,6 +145,22 @@ public class LibreOfficeSlideRenderer(IOptions<ImportOptions> options, ILogger<L
             }
 
             await output;
+        }
+    }
+
+    /// <summary>
+    /// Gives a killed process a moment to go away, so it has let go of its files before the
+    /// caller deletes the work directory.
+    /// </summary>
+    private static async Task WaitForExitAfterKillAsync(Process process)
+    {
+        try
+        {
+            await process.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
+        }
+        catch (TimeoutException)
+        {
+            // Still not gone: the caller's cleanup is best effort for this reason.
         }
     }
 }

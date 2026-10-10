@@ -26,6 +26,19 @@ public class SchemaTests(SqlServerFixture sql)
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
     private static readonly DateTimeOffset Now = new(2026, 10, 9, 15, 0, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Already imported. A pending one would be picked up by the import worker of any test
+    /// that starts the app against this same database.
+    /// </summary>
+    private static Presentation ReadyPresentation()
+    {
+        var presentation = new Presentation("Deck", Now);
+        presentation.StartProcessing();
+        presentation.AddSlide("notes").AddStep("slide.png");
+        presentation.CompleteImport();
+        return presentation;
+    }
+
     [Fact]
     public async Task Participant_email_is_unique()
     {
@@ -40,7 +53,7 @@ public class SchemaTests(SqlServerFixture sql)
     public async Task Session_code_is_unique_among_sessions_that_have_not_ended()
     {
         await using var context = await sql.CreateContextAsync();
-        var presentation = new Presentation("Deck", Now);
+        var presentation = ReadyPresentation();
         context.Presentations.Add(presentation);
         context.Sessions.Add(new Session(presentation.Id, "12345678", Now));
         await context.SaveChangesAsync(Ct);
@@ -54,14 +67,14 @@ public class SchemaTests(SqlServerFixture sql)
     public async Task A_participant_answers_a_launch_only_once()
     {
         await using var context = await sql.CreateContextAsync();
-        var presentation = new Presentation("Deck", Now);
-        var slide = new Slide(presentation.Id, 0, "notes");
+        var presentation = ReadyPresentation();
+        var slide = presentation.Slides[0];
         var widget = new Widget(slide.Id, WidgetType.MultipleChoice, "{}");
         var session = new Session(presentation.Id, "87654321", Now);
         var participant = new Participant("luis@example.com", "Luis");
         var attendance = new Attendance(session.Id, participant.Id, "Luis", Now, "2026-10");
         var launch = new WidgetLaunch(session.Id, widget.Id, "{}", Now);
-        context.AddRange(presentation, slide, widget, session, participant, attendance, launch);
+        context.AddRange(presentation, widget, session, participant, attendance, launch);
         context.Responses.Add(new Response(launch.Id, attendance.Id, "{}", Now));
         await context.SaveChangesAsync(Ct);
 

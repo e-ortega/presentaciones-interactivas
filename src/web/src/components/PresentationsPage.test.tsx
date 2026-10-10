@@ -76,6 +76,34 @@ test('uploads the chosen file and shows it in the list while it is converted', a
   expect(body.get('file')).toEqual(pptx)
 })
 
+test('states the limit the server sent, not one written in the interface', async () => {
+  stubFetch({
+    'GET /api/admin/presentations': jsonResponse([]),
+    'POST /api/admin/presentations': jsonResponse({ code: 'TooManySlides', limit: 120 }, 400),
+  })
+  const user = userEvent.setup()
+
+  renderWithQuery(<PresentationsPage />)
+  await user.upload(screen.getByLabelText('Subir un PowerPoint (.pptx)'), pptx)
+  await user.click(screen.getByRole('button', { name: 'Subir presentación' }))
+
+  expect(await screen.findByRole('alert')).toHaveTextContent('La presentación tiene más de 120 diapositivas.')
+})
+
+test('falls back to a general message for a rejection code it does not know', async () => {
+  stubFetch({
+    'GET /api/admin/presentations': jsonResponse([]),
+    'POST /api/admin/presentations': jsonResponse({ code: 'SomethingAddedLater' }, 400),
+  })
+  const user = userEvent.setup()
+
+  renderWithQuery(<PresentationsPage />)
+  await user.upload(screen.getByLabelText('Subir un PowerPoint (.pptx)'), pptx)
+  await user.click(screen.getByRole('button', { name: 'Subir presentación' }))
+
+  expect(await screen.findByRole('alert')).toHaveTextContent('No se pudo subir el archivo. Probá de nuevo.')
+})
+
 test('explains why the server rejected a file', async () => {
   stubFetch({
     'GET /api/admin/presentations': jsonResponse([]),

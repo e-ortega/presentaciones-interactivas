@@ -67,7 +67,8 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 
 - **Código de sesión:** 8 dígitos aleatorios (`8888-6666`), únicos entre sesiones activas; deja de servir cuando la sesión termina.
 - **Llaves de las cookies:** se guardan en la base de datos (D-51), para que las cookies sigan valiendo cuando el contenedor se reinicia.
-- **Límite de intentos** (rate limiting de ASP.NET Core) en `join` y en la clave de acceso, por IP, para impedir adivinar códigos o la clave.
+- **Límite de intentos** (rate limiting de ASP.NET Core) en `join` y en la clave de acceso, por IP, para impedir adivinar códigos o la clave. Detrás del proxy de Azure la IP real viene en un encabezado: hay que activar los encabezados reenviados en el M5 (ver el plan).
+- **Sesión vencida:** cuando cualquier petición del profesor recibe un 401, la interfaz vuelve a pedir la clave.
 
 ## 4. Importación de presentaciones
 
@@ -77,6 +78,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 4. LibreOffice corre con un perfil temporal propio, en una carpeta temporal, con **tiempo máximo de 2 minutos**; si se pasa, se termina el proceso y la importación queda en `Failed` con su motivo como código (D-54). Las imágenes salen en PNG de 1600 px de ancho (D-55).
 5. El frontend consulta el estado cada pocos segundos (`GET /api/admin/presentations/{id}`). En la Fase 1 no hace falta SignalR para esto.
 6. Al arrancar, las importaciones que quedaron en `Pending` o `Processing` se vuelven a encolar.
+7. Si una importación no puede ni empezar o no puede guardar su resultado (típicamente, la base está en pausa), se reintenta hasta 3 veces con una espera entre intentos (D-63). Si falla, los archivos que ya había guardado se borran y queda solo el original.
 - **Al crecer:** la cola pasa a Azure Storage Queues y el procesamiento a un Container Apps Job, sin cambiar `ISlideRenderer`.
 
 ## 5. Archivos

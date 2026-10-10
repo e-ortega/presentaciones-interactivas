@@ -24,20 +24,20 @@ public static class PptxUpload
     private static ReadOnlySpan<byte> ZipSignature => [0x50, 0x4B, 0x03, 0x04]; // "PK\x03\x04"
 
     /// <summary>Returns null when the file can be imported.</summary>
-    public static UploadError? Validate(string fileName, string localPath, ImportOptions options)
+    /// <param name="content">A seekable stream. It is left open, at an unspecified position.</param>
+    public static UploadError? Validate(string fileName, Stream content, ImportOptions options)
     {
         if (!string.Equals(Path.GetExtension(fileName), ".pptx", StringComparison.OrdinalIgnoreCase))
         {
             return UploadError.NotPptx;
         }
 
-        var length = new FileInfo(localPath).Length;
-        if (length > options.MaxFileBytes)
+        if (content.Length > options.MaxFileBytes)
         {
             return UploadError.TooLarge;
         }
 
-        if (!HasZipSignature(localPath))
+        if (!HasZipSignature(content))
         {
             return UploadError.Unreadable;
         }
@@ -45,7 +45,8 @@ public static class PptxUpload
         int visibleSlides;
         try
         {
-            visibleSlides = PptxReader.ReadVisibleSlideNotes(localPath).Count;
+            content.Position = 0;
+            visibleSlides = PptxReader.ReadVisibleSlideNotes(content).Count;
         }
         catch (InvalidDataException)
         {
@@ -60,18 +61,27 @@ public static class PptxUpload
         };
     }
 
-    /// <summary>The file name without extension, as the initial title.</summary>
+    /// <summary>
+    /// The file name without folders or extension, as the initial title. Browsers send only
+    /// the name, but other clients may send a full path with either kind of separator.
+    /// </summary>
     public static string TitleFrom(string fileName)
     {
-        var title = Path.GetFileNameWithoutExtension(fileName).Trim();
+        var name = fileName[(fileName.LastIndexOfAny(['/', '\\']) + 1)..].Trim();
+        var title = Path.GetFileNameWithoutExtension(name).Trim();
+        if (title.Length == 0)
+        {
+            title = name; // a file called just ".pptx" keeps that as its title
+        }
+
         return title.Length <= 200 ? title : title[..200];
     }
 
-    private static bool HasZipSignature(string path)
+    private static bool HasZipSignature(Stream content)
     {
         Span<byte> header = stackalloc byte[4];
-        using var file = File.OpenRead(path);
-        return file.ReadAtLeast(header, header.Length, throwOnEndOfStream: false) == header.Length
+        content.Position = 0;
+        return content.ReadAtLeast(header, header.Length, throwOnEndOfStream: false) == header.Length
             && header.SequenceEqual(ZipSignature);
     }
 }

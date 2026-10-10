@@ -4,11 +4,9 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Abiertos
 
-- [ ] **Decidir quién revisa el código de Claude.** El ruleset pide revisión de Copilot, pero nunca se ejecutó en los pull requests #1 a #4 (parece que la cuenta no la tiene activada). Mientras tanto Claude revisa cada diff con una pasada independiente (D-61). Opciones: activar Copilot, que revise Esteban, o dejarlo así. _(Nuevo)_
-- [ ] **Decidir si se revisa hacia atrás el código del M0 y el M1**, que entró sin revisión. _(Nuevo)_
-- [ ] **Probar la app en el navegador:** levantar Docker Compose, entrar con la clave real y subir un PowerPoint. Es la primera vez que la clave real se usa; Claude solo probó con una clave temporal.
+- [ ] **Decidir quién revisa el código de Claude.** El ruleset pide revisión de Copilot, pero nunca se ejecutó en los pull requests #1 a #4 (parece que la cuenta no la tiene activada). Mientras tanto Claude revisa cada diff con una pasada independiente (D-61). Opciones: activar Copilot, que revise Esteban, o dejarlo así.
 - [ ] **Confirmar el trato en los textos de la interfaz:** están en voseo ("Subí tu primer PowerPoint", "Probá de nuevo"), como en el documento de identidad visual. Si se prefiere "usted" o "tú", es cambiar un archivo: `src/web/src/i18n/es.json`.
-- [ ] **Revisar las decisiones D-49 a D-61** que Claude tomó al implementar el M0 y el M1 ([decisiones.md](decisiones.md)). _(Cambió: se agregan D-60 y D-61)_
+- [ ] **Revisar las decisiones D-49 a D-63** que Claude tomó al implementar el M0 y el M1 ([decisiones.md](decisiones.md)). _(Cambió: se agregan D-62 y D-63)_
 - [ ] **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes.
 - [ ] **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador.
 - [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
@@ -16,6 +14,7 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 ## Más adelante (sin acción por ahora)
 
 - Un deck real con **diapositivas ocultas** y otro con **fuentes poco comunes**, para probar esos dos casos con material real. Los seis decks usados no tienen ninguno de los dos; hoy solo están cubiertos con archivos sintéticos.
+- **Borrar una presentación.** Hoy no se puede: las importaciones fallidas y las de prueba se quedan en la lista. Va con la gestión de presentaciones, en el M2 o después. _(Nuevo)_
 - Inicio de sesión del profesor (D-36).
 - Nombre del producto (D-37).
 - Documentación de uso en inglés, si hace falta (D-43).
@@ -24,7 +23,10 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Resueltos
 
-- [x] Verificaciones automáticas estrictas en el servidor y el frontend (D-60). _(Nuevo)_
+- [x] Revisión hacia atrás del M0 y el M1: 9 hallazgos, 8 corregidos y 1 anotado para el M5 (D-63). _(Nuevo)_
+- [x] App probada en el navegador con la clave real: entra y la importación funciona. _(Nuevo)_
+- [x] Las preguntas de React son opcionales y no quedan como pendiente (D-62). _(Nuevo)_
+- [x] Verificaciones automáticas estrictas en el servidor y el frontend (D-60).
 - [x] M1 (importación) terminado: servidor y pantallas de React.
 - [x] Claude puede fusionar sus pull requests con el CI en verde (D-59).
 - [x] Hash de la clave de acceso cargado en `dotnet user-secrets`.

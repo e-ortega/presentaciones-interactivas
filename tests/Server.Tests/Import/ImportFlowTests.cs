@@ -10,6 +10,7 @@ using Server.Tests.Data;
 namespace Server.Tests.Import;
 
 /// <summary>Upload, background import and reading the result, through the HTTP API.</summary>
+[Collection(ImportPipelineCollection.Name)]
 public sealed class ImportFlowTests(SqlServerFixture sql) : IDisposable
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)

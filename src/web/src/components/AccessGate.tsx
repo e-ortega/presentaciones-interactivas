@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { hasAccess } from '../api/access'
+import { accessQueryKey } from '../api/queryClient'
 import { AccessKeyForm } from './AccessKeyForm'
 
 type AccessGateProps = {
@@ -13,7 +14,7 @@ type AccessGateProps = {
 export function AccessGate({ children }: AccessGateProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const access = useQuery({ queryKey: ['access'], queryFn: hasAccess })
+  const access = useQuery({ queryKey: accessQueryKey, queryFn: hasAccess })
 
   if (access.isPending) {
     return <p role="status">{t('access.checking')}</p>
@@ -25,7 +26,7 @@ export function AccessGate({ children }: AccessGateProps) {
 
   if (!access.data) {
     // The key was accepted: remember it, which renders this component again.
-    return <AccessKeyForm onAccepted={() => queryClient.setQueryData(['access'], true)} />
+    return <AccessKeyForm onAccepted={() => queryClient.setQueryData(accessQueryKey, true)} />
   }
 
   return children
