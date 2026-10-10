@@ -69,4 +69,5 @@ Decisiones planteadas por Claude que esperan confirmación de Esteban. Ver [pend
 | ~~P-09~~ | Aprobada → D-39. **Un solo modo, tres ventanas** (revisada el 9 oct, noche): presentador, ventana opcional para compartir o proyectar (sin notas) y estudiante. La ventana para compartir entra en la Fase 1. Roles de cliente `Presenter`, `Display`, `Participant` | En la referencia de Genially el profesor comparte pantalla en la videollamada; sin una ventana limpia, la clase vería sus notas. Ver [diseno.md](diseno.md) §13 |
 | ~~P-10~~ | Aprobada → D-44 | |
 | ~~P-12~~ | Aprobada → D-42 | |
+| P-13 | **Arquitectura de implementación** de la Fase 1: backend por funcionalidades con Minimal APIs y EF Core directo, estado en vivo en memoria con una réplica, contrato del hub SignalR, identidad por cookies firmadas, importación en cola dentro del proceso, archivos servidos por la app, TanStack Query + hook de sesión en React, pruebas con Testcontainers y archivos sintéticos, ramas + PR + GitHub Actions | Ver [arquitectura.md](arquitectura.md) |
 | ~~P-11~~ | Aprobada → D-45 | |

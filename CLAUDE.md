@@ -15,6 +15,7 @@ Dueño del proyecto: **Esteban Ortega**, ingeniero de software en Costa Rica y p
 | `docs/diseno.md` | Diseño completo: experiencia, modelo de datos, arquitectura, Azure, fases |
 | `docs/decisiones.md` | Registro de decisiones (D-xx) y propuestas en revisión (P-xx) |
 | `docs/pendientes.md` | Lo que depende de Esteban |
+| `docs/arquitectura.md` | Arquitectura de implementación: backend, contrato SignalR, identidad, importación, frontend, pruebas, CI/CD |
 | `docs/plan-fase-1.md` | Plan de implementación del MVP, por hitos |
 | `docs/identidad-visual.md` | Identidad visual y principios; tokens CSS en `design/tokens.css` (usarlos, no inventar colores) |
 | `docs/competencia.md` | Competencia, posicionamiento y monetización |

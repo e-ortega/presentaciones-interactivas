@@ -28,7 +28,7 @@ presentaciones-interactivas/
 └── docker-compose.yml
 ```
 
-Un solo proyecto de servidor con carpetas, no varios proyectos. La interfaz `ISlideRenderer` basta para mantener intercambiable la conversión del PPTX sin agregar capas.
+Un solo proyecto de servidor con carpetas, no varios proyectos. Los detalles de implementación (contrato del hub, identidad, cola de importación, frontend, pruebas, CI) están en [arquitectura.md](arquitectura.md). La interfaz `ISlideRenderer` basta para mantener intercambiable la conversión del PPTX sin agregar capas.
 
 ## Hitos
 
@@ -39,7 +39,8 @@ Un solo proyecto de servidor con carpetas, no varios proyectos. La interfaz `ISl
 - Zona del profesor protegida por la clave de acceso (D-45): middleware que compara el SHA-256 de la clave ingresada con `AdminAccess:KeySha256` en tiempo constante y deja una cookie. En local, Esteban carga el hash con `dotnet user-secrets`.
 - EF Core con la primera migración (entidades de la Fase 1, ver diseño §10).
 - Almacenamiento de archivos detrás de una interfaz: disco local en desarrollo, Blob Storage en Azure.
-- **Listo cuando:** `docker compose up` levanta todo y la página de React llama a un endpoint de salud.
+- GitHub Actions: compilar y probar backend y frontend en cada pull request.
+- **Listo cuando:** `docker compose up` levanta todo, la página de React llama a un endpoint de salud y el CI pasa en verde.
 
 ### M1 — Importación (el riesgo principal)
 - Endpoint para subir un PPTX.

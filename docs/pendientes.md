@@ -4,6 +4,7 @@ _Última actualización: 9 oct 2026 (noche). Marcados como (Nuevo) los agregados
 
 ## Abiertos
 
+- [ ] **Revisar y aprobar la arquitectura de implementación** (P-13, [arquitectura.md](arquitectura.md)). Antes de empezar el M0. _(Nuevo)_
 - [ ] **Guardar la clave de acceso en tu gestor de contraseñas** y, al terminar el M0, cargar su hash con `dotnet user-secrets` (D-45). La clave y el hash se entregaron en el chat de diseño; no están en el repo. _(Nuevo)_
 - [ ] **Hacer `git push`** desde Windows para subir los commits que Claude hace desde su entorno (no tiene credenciales de GitHub). _(Nuevo)_
 - [ ] **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes.

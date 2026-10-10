@@ -9,6 +9,7 @@ App web que convierte una presentación de PowerPoint que el profesor **ya tiene
 | [docs/diseno.md](docs/diseno.md) | Documento de diseño: visión, experiencia, modelo de datos, arquitectura y fases |
 | [docs/decisiones.md](docs/decisiones.md) | Registro de decisiones, con fecha y motivo |
 | [docs/pendientes.md](docs/pendientes.md) | Acciones pendientes que dependen de Esteban |
+| [docs/arquitectura.md](docs/arquitectura.md) | Arquitectura de implementación de la Fase 1 |
 | [docs/plan-fase-1.md](docs/plan-fase-1.md) | Plan de implementación del MVP por hitos |
 | [docs/contexto.md](docs/contexto.md) | Cómo se llegó al diseño y qué se descartó |
 | [docs/identidad-visual.md](docs/identidad-visual.md) | Identidad visual propuesta; tokens en `design/tokens.css` |
