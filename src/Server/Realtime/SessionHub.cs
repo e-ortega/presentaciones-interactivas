@@ -197,6 +197,8 @@ public class SessionHub(AppDbContext db, ILiveSessionStore live, TimeProvider ti
                 {
                     live.Disconnect(connection.SessionId, attendanceId, Context.ConnectionId);
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, SessionGroup(connection.SessionId));
+                    // The removal may have counted this connection a moment ago: send the count again.
+                    await BroadcastAttendanceAsync(connection.SessionId);
                     throw new HubException(HubErrors.Removed);
                 }
 

@@ -69,6 +69,7 @@ public class Attendance
     public Guid Id { get; private set; }
     public Guid SessionId { get; private set; }
     public Guid ParticipantId { get; private set; }
+    /// <summary>The name given on first joining this session. It does not change afterwards (D-84).</summary>
     public string DisplayName { get; private set; } = "";
     public DateTimeOffset ConsentedAt { get; private set; }
 
@@ -85,7 +86,4 @@ public class Attendance
 
     /// <summary>The teacher takes this participant out of the session.</summary>
     public void Remove() => Admitted = false;
-
-    /// <summary>Someone coming back with the same email may have fixed a typo in their name.</summary>
-    public void Rename(string displayName) => DisplayName = displayName;
 }

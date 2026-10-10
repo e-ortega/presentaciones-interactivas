@@ -100,13 +100,9 @@ public static class JoinEndpoints
             attendance = new Attendance(session.Id, participant.Id, name, consentedAt: time.GetUtcNow(), NoticeVersion);
             db.Attendances.Add(attendance);
         }
-        else if (await SessionAccess.ParticipantAttendanceAsync(http, session.Id) == attendance.Id)
-        {
-            // The same browser that joined before: it may fix its own name. Emails are not
-            // verified (D-18), so someone else typing this email gets in as this participant,
-            // but cannot change the name the teacher already sees.
-            attendance.Rename(name);
-        }
+        // An existing attendance keeps the name it was created with. Emails are not verified
+        // (D-18), so whoever types this email gets in as this participant; if they could also
+        // rename it, anyone with the code could rename a classmate in the teacher's list (D-84).
 
         try
         {

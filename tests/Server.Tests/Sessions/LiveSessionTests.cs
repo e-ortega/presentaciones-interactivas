@@ -235,28 +235,19 @@ public sealed class LiveSessionTests(SqlServerFixture sql) : IAsyncDisposable
     }
 
     [Fact]
-    public async Task A_student_can_fix_their_own_name_from_the_browser_they_joined_with()
-    {
-        var scenario = await StartScenarioAsync();
-        var presenter = await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Presenter);
-        var (browser, _) = await scenario.JoinedStudentAsync("Anna Mroa", "ana@example.com");
-
-        (await browser.JoinAsync(scenario.Session.Code, "Ana Mora", "ana@example.com")).EnsureSuccessStatusCode();
-        await browser.ConnectAsync(scenario.Session.Id, ClientRole.Participant);
-
-        await presenter.NextAsync<AttendanceUpdate>(u => u.Attendees is [{ DisplayName: "Ana Mora" }]);
-    }
-
-    [Fact]
-    public async Task Someone_else_typing_a_classmates_email_cannot_change_the_name_the_teacher_sees()
+    public async Task Nobody_typing_a_classmates_email_can_change_the_name_the_teacher_sees()
     {
         var scenario = await StartScenarioAsync();
         var presenter = await scenario.Teacher.ConnectAsync(scenario.Session.Id, ClientRole.Presenter);
         await scenario.JoinedStudentAsync("Ana Mora", "ana@example.com");
         await presenter.NextAsync<AttendanceUpdate>(u => u.ConnectedCount == 1);
 
-        // Emails are not verified per session (D-18), so this gets in as Ana; it must not rename her.
-        await scenario.JoinedStudentAsync("Something rude", "ana@example.com");
+        // Emails are not verified per session (D-18), so this browser gets in as Ana. Sending the
+        // form again, now holding the cookie of Ana's attendance, must not rename her either.
+        var impostor = scenario.NewBrowser();
+        (await impostor.JoinAsync(scenario.Session.Code, "Something rude", "ana@example.com")).EnsureSuccessStatusCode();
+        (await impostor.JoinAsync(scenario.Session.Code, "Something rude", "ana@example.com")).EnsureSuccessStatusCode();
+        await impostor.ConnectAsync(scenario.Session.Id, ClientRole.Participant);
 
         var update = await presenter.NextAsync<AttendanceUpdate>();
         Assert.Equal(["Ana Mora"], update.Attendees!.Select(attendee => attendee.DisplayName));
