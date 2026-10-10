@@ -73,7 +73,7 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-M0 y M1 terminados: la app importa un PPTX (imágenes, notas y PDF) y la zona del profesor permite entrar con la clave, subir presentaciones y ver su estado. Siguiente hito: M2, vista del presentador (`docs/plan-fase-1.md`). Ahí se agrega React Router (D-58).
+M0, M1 y M2 terminados: la app importa un PPTX (imágenes, notas y PDF); la zona del profesor permite entrar con la clave, subir presentaciones y ver su estado; y la vista del presentador recorre una presentación con sus notas como guion, por botones o teclado. Siguiente hito: M3, sesión en vivo con SignalR (`docs/plan-fase-1.md`).
 
 ## Flujo de trabajo
 
@@ -90,6 +90,7 @@ Antes de subir cambios, correr localmente lo mismo que el CI: `dotnet build` (lo
 - Los decks reales de Esteban se leen desde su carpeta para pruebas manuales; **nunca se copian al repo**, que es público.
 - Tipos de la API: al cambiar un endpoint o un DTO, correr `PI_UPDATE_OPENAPI=1 dotnet test` (actualiza `src/web/src/api/openapi.json`) y luego `npm run generate:api` en `src/web`; guardar los dos archivos (D-65). Si no, falla una prueba del servidor o el CI.
 - Hooks: `git commit` corre lint-staged (D-64). Si un hook falla, corregir el problema; no saltarlo con `--no-verify`.
-- Dependabot abre pull requests los lunes (D-67): pasan por el mismo CI y la misma revisión que cualquier otro.
+- Dependabot abre pull requests los lunes (D-67). Claude los revisa y fusiona los seguros; ante la duda, avisa a Esteban (D-68). Node se queda en la 24 LTS (D-69).
+- Las capturas de pantalla sirven para ver lo que las pruebas no ven (un botón sin texto pasó 46 pruebas): al cambiar estilos, mirar la pantalla en el navegador.
 - Pruebas: `dotnet test` en la raíz; `npm test` y `npm run lint` en `src/web`.
 - Nueva migración: `dotnet ef migrations add <Name> --project src/Server --output-dir Infrastructure/Data/Migrations`.

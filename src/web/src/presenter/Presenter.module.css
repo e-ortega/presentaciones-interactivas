@@ -1,0 +1,137 @@
+/* Three zones (design §4): slide, script and a bar of controls, filling the window. */
+.layout,
+.layoutWithoutScript {
+  display: grid;
+  height: 100dvh;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'stage script'
+    'controls controls';
+}
+
+.layout {
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 28rem);
+}
+
+.layoutWithoutScript {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'stage'
+    'controls';
+}
+
+.stage {
+  grid-area: stage;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: var(--space-5);
+}
+
+/* The teacher's slide sits in a white frame: it is their content, shown as it is. */
+.slide {
+  max-width: 100%;
+  max-height: 100%;
+  border: 1px solid var(--color-renglon);
+  background: var(--color-blanco);
+  object-fit: contain;
+}
+
+.layout > aside {
+  grid-area: script;
+  min-height: 0;
+}
+
+.controls {
+  grid-area: controls;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--color-renglon);
+  background: var(--color-blanco);
+}
+
+/* Ink means "action": the two buttons used all through the class. */
+.navigate {
+  min-width: 7.5rem;
+  min-height: 48px;
+  padding: var(--space-2) var(--space-5);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-tinta);
+  color: var(--color-blanco);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.navigate:hover:not([aria-disabled='true']) {
+  background: var(--color-tinta-hover);
+}
+
+.navigate[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.position {
+  margin: 0 var(--space-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+/* Quieter than the navigation buttons: used a few times per class, not on every slide. */
+.option {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 2px solid var(--color-renglon);
+  border-radius: var(--radius);
+  background: var(--color-blanco);
+  color: var(--color-grafito);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.option:hover {
+  border-color: var(--color-grafito-suave);
+}
+
+.option[aria-pressed='true'] {
+  border-color: var(--color-tinta);
+  color: var(--color-tinta);
+  font-weight: 700;
+}
+
+.navigate:focus-visible,
+.option:focus-visible {
+  outline: 3px solid var(--color-tinta);
+  outline-offset: 2px;
+}
+
+/* Narrow window (half a screen beside a video call): the script goes under the slide. */
+@media (max-width: 56rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 3fr) minmax(0, 2fr) auto;
+    grid-template-areas:
+      'stage'
+      'script'
+      'controls';
+  }
+
+  .stage {
+    padding: var(--space-3);
+  }
+}

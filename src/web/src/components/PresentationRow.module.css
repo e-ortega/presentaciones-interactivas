@@ -1,6 +1,6 @@
 .row {
   display: grid;
-  grid-template-columns: 10rem 1fr;
+  grid-template-columns: 10rem 1fr auto;
   gap: var(--space-4);
   align-items: center;
   padding-block: var(--space-4);
@@ -39,8 +39,35 @@
   margin: var(--space-2) 0 0;
 }
 
+/* Ink: the main action of the row. */
+.present {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-tinta);
+  color: var(--color-blanco);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.present:hover {
+  background: var(--color-tinta-hover);
+}
+
+.present:focus-visible {
+  outline: 3px solid var(--color-tinta);
+  outline-offset: 2px;
+}
+
 @media (max-width: 30rem) {
   .row {
     grid-template-columns: 6rem 1fr;
+  }
+
+  .present {
+    grid-column: 1 / -1;
+    justify-content: center;
   }
 }

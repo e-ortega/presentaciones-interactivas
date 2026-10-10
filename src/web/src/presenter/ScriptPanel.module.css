@@ -1,0 +1,72 @@
+.panel {
+  overflow-y: auto;
+  padding: var(--space-5);
+  border-left: 1px solid var(--color-renglon);
+  background: var(--color-papel);
+}
+
+/* Line breaks in the notes are the teacher's paragraphs: keep them. */
+.notes {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-grafito-suave);
+}
+
+/* Teleprompter */
+.current {
+  font-size: var(--text-lg);
+  line-height: 1.45;
+}
+
+.upcoming {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-renglon);
+  color: var(--color-grafito-suave);
+}
+
+.upcomingLabel {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* Static notes */
+.allNotes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.staticNote {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-renglon);
+  color: var(--color-grafito-suave);
+}
+
+/* The slide on screen: full-strength text and a mark in the margin. */
+.staticNote[aria-current='true'] {
+  color: var(--color-grafito);
+  box-shadow: inset 4px 0 0 var(--color-grafito);
+  padding-left: var(--space-3);
+}
+
+.slideNumber {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 56rem) {
+  .panel {
+    border-left: 0;
+    border-top: 1px solid var(--color-renglon);
+  }
+}
