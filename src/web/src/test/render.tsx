@@ -1,0 +1,35 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render } from '@testing-library/react'
+import type { ReactElement } from 'react'
+import { vi } from 'vitest'
+
+/** Renders a component that uses TanStack Query, with a fresh client and no retries. */
+export function renderWithQuery(ui: ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  })
+  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+}
+
+/** A JSON response, as the server would send it. */
+export function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+}
+
+/**
+ * Replaces fetch for one test. `routes` maps "METHOD /path" to the response to give;
+ * a function is called on every request, so it can answer differently each time.
+ */
+export function stubFetch(routes: Record<string, Response | (() => Response)>) {
+  const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const key = `${init?.method ?? 'GET'} ${String(input)}`
+    const route = routes[key]
+    if (route === undefined) {
+      throw new Error(`Unexpected request in test: ${key}`)
+    }
+    // A Response body can be read only once, so every call gets its own copy.
+    return typeof route === 'function' ? route() : route.clone()
+  })
+  vi.stubGlobal('fetch', fetchMock)
+  return fetchMock
+}

@@ -1,0 +1,21 @@
+.form {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  padding-block: var(--space-5);
+  border-block: 1px solid var(--color-renglon);
+}
+
+.label {
+  font-weight: 700;
+}
+
+.file {
+  max-width: 100%;
+  font: inherit;
+}
+
+.error {
+  margin: 0;
+  font-weight: 700;
+}

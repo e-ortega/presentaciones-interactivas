@@ -91,11 +91,11 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 | Tema | Propuesta | Por qué |
 |---|---|---|
 | Base | Vite + React + TypeScript (D-31, D-33) | |
-| Rutas | React Router: `/admin` (presentaciones, importar, widgets), `/present/:sessionId`, `/display/:sessionId`, `/join` y `/s/:code` | Una ruta por ventana |
+| Rutas | React Router, desde el M2 (D-58): `/admin` (presentaciones, importar, widgets), `/present/:sessionId`, `/display/:sessionId`, `/join` y `/s/:code` | Una ruta por ventana |
 | Datos del servidor | **TanStack Query** para las llamadas REST | Caché, reintentos y estados de carga resueltos |
 | Tiempo real | Un hook `useLiveSession(sessionId, role)` que envuelve `@microsoft/signalr`, maneja la reconexión y expone el estado del último `SessionSnapshot` | Los componentes no tocan SignalR directamente; buen punto para aprender hooks |
 | Estado global | **Sin Redux.** Estado local de React + el hook de sesión | No hace falta en la Fase 1 |
-| Tipos de la API | Generados desde OpenAPI con `openapi-typescript` | Los tipos de C# y TypeScript no se desincronizan |
+| Tipos de la API | Generados desde OpenAPI con `openapi-typescript`: `npm run generate:api` con el servidor de desarrollo encendido (D-57) | Los tipos de C# y TypeScript no se desincronizan |
 | Textos | `react-i18next`, archivo `es.json` (D-44) | |
 | Estilos | CSS Modules + `tokens.css` (D-46) | Sin librería de componentes: la identidad es propia y los elementos nativos son accesibles |
 | Pruebas | Vitest + Testing Library; lint con oxlint (D-53) | |

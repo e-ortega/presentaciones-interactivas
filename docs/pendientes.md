@@ -4,9 +4,9 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Abiertos
 
-- [ ] **Fusionar el pull request del M1 (servidor)** cuando el CI esté en verde. _(Nuevo)_
-- [ ] **Decidir si Claude fusiona sus propios pull requests** cuando el CI esté en verde, o si los sigue fusionando Esteban. _(Nuevo)_
-- [ ] **Revisar las decisiones D-49 a D-56** que Claude tomó al implementar el M0 y el M1 ([decisiones.md](decisiones.md)). _(Cambió: se agregan D-54 a D-56)_
+- [ ] **Probar la app en el navegador:** levantar Docker Compose, entrar con la clave real y subir un PowerPoint. Es la primera vez que la clave real se usa; Claude solo probó con una clave temporal. _(Nuevo)_
+- [ ] **Confirmar el trato en los textos de la interfaz:** están en voseo ("Subí tu primer PowerPoint", "Probá de nuevo"), como en el documento de identidad visual. Si se prefiere "usted" o "tú", es cambiar un archivo: `src/web/src/i18n/es.json`. _(Nuevo)_
+- [ ] **Revisar las decisiones D-49 a D-58** que Claude tomó al implementar el M0 y el M1 ([decisiones.md](decisiones.md)). _(Cambió: se agregan D-57 y D-58)_
 - [ ] **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes.
 - [ ] **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador.
 - [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
@@ -22,9 +22,11 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Resueltos
 
-- [x] Hash de la clave de acceso cargado en `dotnet user-secrets`. _(Nuevo)_
-- [x] Decks reales para probar la importación: seis presentaciones de un curso de Esteban. Se leen desde su carpeta; no se copian al repo. _(Nuevo)_
-- [x] M1, parte del servidor: importación probada con esos seis decks. _(Nuevo)_
+- [x] M1 (importación) terminado: servidor y pantallas de React. _(Nuevo)_
+- [x] Claude puede fusionar sus pull requests con el CI en verde (D-59). _(Nuevo)_
+- [x] Hash de la clave de acceso cargado en `dotnet user-secrets`.
+- [x] Decks reales para probar la importación: seis presentaciones de un curso de Esteban. Se leen desde su carpeta; no se copian al repo.
+- [x] M1, parte del servidor: importación probada con esos seis decks.
 - [x] M0 terminado y fusionado en `main` (pull request #1), con el CI en verde: 24 pruebas del servidor, incluidas las de Testcontainers, frontend e imagen Docker.
 - [x] Rama `main` protegida con el ruleset `pr_main`: pull request obligatorio, los tres trabajos del CI en verde, solo fusión "squash", y las ramas se borran al fusionar.
 - [x] M0 (esqueleto) implementado en la rama `feat/m0-skeleton`.

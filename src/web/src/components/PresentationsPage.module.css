@@ -1,0 +1,14 @@
+.title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-lg);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.empty {
+  color: var(--color-grafito-suave);
+}

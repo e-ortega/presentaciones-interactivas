@@ -33,7 +33,11 @@ builder.Services.AddHostedService<ImportWorker>();
 builder.Services.AddSingleton(TimeProvider.System);
 // Enums travel as their names ("Ready"), not as numbers.
 builder.Services.ConfigureHttpJsonOptions(options =>
-    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    // Numbers are numbers, never "12": keeps the generated TypeScript types exact.
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+});
 
 builder.Services.AddRateLimiter(options =>
 {

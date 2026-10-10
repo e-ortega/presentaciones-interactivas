@@ -1,0 +1,46 @@
+.row {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: var(--space-4);
+  align-items: center;
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-renglon);
+}
+
+/* The teacher's slide always sits in a white frame: it is their content. */
+.thumbnail {
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--color-renglon);
+  border-radius: var(--radius);
+  background: var(--color-blanco);
+  overflow: hidden;
+}
+
+.thumbnail img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-base);
+  overflow-wrap: anywhere;
+}
+
+.detail {
+  margin: var(--space-1) 0 0;
+  color: var(--color-grafito-suave);
+  font-size: var(--text-sm);
+}
+
+.failure {
+  margin: var(--space-2) 0 0;
+}
+
+@media (max-width: 30rem) {
+  .row {
+    grid-template-columns: 6rem 1fr;
+  }
+}
