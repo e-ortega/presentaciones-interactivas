@@ -17,6 +17,8 @@ Dueño del proyecto: **Esteban Ortega**, ingeniero de software en Costa Rica y p
 | `docs/pendientes.md` | Lo que depende de Esteban |
 | `docs/plan-fase-1.md` | Plan de implementación del MVP, por hitos |
 | `docs/identidad-visual.md` | Identidad visual y principios; tokens CSS en `design/tokens.css` (usarlos, no inventar colores) |
+| `docs/competencia.md` | Competencia, posicionamiento y monetización |
+| `docs/legal/aviso-privacidad.md` | Aviso de consentimiento Ley 8968 (texto de la interfaz) |
 | `docs/contexto.md` | Cómo se llegó a este diseño y qué se descartó |
 | `docs/referencia/` | Notas previas hechas con Gemini. **Solo referencia, no son decisiones** |
 
@@ -38,7 +40,8 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 - **`ISlideRenderer`** (D-27, en el diseño: `IRenderizadorPresentacion`): interfaz intercambiable que recibe el PPTX y devuelve diapositivas con pasos (imágenes) y notas. La v1 la implementa con LibreOffice.
 - **Widget vs. Lanzamiento** (D-22): el widget es el diseño editable; el lanzamiento (`WidgetLaunch`) guarda una **copia exacta** (snapshot) de la pregunta al momento de lanzarse. Las respuestas cuelgan del lanzamiento, nunca del widget.
 - **Vista del estudiante amarrada** a la del profesor (D-12) y **adaptable**, diseñada primero para computadora (D-35).
-- **Modos de uso (P-09):** Fase 1 solo modo virtual. Cada cliente se une a la sesión con un rol (`Presenter`, `Participant`; a futuro `Display` para el proyector) y el hub emite eventos al grupo de la sesión, no a un rol fijo. No cerrar esa puerta.
+- **Un solo modo, tres ventanas (D-39):** presentador, ventana para compartir o proyectar (`Display`, sin notas ni controles) y estudiante. Cada cliente se une con un rol (`Presenter`, `Display`, `Participant`) y el hub emite eventos al grupo de la sesión.
+- **Los datos de estudiantes nunca van a servicios de IA** (P-12).
 - **Sin login de profesor en la Fase 1** (D-36); antes de publicar en Azure, una clave de acceso por configuración (P-11).
 - **El correo es la identidad** del participante (D-16).
 - **Ley 8968:** el formulario de nombre y correo lleva aviso de consentimiento y se guarda la fecha del consentimiento (D-29).
@@ -69,4 +72,4 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-Diseño de la Fase 1 casi cerrado: falta decidir los modos de uso (P-09) para aprobar el plan. Repositorio git local creado, todavía sin código. Siguiente paso: revisar `docs/pendientes.md` con Esteban y empezar `docs/plan-fase-1.md` por el hito M0.
+Diseño y plan de la Fase 1 aprobados (D-39, D-40). Repositorio creado, todavía sin código. Siguiente paso: revisar `docs/pendientes.md` con Esteban y empezar `docs/plan-fase-1.md` por el hito M0.

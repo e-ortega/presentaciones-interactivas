@@ -1,10 +1,10 @@
 # Plan de implementación — Fase 1 (MVP)
 
-_Propuesta de Claude, 9 oct 2026. Esteban la aprueba una vez resueltos los modos de uso (P-09). Los cambios de fondo van a [decisiones.md](decisiones.md)._
+_Aprobado por Esteban el 9 oct 2026 (D-40). Los cambios de fondo van a [decisiones.md](decisiones.md)._
 
 **Objetivo:** que Esteban pueda dar una clase real con la app: importar su PPTX, presentar con su script y lanzar al menos un quiz que los estudiantes respondan desde el celular.
 
-**Modo:** solo virtual (P-09). **Fuera de la Fase 1:** inicio de sesión del profesor (D-36), modo en aula y vista de proyección, sugerencias de IA, editor desde cero, grupos y cuentas de estudiante, apodos, nube de palabras, Q&A, publicar PDF, analíticas, animaciones.
+**Ventanas (D-39):** presentador, para compartir o proyectar, y estudiante. **Fuera de la Fase 1:** inicio de sesión del profesor (D-36), sugerencias de IA, editor desde cero, grupos y cuentas de estudiante, apodos, nube de palabras, Q&A, publicar PDF, analíticas, animaciones.
 
 **Principio de orden:** primero lo más riesgoso. La importación del PPTX es la parte con más incertidumbre, así que va antes que cualquier pantalla bonita.
 
@@ -62,9 +62,10 @@ Un solo proyecto de servidor con carpetas, no varios proyectos. La interfaz `ISl
 
 ### M3 — Sesión en vivo
 - Crear sesión: código tipo `8888-6666`, enlace y QR.
-- `SessionHub` (SignalR): grupo por sesión; cada cliente se une con un rol (`Presenter`, `Participant`); el profesor envía `(slideIndex, stepIndex)` y el hub lo emite al grupo de la sesión.
+- `SessionHub` (SignalR): grupo por sesión; cada cliente se une con un rol (`Presenter`, `Display`, `Participant`); el profesor envía `(slideIndex, stepIndex)` y el hub lo emite al grupo de la sesión.
 - Vista del estudiante adaptable, primero computadora (D-35; maqueta en el canvas de identidad visual).
-- Entrada del estudiante: código → nombre + correo + aviso de consentimiento (Ley 8968) → lobby. Crea o reutiliza el `Participant` por correo y registra la `Attendance` con la fecha del consentimiento.
+- **Ventana para compartir o proyectar** (`Display`): sala de espera con código y QR, diapositiva a pantalla completa y resultados revelados; sin notas ni controles. El presentador la abre con un botón en una ventana aparte.
+- Entrada del estudiante: código → nombre + correo + aviso de consentimiento (Ley 8968, texto en `docs/legal/aviso-privacidad.md`, casilla sin marcar por defecto) → lobby. Crea o reutiliza el `Participant` por correo y registra la `Attendance` con la fecha del consentimiento.
 - Lobby del profesor: contador de conectados, admitir o expulsar, iniciar.
 - Reconexión: si el celular pierde la conexión, al volver recibe el estado actual de la sesión.
 - **Listo cuando:** varios celulares siguen la presentación sincronizados.

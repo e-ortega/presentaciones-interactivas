@@ -97,7 +97,7 @@ LOBBY ──▶ EN VIVO ──▶ FINALIZADA
 
 ### Ley 8968 (Protección de la Persona frente al Tratamiento de sus Datos Personales)
 
-El formulario de nombre y correo debe incluir un aviso de consentimiento informado: qué datos se recogen, para qué, quién es el responsable y cómo ejercer los derechos de acceso, rectificación y eliminación. El texto final debe revisarse con criterio legal antes de usar la app con estudiantes reales.
+El formulario de nombre y correo lleva el aviso de consentimiento informado. Borrador completo, con el texto corto del formulario y el aviso de privacidad: [legal/aviso-privacidad.md](legal/aviso-privacidad.md). Debe revisarlo una persona abogada antes de usar la app con estudiantes reales.
 
 ## 8. Widgets
 
@@ -151,7 +151,7 @@ Fase indicada entre corchetes. Los campos son orientativos.
 | **Paso** | Id, DiapositivaId, Orden, RutaImagen | 1 (uno por diapositiva) |
 | **Widget** | Id, DiapositivaId, Tipo, ConfigJson, Origen (Manual/IA), EstadoSugerencia (Pendiente/Aceptada/Editada/Descartada) | 1 (Origen IA en fase 2) |
 | **Sesion** | Id, PresentacionId, GrupoId?, Codigo, Estado (Lobby/EnVivo/Finalizada), DiapositivaActual, PasoActual, PermiteApodos, PdfPublicado, IniciadaEn, FinalizadaEn | 1 |
-| **Asistencia** | Id, SesionId, ParticipanteId, NombreMostrado, ConsentimientoEn, Admitido, EntroEn | 1 |
+| **Asistencia** | Id, SesionId, ParticipanteId, NombreMostrado, ConsentimientoEn, VersionAviso, Admitido, EntroEn | 1 |
 | **Lanzamiento** | Id, SesionId, WidgetId, SnapshotJson, AbiertoEn, CerradoEn, ResultadosRevelados | 1 |
 | **Respuesta** | Id, LanzamientoId, AsistenciaId, PayloadJson, EnviadaEn — única por (Lanzamiento, Asistencia) | 1 |
 
@@ -205,12 +205,12 @@ Con 1 vCPU y 2 GiB, la concesión gratuita equivale a unas 50 horas al mes de ap
 
 | Fase | Objetivo | Incluye |
 |---|---|---|
-| **1 — MVP** | Probarlo en una clase real | Importar PPTX (imágenes + notas + PDF), vista del presentador con script, quiz de opción múltiple, sesión con entrada por código + nombre + correo + consentimiento, sincronización por diapositiva + paso |
+| **1 — MVP** | Probarlo en una clase real | Importar PPTX (imágenes + notas + PDF), vista del presentador con script, ventana para compartir o proyectar, vista del estudiante adaptable, quiz de opción múltiple, sesión con entrada por código + nombre + correo + consentimiento, sincronización por diapositiva + paso |
 | **2 — El valor** | Lo que diferencia al producto | Sugerencias de la IA con borrador editable, experiencia del estudiante pulida |
 | **3 — Crecer** | Uso continuo en cursos | Grupos con cuentas, apodos, nube de palabras, Q&A, publicar PDF, editor desde cero, analíticas |
 | **Después** | | Animaciones (imágenes por paso), modo en aula con vista de proyección (§13), integración con LMS, gamificación, interfaz en inglés |
 
-## 13. Modos de uso (en discusión)
+## 13. Modos de uso (decidido: D-39)
 
 El diseño original asume **un modo virtual**: el profesor usa una sola pantalla (la vista del presentador) y cada estudiante ve la misma diapositiva en su propia computadora o celular. Al diseñar la identidad visual apareció un segundo uso posible, **en aula**, con un proyector. Esteban no lo había contemplado y le parece buena idea; queda por decidir si se incluye y cuándo.
 

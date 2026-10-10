@@ -4,17 +4,17 @@ _Última actualización: 9 oct 2026 (noche). Marcados como (Nuevo) los agregados
 
 ## Abiertos
 
-- [ ] **Aprobar "un solo modo, tres ventanas"** (P-09 revisada, [diseno.md](diseno.md) §13), con la ventana para compartir o proyectar en la Fase 1. De esto depende aprobar el plan de la Fase 1. _(Cambió)_
-- [ ] **Revisar la competencia** antes de invertir mucho: Genially, Mentimeter, Slido, Kahoot, Pear Deck y Nearpod; los dos últimos ya importan presentaciones. Sirve para afinar el diferenciador. _(Nuevo)_
-- [ ] **Aprobar el plan de la Fase 1** (P-07) una vez resuelto P-09. _(Cambió)_
-- [ ] **Idioma de los documentos de diseño:** `docs/` está en español. ¿Se traduce al inglés por D-34, o se queda en español y solo la documentación técnica nueva va en inglés? _(Nuevo)_
-- [ ] **Interfaz preparada para traducción desde el inicio** (P-10). _(Nuevo)_
-- [ ] **Clave de acceso para la zona del profesor** antes de publicar en Azure (P-11). _(Nuevo)_
-- [ ] **Aprobar la identidad visual** "Hoja de respuestas" (P-08). Se ajustó para el modo virtual y se agregó la vista del estudiante en computadora. _(Cambió)_
+- [ ] **Subir el repo a GitHub** (D-41): correr en Windows, dentro de la carpeta del proyecto, `gh repo create presentaciones-interactivas --public --source . --push`. Antes, decidir el correo de autor de los commits (ver siguiente punto). _(Nuevo)_
+- [ ] **Correo visible en un repo público:** los commits tienen como autor `eortega1793@gmail.com`, que quedaría público. Opción: usar el correo `noreply` de GitHub (Settings › Emails) y reescribir el autor de los dos commits antes del primer push. _(Nuevo)_
+- [ ] **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes: responsable, cédula, dirección, correo de contacto, región de Azure y plazo de conservación. _(Cambió: el borrador ya está)_
+- [ ] **Aprobar que los datos de estudiantes nunca vayan a servicios de IA** (P-12). _(Nuevo)_
+- [ ] **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador. _(Nuevo)_
+- [ ] **Idioma de los documentos de diseño:** ¿se traducen al inglés por D-34 o se quedan en español?
+- [ ] **Interfaz preparada para traducción desde el inicio** (P-10).
+- [ ] **Clave de acceso para la zona del profesor** antes de publicar en Azure (P-11).
+- [ ] **Aprobar la identidad visual** "Hoja de respuestas" (P-08).
 - [ ] **Aprobar la infraestructura de Azure** (P-01 a P-04).
-- [ ] **Repositorio remoto:** crear el repo en GitHub (¿privado o público?) y conectarlo. _(Nuevo)_
-- [ ] **Git dentro de una carpeta sincronizada con Google Drive:** Drive puede sincronizar a medias la carpeta `.git` y corromperla. Conviene mover el repo fuera de `D:\Documents` (por ejemplo, `D:\source\repos`) o excluirlo de la sincronización; GitHub ya sirve de respaldo. _(Nuevo)_
-- [ ] **Redactar el aviso de consentimiento (Ley 8968)** y revisarlo con criterio legal antes de usarlo con estudiantes reales.
+- [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
 
 ## Más adelante (sin acción por ahora)
 
@@ -22,16 +22,17 @@ _Última actualización: 9 oct 2026 (noche). Marcados como (Nuevo) los agregados
 - Inicio de sesión del profesor (D-36).
 - Nombre del producto (D-37).
 - Ideas vistas en Genially para fases posteriores: temporizador por pregunta y candado para cerrar la entrada a la sesión.
+- Probar ClassPoint y Mentimeter un par de semanas antes de la Fase 2 ([competencia.md](competencia.md)).
 
 ## Resueltos
 
-- [x] TypeScript → sí (D-33).
-- [x] Idiomas → código y documentación interna en inglés; documentación al usuario e interfaz en español; inglés en la interfaz después (D-34).
-- [x] Estudiante desde computadora o celular → vista adaptable, primero computadora (D-35).
-- [x] Repositorio git local → creado (D-38).
-- [x] Tecnología del frontend → React + Vite servido por ASP.NET Core (D-31).
-- [x] Contexto para Claude Code → `CLAUDE.md` y `docs/` (D-32).
-- [x] Animaciones → fuera de la v1, preparada para agregarlas (D-25 a D-27).
-- [x] Entrada mínima por código en la Fase 1 (D-23).
-- [x] Stack → ASP.NET Core + SignalR, SQL Server, Azure (D-28).
-- [x] Consentimiento según Ley 8968 → se incluye (D-29).
+- [x] Modos de uso → un solo modo, tres ventanas (D-39).
+- [x] Plan de la Fase 1 → aprobado (D-40).
+- [x] Repo en GitHub → público, en la carpeta actual (D-41).
+- [x] Voz en clases virtuales → por la videollamada.
+- [x] Revisión de competencia → [competencia.md](competencia.md).
+- [x] Borrador del aviso de consentimiento Ley 8968 → [legal/aviso-privacidad.md](legal/aviso-privacidad.md).
+- [x] TypeScript (D-33). Idiomas (D-34). Vista del estudiante adaptable (D-35).
+- [x] Repo git local (D-38). Frontend React + Vite (D-31). Contexto para Claude Code (D-32).
+- [x] Animaciones fuera de la v1, preparada (D-25 a D-27). Entrada por código en la Fase 1 (D-23).
+- [x] Stack (D-28). Consentimiento Ley 8968 incluido (D-29).

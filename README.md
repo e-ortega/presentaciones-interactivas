@@ -12,11 +12,13 @@ App web que convierte una presentación de PowerPoint que el profesor **ya tiene
 | [docs/plan-fase-1.md](docs/plan-fase-1.md) | Plan de implementación del MVP por hitos |
 | [docs/contexto.md](docs/contexto.md) | Cómo se llegó al diseño y qué se descartó |
 | [docs/identidad-visual.md](docs/identidad-visual.md) | Identidad visual propuesta; tokens en `design/tokens.css` |
+| [docs/competencia.md](docs/competencia.md) | Competencia, mercado y monetización |
+| [docs/legal/aviso-privacidad.md](docs/legal/aviso-privacidad.md) | Aviso de privacidad y consentimiento (Ley 8968), borrador |
 | [docs/referencia/](docs/referencia/) | Notas previas hechas con Gemini (solo referencia) |
 | [CLAUDE.md](CLAUDE.md) | Contexto e instrucciones para trabajar con Claude Code |
 
 ## Estado
 
-Diseño de la Fase 1 terminado (octubre 2026). Todavía no hay código. El repositorio git se crea más adelante.
+Diseño y plan de la Fase 1 aprobados (octubre 2026). Todavía no hay código.
 
 Las notas previas trabajadas con Gemini (correos del 8 oct 2026) quedan como referencia aparte; este proyecto toma sus propias decisiones.

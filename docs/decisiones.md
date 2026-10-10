@@ -42,6 +42,9 @@ Cada decisión con su fecha y el motivo. Si una decisión cambia, no se borra: s
 | D-36 | 2026-10-09 | Sin inicio de sesión del profesor en la Fase 1; se resuelve después | Pedido de Esteban; no es necesario para probar el núcleo |
 | D-37 | 2026-10-09 | El nombre del producto se decide más adelante; "Presentaciones Interactivas" sigue como provisional | Pedido de Esteban |
 | D-38 | 2026-10-09 | Se crea el repositorio git local del proyecto (rama `main`) | Pedido de Esteban |
+| D-39 | 2026-10-09 | **Un solo modo, tres ventanas** (antes P-09): presentador, ventana opcional para compartir o proyectar (sin notas ni controles) y estudiante. La ventana para compartir entra en la Fase 1 | Sirve igual para clase virtual con o sin pantalla compartida y para aula con proyector |
+| D-40 | 2026-10-09 | Plan de la Fase 1 aprobado (antes P-07), con la ventana para compartir | Resueltos los modos de uso |
+| D-41 | 2026-10-09 | Repositorio **público** en GitHub; el repo local se queda en `D:\Documents\source\repos` y Esteban lo saca de la sincronización de Drive | Pedido de Esteban |
 
 ## Propuestas en revisión
 
@@ -55,8 +58,9 @@ Decisiones planteadas por Claude que esperan confirmación de Esteban. Ver [pend
 | P-04 | Desarrollo local con Docker Compose y SQL Server en contenedor | Costo cero y entorno reproducible |
 | ~~P-05~~ | Aprobada → D-33 | |
 | ~~P-06~~ | Aprobada → D-34 | |
-| P-07 | Plan de la Fase 1 por hitos M0–M6, empezando por la importación (riesgo principal) y con un solo proyecto de servidor | Esteban lo aprueba una vez resuelto P-09. Ver [plan-fase-1.md](plan-fase-1.md) |
+| ~~P-07~~ | Aprobada → D-40 | |
 | P-08 | Identidad visual "Hoja de respuestas": papel frío, tinta azul, resaltador solo para la respuesta correcta, Atkinson Hyperlegible | Legibilidad en proyector y celular; ver [identidad-visual.md](identidad-visual.md) |
-| P-09 | **Un solo modo, tres ventanas** (revisada el 9 oct, noche): presentador, ventana opcional para compartir o proyectar (sin notas) y estudiante. La ventana para compartir entra en la Fase 1. Roles de cliente `Presenter`, `Display`, `Participant` | En la referencia de Genially el profesor comparte pantalla en la videollamada; sin una ventana limpia, la clase vería sus notas. Ver [diseno.md](diseno.md) §13 |
+| ~~P-09~~ | Aprobada → D-39. **Un solo modo, tres ventanas** (revisada el 9 oct, noche): presentador, ventana opcional para compartir o proyectar (sin notas) y estudiante. La ventana para compartir entra en la Fase 1. Roles de cliente `Presenter`, `Display`, `Participant` | En la referencia de Genially el profesor comparte pantalla en la videollamada; sin una ventana limpia, la clase vería sus notas. Ver [diseno.md](diseno.md) §13 |
 | P-10 | Todos los textos de la interfaz en archivos de recursos desde el día uno (por ejemplo, react-i18next), aunque solo exista el español | Agregar el inglés después es traducir un archivo, no recorrer todos los componentes |
+| P-12 | Los datos personales de los estudiantes (nombre, correo, respuestas) **nunca se envían a servicios de IA**; la IA solo procesa el contenido de la presentación | Compromiso del aviso de privacidad; reduce el riesgo legal y simplifica la Ley 8968 |
 | P-11 | Sin cuentas de profesor en la Fase 1, pero con una **clave de acceso** única por configuración para la zona del profesor antes de publicar en Azure (M5) | Sin ella, cualquiera en internet podría subir archivos y crear sesiones: costos y riesgo de archivos maliciosos |
