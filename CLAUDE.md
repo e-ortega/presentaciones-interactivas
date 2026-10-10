@@ -32,7 +32,7 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 3. **Pendientes explícitos.** Al terminar un ciclo, actualizar `docs/pendientes.md` y mostrar a Esteban la lista de lo que depende de él, marcando qué es nuevo o qué cambió desde la última versión.
 4. **Alcance:** respetar las fases de `docs/diseno.md` §12. No construir cosas de fases posteriores "de paso".
 5. **Enseñar React mientras se construye.** Esteban está aprendiendo React. Al escribir frontend: explicar cada concepto nuevo (hooks, estado, efectos, props, contexto) con el ejemplo concreto del código que se está escribiendo, a ritmo pausado, uno a uno, y al final hacer una o dos preguntas para confirmar que lo entendió. Preferir código claro sobre código ingenioso.
-6. **Idioma (D-34):** código, comentarios y documentación técnica en **inglés**; documentación para el usuario y textos de interfaz en **español**. Los textos de la interfaz van en archivos de recursos desde el inicio (P-10) para agregar inglés después. Los documentos de diseño de `docs/` se quedan en español (D-43).
+6. **Idioma (D-34):** código, comentarios y documentación técnica en **inglés**; documentación para el usuario y textos de interfaz en **español**. Los textos de la interfaz van en archivos de recursos desde el inicio (D-44) para agregar inglés después. Los documentos de diseño de `docs/` se quedan en español (D-43).
 
 ## Decisiones que más afectan el código
 

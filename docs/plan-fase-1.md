@@ -18,9 +18,9 @@ presentaciones-interactivas/
 ├── src/
 │   ├── Server/            ASP.NET Core: API, hub SignalR, sirve el build de React
 │   │   ├── Domain/        Entidades y reglas
-│   │   ├── Features/      Endpoints por funcionalidad (Import, Presentations, Sessions, Widgets)
+│   │   ├── Features/      Endpoints por funcionalidad (Import, Presentations, Sessions, Widgets, Join)
 │   │   ├── Infrastructure/ EF Core, almacenamiento de archivos, renderizador LibreOffice
-│   │   └── Hubs/          SessionHub (SignalR)
+│   │   └── Realtime/      SessionHub (SignalR), estado en vivo y contratos
 │   └── web/               React + Vite
 ├── tests/
 │   └── Server.Tests/
@@ -34,7 +34,7 @@ Un solo proyecto de servidor con carpetas, no varios proyectos. Los detalles de 
 
 ### M0 — Esqueleto
 - Solución .NET, proyecto `Server`, proyecto de pruebas.
-- React + Vite + TypeScript en `src/web`, con los textos en archivos de recursos (P-10) y los tokens de `design/tokens.css`; en desarrollo, proxy de Vite hacia la API; en producción, el build se copia a `wwwroot`.
+- React + Vite + TypeScript en `src/web`, con los textos en archivos de recursos (D-44) y los tokens de `design/tokens.css`; en desarrollo, proxy de Vite hacia la API; en producción, el build se copia a `wwwroot`.
 - Docker Compose: app + SQL Server.
 - Zona del profesor protegida por la clave de acceso (D-45): middleware que compara el SHA-256 de la clave ingresada con `AdminAccess:KeySha256` en tiempo constante y deja una cookie. En local, Esteban carga el hash con `dotnet user-secrets`.
 - EF Core con la primera migración (entidades de la Fase 1, ver diseño §10).

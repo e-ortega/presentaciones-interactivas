@@ -1,10 +1,10 @@
 # Pendientes que dependen de Esteban
 
-_Última actualización: 9 oct 2026 (noche). Marcados como (Nuevo) los agregados en esta versión._
+_Última actualización: 9 oct 2026. Marcados como (Nuevo) o (Cambió) los puntos que difieren de la versión anterior._
 
 ## Abiertos
 
-- [ ] **Hacer `git push`** desde Windows para subir los commits que Claude hace desde su entorno (no tiene credenciales de GitHub). _(Nuevo)_
+- [ ] **Decidir quién hace `git push`.** Claude Code ahora corre en el Windows de Esteban, con acceso al repo y al remoto. Puede seguir haciendo el push Esteban o Claude puede hacerlo cuando Esteban lo pida. _(Cambió)_
 - [ ] **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes.
 - [ ] **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador.
 - [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
@@ -21,6 +21,7 @@ _Última actualización: 9 oct 2026 (noche). Marcados como (Nuevo) los agregados
 
 ## Resueltos
 
+- [x] Documentos alineados con las decisiones aprobadas: diseño §12-13 e identidad visual reflejan D-39 y D-46; plan con `Realtime/` y D-44. _(Nuevo)_
 - [x] Arquitectura de implementación aprobada (D-48).
 - [x] Datos de estudiantes nunca van a la IA (D-42).
 - [x] Documentos de diseño en español (D-43).
