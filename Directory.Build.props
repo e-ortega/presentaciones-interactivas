@@ -3,8 +3,17 @@
   <PropertyGroup>
     <!-- A warning is a defect waiting to be noticed: the build fails instead. -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <!-- .NET code analyzers (correctness, security, performance), recommended set. -->
-    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <!--
+      Except NuGet vulnerability advisories: they appear when an advisory is published, not
+      when the code changes, and would block every pull request. They stay visible as warnings.
+    -->
+    <WarningsNotAsErrors>NU1900;NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+    <!--
+      .NET code analyzers (correctness, security, performance), recommended set.
+      Pinned to a version so a new SDK does not change the rules under unchanged code;
+      raise it on purpose when moving to a new .NET version.
+    -->
+    <AnalysisLevel>10.0-recommended</AnalysisLevel>
     <!-- Code style rules from .editorconfig are checked by the compiler too. -->
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
