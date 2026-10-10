@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { enterAccessKey } from '../api/access'
 import { ApiError } from '../api/http'
@@ -17,7 +17,7 @@ export function AccessKeyForm({ onAccepted }: AccessKeyFormProps) {
   const [key, setKey] = useState('')
   const signIn = useMutation({ mutationFn: enterAccessKey, onSuccess: onAccepted })
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault() // the browser would reload the page
     signIn.mutate(key)
   }

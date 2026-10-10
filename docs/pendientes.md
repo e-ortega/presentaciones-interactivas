@@ -4,9 +4,11 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Abiertos
 
-- [ ] **Probar la app en el navegador:** levantar Docker Compose, entrar con la clave real y subir un PowerPoint. Es la primera vez que la clave real se usa; Claude solo probó con una clave temporal. _(Nuevo)_
-- [ ] **Confirmar el trato en los textos de la interfaz:** están en voseo ("Subí tu primer PowerPoint", "Probá de nuevo"), como en el documento de identidad visual. Si se prefiere "usted" o "tú", es cambiar un archivo: `src/web/src/i18n/es.json`. _(Nuevo)_
-- [ ] **Revisar las decisiones D-49 a D-58** que Claude tomó al implementar el M0 y el M1 ([decisiones.md](decisiones.md)). _(Cambió: se agregan D-57 y D-58)_
+- [ ] **Decidir quién revisa el código de Claude.** El ruleset pide revisión de Copilot, pero nunca se ejecutó en los pull requests #1 a #4 (parece que la cuenta no la tiene activada). Mientras tanto Claude revisa cada diff con una pasada independiente (D-61). Opciones: activar Copilot, que revise Esteban, o dejarlo así. _(Nuevo)_
+- [ ] **Decidir si se revisa hacia atrás el código del M0 y el M1**, que entró sin revisión. _(Nuevo)_
+- [ ] **Probar la app en el navegador:** levantar Docker Compose, entrar con la clave real y subir un PowerPoint. Es la primera vez que la clave real se usa; Claude solo probó con una clave temporal.
+- [ ] **Confirmar el trato en los textos de la interfaz:** están en voseo ("Subí tu primer PowerPoint", "Probá de nuevo"), como en el documento de identidad visual. Si se prefiere "usted" o "tú", es cambiar un archivo: `src/web/src/i18n/es.json`.
+- [ ] **Revisar las decisiones D-49 a D-61** que Claude tomó al implementar el M0 y el M1 ([decisiones.md](decisiones.md)). _(Cambió: se agregan D-60 y D-61)_
 - [ ] **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes.
 - [ ] **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador.
 - [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
@@ -22,8 +24,9 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Resueltos
 
-- [x] M1 (importación) terminado: servidor y pantallas de React. _(Nuevo)_
-- [x] Claude puede fusionar sus pull requests con el CI en verde (D-59). _(Nuevo)_
+- [x] Verificaciones automáticas estrictas en el servidor y el frontend (D-60). _(Nuevo)_
+- [x] M1 (importación) terminado: servidor y pantallas de React.
+- [x] Claude puede fusionar sus pull requests con el CI en verde (D-59).
 - [x] Hash de la clave de acceso cargado en `dotnet user-secrets`.
 - [x] Decks reales para probar la importación: seis presentaciones de un curso de Esteban. Se leen desde su carpeta; no se copian al repo.
 - [x] M1, parte del servidor: importación probada con esos seis decks.

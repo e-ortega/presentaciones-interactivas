@@ -77,7 +77,9 @@ M0 y M1 terminados: la app importa un PPTX (imágenes, notas y PDF) y la zona de
 
 ## Flujo de trabajo
 
-`main` está protegida (ruleset `pr_main`): no se puede subir directo, ni documentación. Cada cambio va en una rama corta (`feat/...`, `fix/...`, `docs/...`) con pull request; se fusiona con "squash" cuando pasan los tres trabajos del CI (`Server (.NET)`, `Web (React)`, `Docker image`). Si se renombra un trabajo en `.github/workflows/ci.yml`, hay que actualizar el ruleset o los pull requests quedan bloqueados. Claude puede fusionar sus propios pull requests cuando el CI esté en verde (D-59).
+`main` está protegida (ruleset `pr_main`): no se puede subir directo, ni documentación. Cada cambio va en una rama corta (`feat/...`, `fix/...`, `docs/...`) con pull request; se fusiona con "squash" cuando pasan los tres trabajos del CI (`Server (.NET)`, `Web (React)`, `Docker image`). Si se renombra un trabajo en `.github/workflows/ci.yml`, hay que actualizar el ruleset o los pull requests quedan bloqueados. Claude puede fusionar sus propios pull requests cuando el CI esté en verde (D-59), pero **antes debe hacer revisar el diff con `/code-review`** y corregir o anotar los hallazgos en el pull request (D-61).
+
+Antes de subir cambios, correr localmente lo mismo que el CI: `dotnet build` (los avisos son errores), `dotnet format --verify-no-changes`, `dotnet test`; y en `src/web`: `npm run lint`, `npm test`, `npm run build` (D-60). No apagar una regla del linter o de los analizadores sin dejar el motivo escrito junto a ella.
 
 ## Comandos
 

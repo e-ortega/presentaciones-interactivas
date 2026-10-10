@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security;
 using System.Text;
 using DocumentFormat.OpenXml;
@@ -51,7 +52,7 @@ public static class SyntheticDeck
                     Write(notesPart, NotesXml(notes));
                 }
 
-                slideIds.Append($"<p:sldId id=\"{256 + i}\" r:id=\"rIdSlide{i}\"/>");
+                slideIds.Append(CultureInfo.InvariantCulture, $"<p:sldId id=\"{256 + i}\" r:id=\"rIdSlide{i}\"/>");
             }
 
             Write(presentation, PresentationXml(slideIds.ToString()));

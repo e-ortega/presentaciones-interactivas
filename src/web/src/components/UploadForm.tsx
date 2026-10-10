@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ApiError } from '../api/http'
 import { uploadPresentation } from '../api/presentations'
@@ -15,7 +15,7 @@ export function UploadForm() {
   const [file, setFile] = useState<File | null>(null)
   const upload = useMutation({ mutationFn: uploadPresentation })
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     if (file === null) {
       return

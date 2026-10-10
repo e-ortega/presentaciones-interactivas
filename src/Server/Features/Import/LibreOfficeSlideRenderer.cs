@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using Microsoft.Extensions.Options;
 using Server.Domain;
 
@@ -83,12 +84,12 @@ public class LibreOfficeSlideRenderer(IOptions<ImportOptions> options, ILogger<L
 
         await RunAsync(
             _options.PdftoppmPath,
-            ["-png", "-scale-to-x", _options.ImageWidth.ToString(), "-scale-to-y", "-1", pdfPath, Path.Combine(outputDirectory, "page")],
+            ["-png", "-scale-to-x", _options.ImageWidth.ToString(CultureInfo.InvariantCulture), "-scale-to-y", "-1", pdfPath, Path.Combine(outputDirectory, "page")],
             cancellationToken);
 
         // pdftoppm names the files page-1.png, page-01.png or page-001.png depending on the page count.
         return Directory.GetFiles(outputDirectory, "page-*.png")
-            .OrderBy(path => int.Parse(Path.GetFileNameWithoutExtension(path)["page-".Length..]))
+            .OrderBy(path => int.Parse(Path.GetFileNameWithoutExtension(path)["page-".Length..], CultureInfo.InvariantCulture))
             .ToList();
     }
 
