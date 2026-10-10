@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Server.Tests.AdminAccess;
 
@@ -52,6 +53,20 @@ public class AdminAccessEndpointsTests(AppFactory factory) : IClassFixture<AppFa
 
         await client.DeleteAsync("/api/admin/access", Ct);
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/admin/access", Ct)).StatusCode);
+    }
+
+    [Fact]
+    public async Task Without_a_configured_hash_the_answer_is_not_configured_instead_of_wrong_key()
+    {
+        using var unconfigured = factory.WithWebHostBuilder(builder => builder.UseSetting("AdminAccess:KeySha256", ""));
+        var client = unconfigured.CreateClient(new() { BaseAddress = new Uri("https://localhost") });
+
+        var signIn = await client.PostAsJsonAsync("/api/access", new { key = AppFactory.AccessKey }, Ct);
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, signIn.StatusCode);
+        var problem = await signIn.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Ct);
+        Assert.Equal("AccessKeyNotConfigured", problem.GetProperty("code").GetString());
+        Assert.False(signIn.Headers.Contains("Set-Cookie"));
     }
 
     [Fact]

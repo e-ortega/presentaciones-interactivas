@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, test } from 'vitest'
-import { renderWithQuery, stubFetch } from '../test/render'
+import { jsonResponse, renderWithQuery, stubFetch } from '../test/render'
 import { AccessGate } from './AccessGate'
 
 function renderGate() {
@@ -49,6 +49,22 @@ test('says the key is wrong and keeps the teacher area closed', async () => {
 
   expect(await screen.findByRole('alert')).toHaveTextContent('Esa clave no es correcta.')
   expect(screen.queryByText('Teacher area')).not.toBeInTheDocument()
+})
+
+test('does not blame the key when the server has no key configured', async () => {
+  stubFetch({
+    'GET /api/admin/access': new Response(null, { status: 401 }),
+    'POST /api/access': jsonResponse({ title: 'Not configured.', code: 'AccessKeyNotConfigured' }, 503),
+  })
+  const user = userEvent.setup()
+
+  renderGate()
+  await user.type(await screen.findByLabelText('Clave de acceso'), 'the-right-key')
+  await user.click(screen.getByRole('button', { name: 'Entrar' }))
+
+  const alert = await screen.findByRole('alert')
+  expect(alert).toHaveTextContent('no está configurada en este servidor')
+  expect(alert).not.toHaveTextContent('no es correcta')
 })
 
 test('explains the wait when there were too many attempts', async () => {

@@ -16,6 +16,7 @@
     "submit": "Entrar",
     "submitting": "Entrando…",
     "wrongKey": "Esa clave no es correcta.",
+    "notConfigured": "La zona del profesor no está configurada en este servidor. No es un problema de tu clave: falta cargar la clave en la configuración del servidor.",
     "tooManyAttempts": "Demasiados intentos. Esperá un minuto y probá de nuevo.",
     "failed": "No se pudo comprobar la clave. Probá de nuevo."
   },

@@ -48,6 +48,8 @@ docker compose up --build   # app en http://localhost:8080
 
 Con Docker dentro de WSL, correr esos comandos desde la terminal de Ubuntu, en `/mnt/d/.../presentaciones-interactivas`.
 
+Docker Compose **no lee los user-secrets**: en este modo el hash de la clave va en el archivo `.env`, en `ADMIN_ACCESS_KEY_SHA256`. Si se deja vacío, la zona del profesor avisa que no está configurada.
+
 **Pruebas:**
 
 ```bash

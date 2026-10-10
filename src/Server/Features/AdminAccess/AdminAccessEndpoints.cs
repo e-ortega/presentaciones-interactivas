@@ -28,8 +28,20 @@ public static class AdminAccessEndpoints
         });
     }
 
+    /// <summary>Sent as "code" when the server has no key hash: no key can be right.</summary>
+    public const string NotConfiguredCode = "AccessKeyNotConfigured";
+
     private static async Task<IResult> SignIn(AccessRequest request, AdminKeyVerifier verifier, HttpContext http)
     {
+        if (!verifier.IsConfigured)
+        {
+            // Not a 401: the person typing is not at fault, and must not be told their key is wrong.
+            return Results.Problem(
+                statusCode: StatusCodes.Status503ServiceUnavailable,
+                title: "The teacher area is not configured on this server.",
+                extensions: new Dictionary<string, object?> { ["code"] = NotConfiguredCode });
+        }
+
         if (!verifier.Verify(request.Key))
         {
             return Results.Problem(statusCode: StatusCodes.Status401Unauthorized, title: "Invalid access key.");
