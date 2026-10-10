@@ -1,0 +1,33 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+appsettings.*.local.json
+*.Development.local.json
+
+# Node / Vite
+node_modules/
+dist/
+.vite/
+*.local
+npm-debug.log*
+
+# Local storage of uploaded decks and generated files
+storage/
+uploads/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# OS / editors
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json

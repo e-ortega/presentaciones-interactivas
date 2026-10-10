@@ -1,0 +1,48 @@
+/* Identidad visual "Hoja de respuestas" — ver docs/identidad-visual.md
+   Copiar a src/web/src/styles/tokens.css al crear el frontend (M0/M2). */
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap");
+
+:root {
+  /* Color: 6 colores base */
+  --color-papel: #F5F7F6;          /* fondo de todas las pantallas */
+  --color-grafito: #262A30;        /* texto */
+  --color-grafito-suave: #59606B;  /* texto secundario (5.9:1 sobre papel) */
+  --color-tinta: #1F4FB8;          /* acciones y respuestas (6.8:1 sobre papel) */
+  --color-tinta-hover: #163A88;
+  --color-renglon: #C9D6EA;        /* líneas de lista */
+  --color-renglon-claro: #E3EAF4;  /* fondo de barras de resultados */
+  --color-resaltador: #FFE45C;     /* SOLO la respuesta correcta revelada */
+  --color-en-vivo: #D7263D;        /* SOLO el indicador de sesión en vivo */
+  --color-blanco: #FFFFFF;         /* marco de la diapositiva, superficies elevadas */
+
+  /* Tipografía */
+  --font-ui: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --font-codigo: "Atkinson Hyperlegible Mono", ui-monospace, monospace; /* solo contenido que es código */
+
+  /* Escala (cuarta justa, base 18px) */
+  --text-sm: 0.875rem;   /* 14 */
+  --text-base: 1.125rem; /* 18 */
+  --text-lg: 1.5rem;     /* 24 */
+  --text-xl: 2rem;       /* 32 */
+  --text-2xl: 2.625rem;  /* 42 */
+  --text-3xl: 3.5rem;    /* 56 */
+  --text-codigo-sesion: clamp(4rem, 10vw, 8.25rem); /* código de sesión proyectado */
+
+  /* Espaciado */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+
+  /* Forma */
+  --radius: 6px;          /* contenedores y botones */
+  --radius-burbuja: 50%;  /* burbujas de respuesta: siempre círculo */
+  --tap-min: 56px;        /* alto mínimo de botones en celular */
+  --burbuja: 44px;
+
+  /* Movimiento */
+  --dur-resaltar: 900ms;  /* único momento animado sin acción del usuario */
+  --dur-barras: 800ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-resaltar: 0ms; --dur-barras: 0ms; }
+}
