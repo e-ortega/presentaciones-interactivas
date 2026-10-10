@@ -24,3 +24,9 @@
   margin-top: var(--space-7);
   font-size: var(--text-sm);
 }
+
+/* A plain text link. Not `.page a`: that would also recolor links styled as buttons. */
+.link {
+  color: var(--color-tinta);
+  font-weight: 700;
+}

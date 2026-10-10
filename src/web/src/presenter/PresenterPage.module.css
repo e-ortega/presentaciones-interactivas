@@ -1,0 +1,10 @@
+.message {
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: var(--space-8) var(--space-5);
+}
+
+.message a {
+  color: var(--color-tinta);
+  font-weight: 700;
+}

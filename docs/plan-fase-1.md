@@ -61,6 +61,8 @@ _Estado: terminado el 10 oct 2026 (pull requests #3 y #4). Probado con seis deck
 - **Listo cuando:** un PPTX real queda con imágenes, notas alineadas y PDF.
 
 ### M2 — Vista del presentador (sin tiempo real)
+_Estado: terminado el 10 oct 2026. Probado en pantalla con un deck real de Esteban, en ventana completa y a media pantalla._
+
 - Diapositiva actual, columna de script y barra inferior (diseño §4).
 - Script ocultable, modo teleprompter y modo notas estáticas.
 - Navegación anterior/siguiente por **pasos**, también con teclado.

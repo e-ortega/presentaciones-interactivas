@@ -93,7 +93,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 | Tema | Propuesta | Por qué |
 |---|---|---|
 | Base | Vite + React + TypeScript (D-31, D-33) | |
-| Rutas | React Router, desde el M2 (D-58): `/admin` (presentaciones, importar, widgets), `/present/:sessionId`, `/display/:sessionId`, `/join` y `/s/:code` | Una ruta por ventana |
+| Rutas | React Router: `/admin` (presentaciones, importar, widgets) y `/admin/presentations/:id/present` (presentador sin sesión, D-70) ya existen; con las sesiones llegan `/present/:sessionId`, `/display/:sessionId`, `/join` y `/s/:code` | Una ruta por ventana |
 | Datos del servidor | **TanStack Query** para las llamadas REST | Caché, reintentos y estados de carga resueltos |
 | Tiempo real | Un hook `useLiveSession(sessionId, role)` que envuelve `@microsoft/signalr`, maneja la reconexión y expone el estado del último `SessionSnapshot` | Los componentes no tocan SignalR directamente; buen punto para aprender hooks |
 | Estado global | **Sin Redux.** Estado local de React + el hook de sesión | No hace falta en la Fase 1 |

@@ -6,9 +6,9 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 - [ ] **Decidir quién revisa el código de Claude.** El ruleset pide revisión de Copilot, pero nunca se ejecutó en los pull requests #1 a #4 (parece que la cuenta no la tiene activada). Mientras tanto Claude revisa cada diff con una pasada independiente (D-61). Opciones: activar Copilot, que revise Esteban, o dejarlo así.
 - [ ] **Confirmar el trato en los textos de la interfaz:** están en voseo ("Subí tu primer PowerPoint", "Probá de nuevo"), como en el documento de identidad visual. Si se prefiere "usted" o "tú", es cambiar un archivo: `src/web/src/i18n/es.json`.
-- [ ] **Revisar las decisiones D-49 a D-67** que Claude tomó ([decisiones.md](decisiones.md)). _(Cambió: se agregan D-64 a D-67)_
-- [ ] **Correr `npm install` en `src/web`** una vez, para que los hooks de pre-commit queden activos también en los commits de Esteban. _(Nuevo)_
-- [ ] **Decidir qué hacer con los pull requests de Dependabot**, que empiezan a llegar los lunes: que Claude los revise y fusione al inicio de cada sesión, o que Esteban los atienda. _(Nuevo)_
+- [ ] **Probar la vista del presentador con una clase real en mente** y decir si los dos modos del guion son lo que se esperaba (D-71): teleprompter con las notas de la diapositiva actual y la siguiente, y notas fijas con las de todo el deck. _(Nuevo)_
+- [ ] **Decidir si los tipos de Node vuelven a la versión 24.** El pull request #10 de Dependabot, ya fusionado, los subió a la 26, pero la app corre en Node 24: el editor aceptaría funciones que no existen al ejecutar. Claude recomienda volver a la 24. _(Nuevo)_
+- [ ] **Revisar las decisiones D-49 a D-71** que Claude tomó ([decisiones.md](decisiones.md)). _(Cambió: se agregan D-68 a D-71)_
 - [ ] **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes.
 - [ ] **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador.
 - [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
@@ -16,8 +16,9 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 ## Más adelante (sin acción por ahora)
 
 - Un deck real con **diapositivas ocultas** y otro con **fuentes poco comunes**, para probar esos dos casos con material real. Los seis decks usados no tienen ninguno de los dos; hoy solo están cubiertos con archivos sintéticos.
-- **Borrar una presentación.** Hoy no se puede: las importaciones fallidas y las de prueba se quedan en la lista. Va con la gestión de presentaciones, en el M2 o después.
-- **Calidad, fase 2** (cuando toque cada una): prueba de carga del hub de SignalR (M3); Playwright de punta a punta (cierre del M4); Azurite para probar `BlobFileStorage` y escaneo de la imagen Docker (M5); umbral de cobertura de pruebas; SonarCloud si se suma más gente. _(Nuevo)_
+- **Borrar una presentación.** Hoy no se puede: las importaciones fallidas y las de prueba se quedan en la lista.
+- **Recordar las preferencias del presentador** (guion visible, modo) entre visitas, y la diapositiva al recargar la página. Lo segundo lo resuelve el M3, donde el servidor guarda la posición. _(Nuevo)_
+- **Calidad, fase 2** (cuando toque cada una): prueba de carga del hub de SignalR (M3); Playwright de punta a punta (cierre del M4); Azurite para probar `BlobFileStorage` y escaneo de la imagen Docker (M5); umbral de cobertura de pruebas; SonarCloud si se suma más gente.
 - Inicio de sesión del profesor (D-36).
 - Nombre del producto (D-37).
 - Documentación de uso en inglés, si hace falta (D-43).
@@ -26,7 +27,10 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Resueltos
 
-- [x] Calidad, fase 1: hooks de pre-commit, pruebas de arquitectura, contrato de la API, auditoría de dependencias y Dependabot (D-64 a D-67). _(Nuevo)_
+- [x] M2 (vista del presentador) terminado: diapositiva, guion en dos modos, ocultable, y navegación por botones y teclado. _(Nuevo)_
+- [x] Hooks de pre-commit activos también en la copia de Esteban (`npm install` hecho). _(Nuevo)_
+- [x] Dependabot: Claude revisa y fusiona los seguros (D-68). Primera tanda: Node 25 rechazado (D-69); TypeScript 7 y tipos de Node 26 fusionados por Esteban. _(Nuevo)_
+- [x] Calidad, fase 1: hooks de pre-commit, pruebas de arquitectura, contrato de la API, auditoría de dependencias y Dependabot (D-64 a D-67).
 - [x] Revisión hacia atrás del M0 y el M1: 9 hallazgos, 8 corregidos y 1 anotado para el M5 (D-63).
 - [x] App probada en el navegador con la clave real: entra y la importación funciona.
 - [x] Las preguntas de React son opcionales y no quedan como pendiente (D-62).

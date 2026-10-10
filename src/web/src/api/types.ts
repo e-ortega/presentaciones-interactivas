@@ -4,3 +4,5 @@ import type { components } from './schema'
 
 export type PresentationSummary = components['schemas']['PresentationSummary']
 export type ImportStatus = components['schemas']['ImportStatus']
+export type PresentationDetail = components['schemas']['PresentationDetail']
+export type SlideDetail = components['schemas']['SlideDetail']

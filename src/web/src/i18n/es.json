@@ -22,6 +22,7 @@
   },
   "presentations": {
     "title": "Mis presentaciones",
+    "present": "Presentar",
     "loading": "Cargando presentaciones…",
     "loadFailed": "No se pudieron cargar las presentaciones.",
     "empty": "Todavía no hay presentaciones. Subí tu primer PowerPoint.",
@@ -39,6 +40,33 @@
       "SlideCountMismatch": "Las notas y las diapositivas no coincidieron. Guardá el archivo de nuevo en PowerPoint y volvé a subirlo.",
       "Unexpected": "Ocurrió un error inesperado. Probá de nuevo."
     }
+  },
+  "presenter": {
+    "loading": "Cargando la presentación…",
+    "notFound": "Esa presentación no existe.",
+    "loadFailed": "No se pudo cargar la presentación.",
+    "notReady": "Esta presentación todavía no está lista para presentar.",
+    "backToList": "Volver a mis presentaciones",
+    "slideAlt": "Diapositiva {{number}} de {{total}}",
+    "position": "{{number}} / {{total}}",
+    "step": "paso {{number}} de {{total}}",
+    "script": {
+      "label": "Guion",
+      "next": "Siguiente",
+      "empty": "Esta diapositiva no tiene notas."
+    },
+    "controls": {
+      "label": "Controles de la presentación",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "script": "Guion",
+      "staticNotes": "Notas fijas",
+      "exit": "Salir"
+    }
+  },
+  "notFound": {
+    "title": "Esta página no existe.",
+    "back": "Ir a mis presentaciones"
   },
   "upload": {
     "label": "Subir un PowerPoint (.pptx)",
