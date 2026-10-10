@@ -36,6 +36,7 @@ Un solo proyecto de servidor con carpetas, no varios proyectos. La interfaz `ISl
 - Solución .NET, proyecto `Server`, proyecto de pruebas.
 - React + Vite + TypeScript en `src/web`, con los textos en archivos de recursos (P-10) y los tokens de `design/tokens.css`; en desarrollo, proxy de Vite hacia la API; en producción, el build se copia a `wwwroot`.
 - Docker Compose: app + SQL Server.
+- Zona del profesor protegida por la clave de acceso (D-45): middleware que compara el SHA-256 de la clave ingresada con `AdminAccess:KeySha256` en tiempo constante y deja una cookie. En local, Esteban carga el hash con `dotnet user-secrets`.
 - EF Core con la primera migración (entidades de la Fase 1, ver diseño §10).
 - Almacenamiento de archivos detrás de una interfaz: disco local en desarrollo, Blob Storage en Azure.
 - **Listo cuando:** `docker compose up` levanta todo y la página de React llama a un endpoint de salud.
@@ -79,7 +80,7 @@ Un solo proyecto de servidor con carpetas, no varios proyectos. La interfaz `ISl
 
 ### M5 — Despliegue
 - Dockerfile con .NET, LibreOffice, poppler-utils y las fuentes.
-- Clave de acceso por configuración para la zona del profesor (P-11).
+- Clave de acceso de la zona del profesor (D-45): cargar el hash como secreto de Container Apps (`AdminAccess__KeySha256`).
 - Imagen en GitHub Container Registry; Azure Container Apps (Consumo, una réplica máxima); Azure SQL Database (oferta gratuita); Blob Storage.
 - Alerta sobre la métrica "Free amount remaining" de la base.
 - **Listo cuando:** la app funciona en Azure desde un celular fuera de la red local.

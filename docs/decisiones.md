@@ -45,6 +45,12 @@ Cada decisión con su fecha y el motivo. Si una decisión cambia, no se borra: s
 | D-39 | 2026-10-09 | **Un solo modo, tres ventanas** (antes P-09): presentador, ventana opcional para compartir o proyectar (sin notas ni controles) y estudiante. La ventana para compartir entra en la Fase 1 | Sirve igual para clase virtual con o sin pantalla compartida y para aula con proyector |
 | D-40 | 2026-10-09 | Plan de la Fase 1 aprobado (antes P-07), con la ventana para compartir | Resueltos los modos de uso |
 | D-41 | 2026-10-09 | Repositorio **público** en GitHub, en la cuenta personal `e-ortega` (no en la cuenta de profesor de la Ulatina); el repo local se queda en `D:\Documents\source\repos` y Esteban lo saca de la sincronización de Drive | Pedido de Esteban |
+| D-42 | 2026-10-09 | Los datos personales de los estudiantes **nunca se envían a servicios de IA**; la IA solo analiza la presentación (antes P-12) | Aprobado por Esteban |
+| D-43 | 2026-10-09 | Los documentos de diseño de `docs/` se quedan en español; la documentación de uso en inglés se genera después si hace falta | Aprobado por Esteban |
+| D-44 | 2026-10-09 | Textos de la interfaz en archivos de traducción desde el inicio (antes P-10) | Agregar inglés después es traducir un archivo |
+| D-45 | 2026-10-09 | Clave de acceso para la zona del profesor mientras no haya login (antes P-11). La app guarda solo el **hash SHA-256** de la clave (`AdminAccess:KeySha256`) y compara en tiempo constante. La clave en texto plano vive en el gestor de contraseñas de Esteban; el hash va en `dotnet user-secrets` en desarrollo y como secreto de Container Apps en Azure. **Nunca en el repositorio** | El repo es público; si la configuración se filtra, el hash de una clave aleatoria de 256 bits no permite recuperarla |
+| D-46 | 2026-10-09 | Identidad visual "Hoja de respuestas" aprobada (antes P-08) | Aprobado por Esteban |
+| D-47 | 2026-10-09 | Infraestructura de Azure aprobada (antes P-01 a P-04): Container Apps (Consumo), Azure SQL Database (oferta gratuita), Blob Storage, GitHub Container Registry, SignalR dentro de la app, un contenedor con LibreOffice, Docker Compose en local | Aprobado por Esteban |
 
 ## Propuestas en revisión
 
@@ -52,15 +58,15 @@ Decisiones planteadas por Claude que esperan confirmación de Esteban. Ver [pend
 
 | # | Propuesta | Motivo |
 |---|---|---|
-| P-01 | Azure: Container Apps (Consumo) + SQL Database (oferta gratuita) + Blob Storage + GitHub Container Registry | Costo casi cero en el MVP, escala a cero |
-| P-02 | SignalR dentro de la app, una réplica, sin Azure SignalR Service | El plan gratuito del servicio solo admite 20 conexiones |
-| P-03 | Un solo contenedor con la app y LibreOffice | Menos piezas que mantener en el MVP |
-| P-04 | Desarrollo local con Docker Compose y SQL Server en contenedor | Costo cero y entorno reproducible |
+| ~~P-01~~ | Aprobada → D-47 | |
+| ~~P-02~~ | Aprobada → D-47 | |
+| ~~P-03~~ | Aprobada → D-47 | |
+| ~~P-04~~ | Aprobada → D-47 | |
 | ~~P-05~~ | Aprobada → D-33 | |
 | ~~P-06~~ | Aprobada → D-34 | |
 | ~~P-07~~ | Aprobada → D-40 | |
-| P-08 | Identidad visual "Hoja de respuestas": papel frío, tinta azul, resaltador solo para la respuesta correcta, Atkinson Hyperlegible | Legibilidad en proyector y celular; ver [identidad-visual.md](identidad-visual.md) |
+| ~~P-08~~ | Aprobada → D-46 | |
 | ~~P-09~~ | Aprobada → D-39. **Un solo modo, tres ventanas** (revisada el 9 oct, noche): presentador, ventana opcional para compartir o proyectar (sin notas) y estudiante. La ventana para compartir entra en la Fase 1. Roles de cliente `Presenter`, `Display`, `Participant` | En la referencia de Genially el profesor comparte pantalla en la videollamada; sin una ventana limpia, la clase vería sus notas. Ver [diseno.md](diseno.md) §13 |
-| P-10 | Todos los textos de la interfaz en archivos de recursos desde el día uno (por ejemplo, react-i18next), aunque solo exista el español | Agregar el inglés después es traducir un archivo, no recorrer todos los componentes |
-| P-12 | Los datos personales de los estudiantes (nombre, correo, respuestas) **nunca se envían a servicios de IA**; la IA solo procesa el contenido de la presentación | Compromiso del aviso de privacidad; reduce el riesgo legal y simplifica la Ley 8968 |
-| P-11 | Sin cuentas de profesor en la Fase 1, pero con una **clave de acceso** única por configuración para la zona del profesor antes de publicar en Azure (M5) | Sin ella, cualquiera en internet podría subir archivos y crear sesiones: costos y riesgo de archivos maliciosos |
+| ~~P-10~~ | Aprobada → D-44 | |
+| ~~P-12~~ | Aprobada → D-42 | |
+| ~~P-11~~ | Aprobada → D-45 | |

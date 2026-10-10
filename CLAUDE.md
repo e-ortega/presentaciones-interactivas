@@ -31,7 +31,7 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 3. **Pendientes explícitos.** Al terminar un ciclo, actualizar `docs/pendientes.md` y mostrar a Esteban la lista de lo que depende de él, marcando qué es nuevo o qué cambió desde la última versión.
 4. **Alcance:** respetar las fases de `docs/diseno.md` §12. No construir cosas de fases posteriores "de paso".
 5. **Enseñar React mientras se construye.** Esteban está aprendiendo React. Al escribir frontend: explicar cada concepto nuevo (hooks, estado, efectos, props, contexto) con el ejemplo concreto del código que se está escribiendo, a ritmo pausado, uno a uno, y al final hacer una o dos preguntas para confirmar que lo entendió. Preferir código claro sobre código ingenioso.
-6. **Idioma (D-34):** código, comentarios y documentación técnica en **inglés**; documentación para el usuario y textos de interfaz en **español**. Los textos de la interfaz van en archivos de recursos desde el inicio (P-10) para agregar inglés después. Los documentos de diseño de `docs/` están en español (pendiente decidir si se traducen).
+6. **Idioma (D-34):** código, comentarios y documentación técnica en **inglés**; documentación para el usuario y textos de interfaz en **español**. Los textos de la interfaz van en archivos de recursos desde el inicio (P-10) para agregar inglés después. Los documentos de diseño de `docs/` se quedan en español (D-43).
 
 ## Decisiones que más afectan el código
 
@@ -41,8 +41,8 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 - **Widget vs. Lanzamiento** (D-22): el widget es el diseño editable; el lanzamiento (`WidgetLaunch`) guarda una **copia exacta** (snapshot) de la pregunta al momento de lanzarse. Las respuestas cuelgan del lanzamiento, nunca del widget.
 - **Vista del estudiante amarrada** a la del profesor (D-12) y **adaptable**, diseñada primero para computadora (D-35).
 - **Un solo modo, tres ventanas (D-39):** presentador, ventana para compartir o proyectar (`Display`, sin notas ni controles) y estudiante. Cada cliente se une con un rol (`Presenter`, `Display`, `Participant`) y el hub emite eventos al grupo de la sesión.
-- **Los datos de estudiantes nunca van a servicios de IA** (P-12).
-- **Sin login de profesor en la Fase 1** (D-36); antes de publicar en Azure, una clave de acceso por configuración (P-11).
+- **Los datos de estudiantes nunca van a servicios de IA** (D-42).
+- **Sin login de profesor en la Fase 1** (D-36). La zona del profesor pide una clave de acceso (D-45): la app solo conoce su hash SHA-256 en `AdminAccess:KeySha256` (user-secrets en local, secreto de Container Apps en Azure) y compara en tiempo constante. **Nunca escribir la clave ni su hash en el repositorio**: es público.
 - **El correo es la identidad** del participante (D-16).
 - **Ley 8968:** el formulario de nombre y correo lleva aviso de consentimiento y se guarda la fecha del consentimiento (D-29).
 
@@ -52,7 +52,7 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 - Frontend: **React + Vite + TypeScript** (D-31, D-33), compilado y servido como archivos estáticos por la misma app ASP.NET Core: un solo contenedor, mismo origen, sin CORS.
 - Importación: LibreOffice headless (PPTX → PDF), `pdftoppm` (PDF → PNG por diapositiva), Open XML SDK (notas del orador).
 - Local: Docker Compose con SQL Server en contenedor.
-- Azure (propuesta P-01, pendiente de aprobación): Container Apps (Consumo), Azure SQL Database (oferta gratuita), Blob Storage, imagen en GitHub Container Registry.
+- Azure (D-47): Container Apps (Consumo), Azure SQL Database (oferta gratuita), Blob Storage, imagen en GitHub Container Registry.
 
 ## Glosario dominio → código (D-34)
 
