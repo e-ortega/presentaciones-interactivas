@@ -13,13 +13,18 @@ export function PresenterPage() {
   const presentation = useQuery({
     queryKey: ['presentation', presentationId],
     queryFn: () => getPresentation(presentationId),
+    // An imported deck does not change, so there is nothing to ask again when the teacher
+    // comes back to this window in the middle of a class.
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 
-  if (presentation.isPending) {
-    return <Message text={t('presenter.loading')} />
-  }
-
-  if (presentation.isError) {
+  // Once the deck is on screen it stays there: a later failed request must never replace
+  // the class with an error message and send the teacher back to slide 1.
+  if (presentation.data === undefined) {
+    if (presentation.isPending) {
+      return <Message text={t('presenter.loading')} />
+    }
     const notFound = presentation.error instanceof ApiError && presentation.error.status === 404
     return <Message text={t(notFound ? 'presenter.notFound' : 'presenter.loadFailed')} />
   }

@@ -39,9 +39,11 @@ export function ScriptPanel({ slides, currentSlideIndex, mode }: ScriptPanelProp
   }
 
   // Teleprompter: follows the slide. This slide's notes, then the next one's, dimmed.
+  // The key makes React build a new panel for each slide, so it starts scrolled to the top
+  // instead of keeping the place where the previous notes were left.
   const nextSlide = slides.at(currentSlideIndex + 1)
   return (
-    <aside className={styles.panel} aria-label={t('presenter.script.label')}>
+    <aside key={currentSlideIndex} className={styles.panel} aria-label={t('presenter.script.label')}>
       <div className={styles.current}>
         <Notes text={slides[currentSlideIndex].speakerNotes} />
       </div>

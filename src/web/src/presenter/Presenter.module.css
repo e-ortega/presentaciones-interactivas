@@ -67,11 +67,11 @@
   cursor: pointer;
 }
 
-.navigate:hover:not(:disabled) {
+.navigate:hover:not([aria-disabled='true']) {
   background: var(--color-tinta-hover);
 }
 
-.navigate:disabled {
+.navigate[aria-disabled='true'] {
   opacity: 0.45;
   cursor: not-allowed;
 }

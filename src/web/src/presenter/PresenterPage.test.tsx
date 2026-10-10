@@ -1,7 +1,7 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import type { PresentationDetail } from '../api/types'
 import { jsonResponse, renderWithQuery, stubFetch } from '../test/render'
 import { PresenterPage } from './PresenterPage'
@@ -41,7 +41,7 @@ test('opens on the first slide with its notes, and the next notes after them', a
   expect(script()).toHaveTextContent('Saludar a la clase.')
   expect(script()).toHaveTextContent('Explicar qué es un ERP.')
   expect(screen.getByText('1 / 3')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Anterior' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Anterior' })).toHaveAttribute('aria-disabled', 'true')
 })
 
 test('the buttons move forward and back, and stop at the ends', async () => {
@@ -54,7 +54,7 @@ test('the buttons move forward and back, and stop at the ends', async () => {
 
   await user.click(screen.getByRole('button', { name: 'Siguiente' }))
   expect(await slideImage(3)).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Siguiente' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Siguiente' })).toHaveAttribute('aria-disabled', 'true')
 
   await user.click(screen.getByRole('button', { name: 'Anterior' }))
   expect(await slideImage(2)).toBeInTheDocument()
@@ -87,6 +87,50 @@ test('the space bar on a focused button presses that button and nothing else', a
 
   // One step forward from the button; the key itself must not add a second one.
   expect(await slideImage(2)).toBeInTheDocument()
+  expect(screen.getByText('2 / 3')).toBeInTheDocument()
+})
+
+test('the keyboard keeps working after clicking through to the last slide', async () => {
+  const user = renderPresenter()
+  await slideImage(1)
+  const nextButton = screen.getByRole('button', { name: 'Siguiente' })
+
+  await user.click(nextButton)
+  await user.click(nextButton)
+  await slideImage(3)
+
+  // The button the teacher just clicked is at its end but still focusable, so keys still arrive.
+  expect(nextButton).toHaveFocus()
+  expect(nextButton).not.toBeDisabled()
+  await user.click(nextButton) // does nothing at the end
+  expect(screen.getByText('3 / 3')).toBeInTheDocument()
+  await user.keyboard('{ArrowLeft}')
+  expect(await slideImage(2)).toBeInTheDocument()
+})
+
+test('the teleprompter starts each slide at the top of its notes', async () => {
+  const user = renderPresenter()
+  await slideImage(1)
+  script().scrollTop = 250 // the teacher scrolled down through long notes
+
+  await user.keyboard('{ArrowRight}')
+
+  await slideImage(2)
+  expect(script().scrollTop).toBe(0)
+})
+
+test('coming back to the window does not reload the deck or lose the place', async () => {
+  const user = renderPresenter()
+  await slideImage(1)
+  await user.keyboard('{ArrowRight}')
+  await slideImage(2)
+  const requestsBefore = vi.mocked(fetch).mock.calls.length
+
+  window.dispatchEvent(new Event('focus'))
+  document.dispatchEvent(new Event('visibilitychange'))
+  await new Promise((resolve) => setTimeout(resolve, 50))
+
+  expect(vi.mocked(fetch).mock.calls).toHaveLength(requestsBefore)
   expect(screen.getByText('2 / 3')).toBeInTheDocument()
 })
 

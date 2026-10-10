@@ -63,10 +63,14 @@ export function Presenter({ presentation }: PresenterProps) {
       {scriptVisible && <ScriptPanel slides={slides} currentSlideIndex={position.slideIndex} mode={scriptMode} />}
 
       <nav className={styles.controls} aria-label={t('presenter.controls.label')}>
+        {/*
+          aria-disabled, not disabled: a disabled button that has the focus swallows key
+          presses in some browsers, and the keyboard would stop working at either end.
+        */}
         <button
           className={styles.navigate}
           type="button"
-          disabled={previous === null}
+          aria-disabled={previous === null}
           onClick={() => previous && setPosition(previous)}
         >
           {t('presenter.controls.previous')}
@@ -74,7 +78,7 @@ export function Presenter({ presentation }: PresenterProps) {
         <button
           className={styles.navigate}
           type="button"
-          disabled={next === null}
+          aria-disabled={next === null}
           onClick={() => next && setPosition(next)}
         >
           {t('presenter.controls.next')}
