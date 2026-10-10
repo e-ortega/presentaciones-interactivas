@@ -70,6 +70,24 @@ test('the privacy notice comes before the fields and says who will see what', as
   expect(screen.getByText('Aviso de privacidad, versión 1.0')).toBeInTheDocument()
 })
 
+test('coming back to the form with the network down does not take the form away', async () => {
+  let online = true
+  stubFetch({
+    'GET /api/join/88886666': () => (online ? jsonResponse({ title: 'Semana 01', noticeVersion: '1.0' }) : new Response(null, { status: 503 })),
+  })
+  const user = renderJoin('/s/88886666')
+  await fillIn(user, 'Ana Mora', 'ana@example.com')
+
+  // The student switches to another app and back while the connection is failing.
+  online = false
+  window.dispatchEvent(new Event('focus'))
+  document.dispatchEvent(new Event('visibilitychange'))
+  await new Promise((resolve) => setTimeout(resolve, 50))
+
+  expect(screen.getByLabelText('Tu nombre')).toHaveValue('Ana Mora')
+  expect(screen.queryByText(/No se pudo buscar la clase/)).not.toBeInTheDocument()
+})
+
 test('consent starts unticked, and nobody joins without ticking it', async () => {
   const fetchMock = stubFetch({ 'GET /api/join/88886666': joinInfo })
   const user = renderJoin('/s/88886666')

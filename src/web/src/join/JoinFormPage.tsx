@@ -21,21 +21,27 @@ export function JoinFormPage() {
   // The law asks for express consent: the box starts unticked and nothing ticks it but the student.
   const [consent, setConsent] = useState(false)
 
-  const info = useQuery({ queryKey: ['join', code], queryFn: () => getJoinInfo(code) })
+  // Asked once: a student filling in the form must not lose it to a later failed request.
+  const info = useQuery({
+    queryKey: ['join', code],
+    queryFn: () => getJoinInfo(code),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  })
   const join = useMutation({
     mutationFn: () => joinSession(code, { name, email, consent }),
     onSuccess: ({ sessionId }) => void navigate(`/session/${sessionId}`),
   })
 
-  if (info.isPending) {
-    return (
-      <main className={styles.page}>
-        <p role="status">{t('join.lookingUp')}</p>
-      </main>
-    )
-  }
+  if (info.data === undefined) {
+    if (info.isPending) {
+      return (
+        <main className={styles.page}>
+          <p role="status">{t('join.lookingUp')}</p>
+        </main>
+      )
+    }
 
-  if (info.isError) {
     const notFound = info.error instanceof ApiError && info.error.status === 404
     return (
       <main className={styles.page}>

@@ -88,12 +88,14 @@
       "hint": "Muestra el código y luego la diapositiva, sin tus notas. Compartí esa ventana en la videollamada o llevala al proyector.",
       "open": "Abrir ventana para compartir",
       "copyLink": "Copiar enlace para otro equipo",
-      "linkCopied": "Enlace copiado. Sirve una sola vez, durante 2 minutos."
+      "linkCopied": "Enlace copiado. Sirve una sola vez, durante 2 minutos.",
+      "copyByHand": "Copiá este enlace y abrilo en el otro equipo. Sirve una sola vez, durante 2 minutos."
     }
   },
   "display": {
     "opening": "Abriendo la ventana…",
     "linkExpired": "Este enlace ya no sirve. Pedí uno nuevo desde la vista del presentador.",
+    "openFailed": "No se pudo abrir la ventana. Revisá la conexión y recargá la página: el enlace sigue sirviendo.",
     "refused": "Esta ventana ya no tiene acceso a la clase. Abrila de nuevo desde la vista del presentador.",
     "joinAt": "Entrá a {{address}} con este código"
   },

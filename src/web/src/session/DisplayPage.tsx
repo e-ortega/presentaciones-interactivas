@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useParams } from 'react-router'
+import { ApiError } from '../api/http'
 import { redeemDisplayToken, sessionStepImageUrl } from '../api/join'
 import { formatSessionCode, joinUrl } from '../api/sessions'
 import { useLiveSession } from '../realtime/useLiveSession'
@@ -28,18 +29,21 @@ export function DisplayPage() {
       return true
     },
     enabled: token !== null,
-    retry: false,
+    // The default rule: a refusal (4xx) is final, a network or server failure is tried again.
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
 
-  // The token is spent: take it out of the address bar, which may end up on a shared screen.
+  // A token the server refused is spent or expired; one it could not be asked about is still good.
+  const linkRefused = access.error instanceof ApiError && access.error.status < 500
+
+  // Used or useless, the token leaves the address bar, which may end up on a shared screen.
   useEffect(() => {
-    if (access.isSuccess) {
+    if (access.isSuccess || linkRefused) {
       window.history.replaceState(null, '', window.location.pathname)
     }
-  }, [access.isSuccess])
+  }, [access.isSuccess, linkRefused])
 
   if (token !== null && access.isPending) {
     return <p className={styles.notice}>{t('display.opening')}</p>
@@ -48,7 +52,7 @@ export function DisplayPage() {
   if (token !== null && access.isError) {
     return (
       <p className={styles.notice} role="alert">
-        {t('display.linkExpired')}
+        {t(linkRefused ? 'display.linkExpired' : 'display.openFailed')}
       </p>
     )
   }

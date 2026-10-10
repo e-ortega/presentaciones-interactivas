@@ -225,6 +225,39 @@ test('a link that was already used says so and does not connect', async () => {
   expect(FakeHubConnection.current).toBeUndefined()
 })
 
+test('a link refused by the server is taken out of the address bar too', async () => {
+  stubFetch({ 'POST /api/display/access': jsonResponse({ code: 'InvalidDisplayToken' }, 400) })
+  window.history.replaceState(null, '', '/display/session-1#token=USED')
+
+  renderWithQuery(
+    <Routes>
+      <Route path="/display/:sessionId" element={<DisplayPage />} />
+    </Routes>,
+    '/display/session-1#token=USED',
+  )
+
+  await screen.findByRole('alert')
+  await waitFor(() => expect(window.location.hash).toBe(''))
+})
+
+test('a link that could not be checked is not called spent: reloading still works', async () => {
+  stubFetch({ 'POST /api/display/access': new Response(null, { status: 503 }) })
+  window.history.replaceState(null, '', '/display/session-1#token=GOOD')
+
+  renderWithQuery(
+    <Routes>
+      <Route path="/display/:sessionId" element={<DisplayPage />} />
+    </Routes>,
+    '/display/session-1#token=GOOD',
+  )
+
+  const alert = await screen.findByRole('alert')
+  expect(alert).toHaveTextContent('No se pudo abrir la ventana.')
+  expect(alert).not.toHaveTextContent('ya no sirve')
+  expect(window.location.hash).toBe('#token=GOOD') // kept: it has not been spent
+  expect(FakeHubConnection.current).toBeUndefined()
+})
+
 test('a display window that lost its access says how to open it again', async () => {
   await open('/display/session-1')
 

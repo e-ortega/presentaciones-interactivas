@@ -76,8 +76,23 @@
 }
 
 .display [role='status'] {
+  display: block;
   margin: var(--space-3) 0 0;
   font-weight: 700;
+}
+
+.linkToCopy input {
+  width: 100%;
+  min-height: 44px;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-grafito-suave);
+  border-radius: var(--radius);
+  background: var(--color-blanco);
+  color: var(--color-grafito);
+  font: inherit;
+  font-family: var(--font-codigo);
+  font-size: var(--text-sm);
 }
 
 .empty {
