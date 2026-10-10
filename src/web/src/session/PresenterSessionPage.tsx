@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
 import { ApiError } from '../api/http'
 import { accessQueryKey } from '../api/queryClient'
+import { createDisplayLink } from '../api/join'
 import { formatSessionCode, getSession } from '../api/sessions'
 import type { SessionDetail } from '../api/types'
 import { Presenter } from '../presenter/Presenter'
@@ -42,6 +43,7 @@ function PresenterSession({ details }: { details: SessionDetail }) {
   const queryClient = useQueryClient()
   const live = useLiveSession(details.id, 'Presenter')
   const [actionFailed, setActionFailed] = useState(false)
+  const [displayLinkCopied, setDisplayLinkCopied] = useState(false)
 
   // The hub refuses a presenter only when the teacher cookie is gone, typically because it
   // expired with this tab open. Checking access again brings the access key form back.
@@ -85,6 +87,19 @@ function PresenterSession({ details }: { details: SessionDetail }) {
   const attendance = session.attendance ?? { connectedCount: 0, attendees: [] }
   const code = session.code ?? details.code
 
+  /** The window to share on a video call or drag to the projector. Same browser, so it just opens. */
+  function openDisplay() {
+    window.open(`/display/${details.id}`, `display-${details.id}`)
+  }
+
+  /** For a projector on another computer: a link that works once, for two minutes. */
+  function copyDisplayLink() {
+    run(
+      createDisplayLink(details.id).then((link) => navigator.clipboard.writeText(link)),
+      () => setDisplayLinkCopied(true),
+    )
+  }
+
   function endSession(confirmation: string, then?: () => void) {
     if (window.confirm(confirmation)) {
       run(live.endSession(), then)
@@ -107,6 +122,9 @@ function PresenterSession({ details }: { details: SessionDetail }) {
             }
           }}
           onCancel={() => endSession(t('lobby.cancelConfirm'), () => void navigate('/admin'))}
+          onOpenDisplay={openDisplay}
+          onCopyDisplayLink={copyDisplayLink}
+          displayLinkCopied={displayLinkCopied}
         />
       </>
     )
@@ -126,6 +144,9 @@ function PresenterSession({ details }: { details: SessionDetail }) {
           <span className={styles.codeLabel}>{t('session.code')}</span> {formatSessionCode(code)}
         </p>
         <p className={styles.connected}>{t('session.connected', { count: attendance.connectedCount })}</p>
+        <button className={presenterStyles.option} type="button" onClick={openDisplay}>
+          {t('session.openDisplay')}
+        </button>
         <button className={presenterStyles.option} type="button" onClick={() => endSession(t('session.endConfirm'))}>
           {t('session.end')}
         </button>

@@ -20,7 +20,7 @@ App web que convierte una presentación de PowerPoint que el profesor **ya tiene
 
 ## Estado
 
-Fase 1 en construcción. Terminados los hitos M0 (esqueleto), M1 (importación) y M2 (vista del presentador): el profesor entra con su clave, sube un PowerPoint, la app lo convierte en diapositivas con sus notas y un PDF, y puede recorrerlo con sus notas al lado como guion. Sigue el M3, la sesión en vivo con los estudiantes. Ver [docs/plan-fase-1.md](docs/plan-fase-1.md).
+Fase 1 en construcción. Terminados los hitos M0 (esqueleto), M1 (importación), M2 (vista del presentador) y M3 (sesión en vivo): el profesor entra con su clave, sube un PowerPoint, la app lo convierte en diapositivas con sus notas y un PDF, puede recorrerlo con sus notas al lado como guion, e iniciar una clase en vivo: los estudiantes entran con un código y ven la misma diapositiva que el profesor, y hay una ventana aparte para compartir o proyectar. Sigue el M4, el quiz de opción múltiple. Ver [docs/plan-fase-1.md](docs/plan-fase-1.md).
 
 ## Cómo correrlo
 

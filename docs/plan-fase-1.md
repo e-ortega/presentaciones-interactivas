@@ -69,7 +69,7 @@ _Estado: terminado el 10 oct 2026. Probado en pantalla con un deck real de Esteb
 - **Listo cuando:** Esteban puede recorrer su presentación con sus notas en pantalla.
 
 ### M3 — Sesión en vivo
-_Estado (10 oct 2026): servidor hecho (sesiones, entrada de estudiantes, hub de SignalR, ventana para compartir con token), probado con clientes SignalR reales y por WebSockets en el contenedor. Pantallas del profesor hechas (iniciar clase, sala de espera con código y QR, presentador en vivo) y vistas en un navegador real contra el servidor. Faltan las del estudiante y la ventana para compartir._
+_Estado: terminado el 10 oct 2026 (pull requests #14, #15 y #16). Las tres ventanas se vieron funcionando en un navegador real contra el servidor: sala de espera y clase en vivo del profesor, del estudiante y de la ventana para compartir. Falta la prueba con varios dispositivos reales a la vez, que le toca a Esteban._
 
 - Crear sesión: código tipo `8888-6666`, enlace y QR.
 - `SessionHub` (SignalR): grupo por sesión; cada cliente se une con un rol (`Presenter`, `Display`, `Participant`); el profesor envía `(slideIndex, stepIndex)` y el hub lo emite al grupo de la sesión.

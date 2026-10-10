@@ -4,20 +4,24 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Abiertos
 
-- [ ] **Revisar a posteriori las decisiones D-79 a D-84 y D-87 a D-88** ([decisiones.md](decisiones.md)). D-77, D-78 y D-84 ya las viste: quedaron como D-85 y D-86. _(Cambió)_
+- [ ] **Revisar a posteriori las decisiones D-79 a D-84 y D-87 a D-88** ([decisiones.md](decisiones.md)). D-77, D-78 y D-84 ya las viste: quedaron como D-85 y D-86.
+- [ ] **Probar una clase con varios dispositivos reales a la vez:** tu computadora como profesor, la ventana para compartir, y dos o tres celulares o computadoras como estudiantes. Es el criterio de "listo" del M3 y lo único que Claude no puede hacer: probó cada ventana en un navegador real, pero con estudiantes simulados por script. _(Nuevo)_
 - [ ] **Sacar la carpeta `repos` de la sincronización de Google Drive.**
 
 ## Antes de salir a producción
 
 - **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes. Obligatorio antes de usar la app con estudiantes reales.
+- **Completar los datos del responsable y el correo de contacto** en `src/web/src/legal.ts`. Hoy el formulario de entrada los muestra como "[nombre del responsable]" y "[correo de contacto]". _(Nuevo)_
+- **Página con el aviso de privacidad completo**, enlazada desde el formulario de entrada. Hoy solo se muestra el texto corto. _(Nuevo)_
 - **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador.
 
 ## Más adelante (sin acción por ahora)
 
-- **Corregir datos de la sesión, como el nombre de un estudiante** (D-84, D-86). Por decidir cómo; lo más seguro es que lo corrija el profesor desde la lista de asistencia, porque el estudiante no tiene cómo demostrar quién es. _(Nuevo)_
-- **Modales de ayuda** que expliquen qué se puede hacer en cada pantalla, dentro del trabajo de experiencia de uso. _(Nuevo)_
-- **Sesiones abiertas:** cada "Iniciar clase" crea una sesión nueva (D-87). Falta ver las sesiones abiertas de una presentación y retomar una, junto con "empezar donde quedaste" (D-21). _(Nuevo)_
-- **QR siempre visible en el presentador.** El diseño §4 pide código y QR siempre a la vista; hoy el QR está en la sala de espera y durante la clase se ve solo el código. _(Nuevo)_
+- **Ver las pantallas del estudiante en un celular de verdad.** Las capturas llegan hasta 500 px de ancho, el mínimo de la herramienta usada; se ven bien ahí, pero no se comprobó un ancho de teléfono. _(Nuevo)_
+- **Corregir datos de la sesión, como el nombre de un estudiante** (D-84, D-86). Por decidir cómo; lo más seguro es que lo corrija el profesor desde la lista de asistencia, porque el estudiante no tiene cómo demostrar quién es.
+- **Modales de ayuda** que expliquen qué se puede hacer en cada pantalla, dentro del trabajo de experiencia de uso.
+- **Sesiones abiertas:** cada "Iniciar clase" crea una sesión nueva (D-87). Falta ver las sesiones abiertas de una presentación y retomar una, junto con "empezar donde quedaste" (D-21).
+- **QR siempre visible en el presentador.** El diseño §4 pide código y QR siempre a la vista; hoy el QR está en la sala de espera y durante la clase se ve solo el código.
 - **Suplantación por correo (D-84).** Sin verificar el correo, alguien con el código puede entrar como un compañero. Lo resuelven las cuentas y grupos de la Fase 3; mientras tanto ayudaría el candado para cerrar la entrada. Conviene tenerlo presente antes de usar las respuestas para calificar.
 - **Carga al entrar toda la clase.** Cada estudiante que se conecta cuesta unas 7 consultas pequeñas a la base y reenvía la lista de asistencia al profesor. Con 40 estudiantes es aceptable; medirlo en la prueba de carga del M3 y agrupar los avisos si hace falta.
 - **Experiencia de uso de la vista del presentador** y un guion que se desplace como teleprompter real (velocidad, tamaño de letra). Hoy el guion es estático (D-76). Referencia: el teleprompter HTML de `repos/teleprompter` que menciona el diseño §4.
@@ -33,8 +37,9 @@ _Última actualización: 10 oct 2026. Marcados como (Nuevo) o (Cambió) los punt
 
 ## Resueltos
 
-- [x] M3, pantallas del profesor: iniciar clase, sala de espera con código y QR, presentador en vivo. _(Nuevo)_
-- [x] Los nombres se ven en la ventana para compartir (D-85); D-77 confirmada (D-86). _(Nuevo)_
+- [x] M3 terminado: pantallas del estudiante (código, formulario con consentimiento, clase) y ventana para compartir. _(Nuevo)_
+- [x] M3, pantallas del profesor: iniciar clase, sala de espera con código y QR, presentador en vivo.
+- [x] Los nombres se ven en la ventana para compartir (D-85); D-77 confirmada (D-86).
 - [x] M3, parte del servidor: sesiones, entrada de estudiantes y hub de SignalR.
 - [x] Decisiones D-49 a D-71 aprobadas por Esteban (D-72).
 - [x] Revisión de código: Claude antes de fusionar, Esteban a posteriori; sin Copilot (D-73).

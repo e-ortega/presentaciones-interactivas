@@ -82,7 +82,62 @@
     "removeConfirm": "¿Sacar a {{name}} de la clase? No podrá volver a entrar con ese correo.",
     "start": "Empezar la clase",
     "cancel": "Cancelar la clase",
-    "cancelConfirm": "¿Cancelar la clase? El código dejará de servir."
+    "cancelConfirm": "¿Cancelar la clase? El código dejará de servir.",
+    "display": {
+      "heading": "Ventana para compartir",
+      "hint": "Muestra el código y luego la diapositiva, sin tus notas. Compartí esa ventana en la videollamada o llevala al proyector.",
+      "open": "Abrir ventana para compartir",
+      "copyLink": "Copiar enlace para otro equipo",
+      "linkCopied": "Enlace copiado. Sirve una sola vez, durante 2 minutos."
+    }
+  },
+  "display": {
+    "opening": "Abriendo la ventana…",
+    "linkExpired": "Este enlace ya no sirve. Pedí uno nuevo desde la vista del presentador.",
+    "refused": "Esta ventana ya no tiene acceso a la clase. Abrila de nuevo desde la vista del presentador.",
+    "joinAt": "Entrá a {{address}} con este código"
+  },
+  "join": {
+    "title": "Unirme a una clase",
+    "codeLabel": "Código de la clase",
+    "codeFormat": "El código tiene 8 números, como 1234-5678.",
+    "continue": "Continuar",
+    "teacherLink": "Soy profesor o profesora",
+    "lookingUp": "Buscando la clase…",
+    "codeNotFound": "Ese código no corresponde a una clase abierta. Revisalo con tu profesor o profesora.",
+    "lookupFailed": "No se pudo buscar la clase. Revisá la conexión y probá de nuevo.",
+    "tryAnotherCode": "Probar con otro código",
+    "joining": "Vas a unirte a",
+    "nameLabel": "Tu nombre",
+    "emailLabel": "Tu correo",
+    "consent": "Acepto que {{responsible}} trate mis datos como se describe arriba, incluido su almacenamiento en servidores fuera de Costa Rica.",
+    "submit": "Unirme a la clase",
+    "submitting": "Entrando…",
+    "notice": {
+      "lead": "Antes de unirte:",
+      "text": "para registrar tu participación en esta clase guardamos tu nombre, tu correo y tus respuestas. Tu nombre lo verán tu profesor o profesora y las demás personas de la sesión, como en una videollamada; tu correo y tus respuestas, solo tu profesor o profesora. Se guardan en servidores de Microsoft Azure, que pueden estar fuera de Costa Rica. Sin estos datos no podés unirte a la sesión. Podés consultarlos, corregirlos o pedir que los borremos escribiendo a {{contact}}.",
+      "version": "Aviso de privacidad, versión {{version}}"
+    },
+    "error": {
+      "SessionNotFound": "Esa clase ya no está abierta.",
+      "NameRequired": "Escribí tu nombre.",
+      "NameTooLong": "El nombre es demasiado largo.",
+      "EmailInvalid": "Ese correo no parece válido. Revisalo.",
+      "ConsentRequired": "Para unirte hay que aceptar el tratamiento de tus datos.",
+      "Removed": "Tu profesor o profesora te sacó de esta clase.",
+      "tooManyAttempts": "Demasiados intentos. Esperá un minuto y probá de nuevo.",
+      "generic": "No se pudo entrar a la clase. Probá de nuevo."
+    }
+  },
+  "student": {
+    "connecting": "Conectando con la clase…",
+    "youAreIn": "Ya estás dentro",
+    "waiting": "Esperando a que empiece la clase. Esta pantalla cambia sola.",
+    "ended": "La clase terminó",
+    "thanks": "Gracias por participar.",
+    "removed": "Tu profesor o profesora te sacó de esta clase.",
+    "notJoined": "Para ver esta clase hay que entrar con su código.",
+    "joinWithCode": "Entrar con un código"
   },
   "session": {
     "loading": "Cargando la clase…",
@@ -96,6 +151,7 @@
     "code": "Código",
     "connected_one": "{{count}} conectado",
     "connected_other": "{{count}} conectados",
+    "openDisplay": "Ventana para compartir",
     "end": "Terminar la clase",
     "endConfirm": "¿Terminar la clase? Los estudiantes dejarán de ver las diapositivas."
   },

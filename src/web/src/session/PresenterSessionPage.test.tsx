@@ -277,6 +277,34 @@ test('quick presses with a slow server end on the slide the teacher asked for', 
   expect(screen.getByRole('img', { name: 'Diapositiva 3 de 3' })).toBeInTheDocument()
 })
 
+test('the window to share opens from the lobby and from the class, in this browser', async () => {
+  const open = vi.spyOn(window, 'open').mockReturnValue(null)
+  const user = await openSession()
+  hub().receive('SessionSnapshot', snapshot())
+
+  await user.click(await screen.findByRole('button', { name: 'Abrir ventana para compartir' }))
+  expect(open).toHaveBeenLastCalledWith('/display/session-1', 'display-session-1')
+
+  hub().receive('SessionStarted', 0, 0)
+  await user.click(await screen.findByRole('button', { name: 'Ventana para compartir' }))
+  expect(open).toHaveBeenCalledTimes(2)
+})
+
+test('for a projector on another computer, a one-time link is copied to the clipboard', async () => {
+  const user = await openSession()
+  // Added after the page opened: openSession() set up the stubs for what the page loads first.
+  stubFetch({
+    'GET /api/admin/sessions/session-1': jsonResponse(details),
+    'POST /api/admin/sessions/session-1/display-token': jsonResponse({ token: 'ONE-TIME' }),
+  })
+  hub().receive('SessionSnapshot', snapshot())
+
+  await user.click(await screen.findByRole('button', { name: 'Copiar enlace para otro equipo' }))
+
+  expect(await screen.findByText(/Enlace copiado\. Sirve una sola vez/)).toBeInTheDocument()
+  expect(await navigator.clipboard.readText()).toBe(`${window.location.origin}/display/session-1#token=ONE-TIME`)
+})
+
 test('a session that does not exist says so', async () => {
   stubFetch({ 'GET /api/admin/sessions/session-1': jsonResponse({ status: 404 }, 404) })
   renderWithQuery(

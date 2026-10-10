@@ -19,15 +19,18 @@ const deck = {
   createdAt: '2026-10-10T05:00:00+00:00',
 }
 
-test('the home address leads to the teacher area', async () => {
+test('the home address is the front door for students, with a way through for the teacher', async () => {
   stubFetch({
     'GET /api/admin/access': access,
     'GET /health': healthy,
     'GET /api/admin/presentations': jsonResponse([]),
   })
+  const user = userEvent.setup()
 
   renderWithQuery(<App />, '/')
+  expect(await screen.findByRole('heading', { name: 'Unirme a una clase' })).toBeInTheDocument()
 
+  await user.click(screen.getByRole('link', { name: 'Soy profesor o profesora' }))
   expect(await screen.findByRole('heading', { name: 'Mis presentaciones' })).toBeInTheDocument()
 })
 
