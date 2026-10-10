@@ -73,7 +73,11 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-M0 (esqueleto) hecho en la rama `feat/m0-skeleton`: servidor ASP.NET Core con la clave de acceso, EF Core con la primera migración, almacenamiento de archivos, React + Vite con la llamada de salud, Docker Compose y CI. Docker Compose verificado; falta ver el CI en verde en GitHub (ver `docs/pendientes.md`). Siguiente hito: M1, importación.
+M0 (esqueleto) terminado y en `main`. Siguiente hito: M1, importación del PPTX (`docs/plan-fase-1.md`).
+
+## Flujo de trabajo
+
+`main` está protegida (ruleset `pr_main`): no se puede subir directo, ni documentación. Cada cambio va en una rama corta (`feat/...`, `fix/...`, `docs/...`) con pull request; se fusiona con "squash" cuando pasan los tres trabajos del CI (`Server (.NET)`, `Web (React)`, `Docker image`). Si se renombra un trabajo en `.github/workflows/ci.yml`, hay que actualizar el ruleset o los pull requests quedan bloqueados.
 
 ## Comandos
 
