@@ -1,8 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
 import { ApiError } from '../api/http'
+import { accessQueryKey } from '../api/queryClient'
 import { formatSessionCode, getSession } from '../api/sessions'
 import type { SessionDetail } from '../api/types'
 import { Presenter } from '../presenter/Presenter'
@@ -38,8 +39,18 @@ export function PresenterSessionPage() {
 function PresenterSession({ details }: { details: SessionDetail }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const live = useLiveSession(details.id, 'Presenter')
   const [actionFailed, setActionFailed] = useState(false)
+
+  // The hub refuses a presenter only when the teacher cookie is gone, typically because it
+  // expired with this tab open. Checking access again brings the access key form back.
+  const refused = live.connection === 'refused'
+  useEffect(() => {
+    if (refused) {
+      void queryClient.invalidateQueries({ queryKey: accessQueryKey })
+    }
+  }, [refused, queryClient])
 
   /** Runs something the teacher asked for and says so if the server could not do it. */
   function run(action: Promise<void>, then?: () => void) {
@@ -51,7 +62,7 @@ function PresenterSession({ details }: { details: SessionDetail }) {
       .catch(() => setActionFailed(true))
   }
 
-  if (live.connection === 'refused') {
+  if (refused) {
     return <Message text={t('session.refused')} />
   }
 

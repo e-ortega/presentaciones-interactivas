@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
 import type { SessionDetail } from '../api/types'
+import { AccessGate } from '../components/AccessGate'
 import type { AttendanceUpdate, SessionSnapshot } from '../realtime/contracts'
 import { FakeHubConnection, hub } from '../test/fakeHub'
 import { jsonResponse, renderWithQuery, stubFetch } from '../test/render'
@@ -133,12 +134,20 @@ test('starting the class asks the server, and the presenter view opens when the 
 test('moving to another slide tells the server the slide and the step, and shows it at once', async () => {
   const user = await openSession()
   hub().receive('SessionSnapshot', snapshot({ status: 'Live' }))
+  hub().holdCalls = true // the server takes its time
 
   await user.click(await screen.findByRole('button', { name: 'Siguiente' }))
 
+  // Asked of the server, and already on screen without waiting for the answer.
   expect(hub().calls('GoTo')).toEqual([[1, 0]])
-  expect(await screen.findByRole('img', { name: 'Diapositiva 2 de 3' })).toBeInTheDocument()
+  expect(screen.getByRole('img', { name: 'Diapositiva 2 de 3' })).toBeInTheDocument()
 
+  // The server moves the session, tells everyone, and then answers the call.
+  hub().receive('SlideChanged', 1, 0)
+  await hub().answerCalls()
+  expect(screen.getByRole('img', { name: 'Diapositiva 2 de 3' })).toBeInTheDocument()
+
+  hub().holdCalls = false
   await user.keyboard('{ArrowRight}')
   expect(hub().calls('GoTo')).toEqual([[1, 0], [2, 0]])
 })
@@ -224,6 +233,48 @@ test('a browser the server refuses is told so and does not keep trying', async (
 
   expect(await screen.findByText('No tenés acceso a esta clase.')).toBeInTheDocument()
   expect(hub().start.mock.calls).toHaveLength(startsBefore)
+})
+
+test('when the teacher cookie expired with the tab open, the access key is asked for again', async () => {
+  // Signed in when the page opened; by the time the hub refuses, the cookie is gone.
+  let signedIn = true
+  stubFetch({
+    'GET /api/admin/sessions/session-1': jsonResponse(details),
+    'GET /api/admin/access': () => new Response(null, { status: signedIn ? 204 : 401 }),
+  })
+  renderWithQuery(
+    <AccessGate>
+      <Routes>
+        <Route path="/present/:sessionId" element={<PresenterSessionPage />} />
+      </Routes>
+    </AccessGate>,
+    '/present/session-1',
+  )
+  await waitFor(() => expect(FakeHubConnection.current?.start).toHaveBeenCalled())
+  hub().receive('SessionSnapshot', snapshot({ status: 'Live' }))
+  await screen.findByRole('img', { name: 'Diapositiva 1 de 3' })
+
+  signedIn = false
+  hub().closeWith('NotAllowed')
+
+  expect(await screen.findByLabelText('Clave de acceso')).toBeInTheDocument()
+})
+
+test('quick presses with a slow server end on the slide the teacher asked for', async () => {
+  const user = await openSession()
+  hub().receive('SessionSnapshot', snapshot({ status: 'Live' }))
+  hub().holdCalls = true
+
+  await user.click(await screen.findByRole('button', { name: 'Siguiente' }))
+  await user.click(screen.getByRole('button', { name: 'Siguiente' }))
+  hub().receive('SlideChanged', 1, 0) // the answer to the first press, arriving late
+
+  expect(screen.getByRole('img', { name: 'Diapositiva 3 de 3' })).toBeInTheDocument()
+  expect(hub().calls('GoTo')).toEqual([[1, 0], [2, 0]])
+
+  hub().receive('SlideChanged', 2, 0)
+  await hub().answerCalls()
+  expect(screen.getByRole('img', { name: 'Diapositiva 3 de 3' })).toBeInTheDocument()
 })
 
 test('a session that does not exist says so', async () => {

@@ -3,6 +3,14 @@ import { vi } from 'vitest'
 
 type Handler = (...args: never[]) => void
 
+type RetryPolicy = {
+  nextRetryDelayInMilliseconds: (retry: {
+    previousRetryCount: number
+    elapsedMilliseconds: number
+    retryReason: Error
+  }) => number | null
+}
+
 /**
  * Stands in for a SignalR connection in tests: records what the page asks of the server and
  * lets the test play the server's part. Use it by mocking the library in the test file:
@@ -19,10 +27,15 @@ export class FakeHubConnection {
   invocations: { method: string; args: unknown[] }[] = []
   /** Set to make the server refuse the calls to a method. */
   refuse: string | null = null
+  /** Set to leave calls unanswered, as on a slow network, until `answerCalls()`. */
+  holdCalls = false
+  /** What the page told SignalR to do when the connection drops. */
+  retryPolicy: RetryPolicy | undefined
 
   private handlers = new Map<string, Handler[]>()
   private closeHandlers: ((error?: Error) => void)[] = []
   private reconnectingHandlers: (() => void)[] = []
+  private heldCalls: (() => void)[] = []
 
   constructor(url: string) {
     this.url = url
@@ -33,8 +46,13 @@ export class FakeHubConnection {
     return Promise.resolve()
   })
 
+  /** Like the real one: stopping an open connection reports it closed, with no error. */
   stop = vi.fn(() => {
+    const wasOpen = this.state === 'Connected'
     this.state = 'Disconnected'
+    if (wasOpen) {
+      this.closeHandlers.forEach((handler) => handler())
+    }
     return Promise.resolve()
   })
 
@@ -56,7 +74,14 @@ export class FakeHubConnection {
 
   invoke(method: string, ...args: unknown[]): Promise<void> {
     this.invocations.push({ method, args })
-    return this.refuse === method ? Promise.reject(new Error('InvalidState')) : Promise.resolve()
+    const refused = this.refuse === method
+    const answer = () => (refused ? Promise.reject(new Error('InvalidState')) : Promise.resolve())
+    if (!this.holdCalls) {
+      return answer()
+    }
+    return new Promise<void>((resolve, reject) => {
+      this.heldCalls.push(() => void answer().then(resolve, reject))
+    })
   }
 
   // --- The test playing the server ---------------------------------------------------------
@@ -70,6 +95,16 @@ export class FakeHubConnection {
     })
   }
 
+  /** The server answers the calls left waiting by `holdCalls`. */
+  async answerCalls() {
+    const waiting = this.heldCalls
+    this.heldCalls = []
+    await act(async () => {
+      waiting.forEach((answer) => answer())
+      await Promise.resolve()
+    })
+  }
+
   /** The network drops and SignalR starts trying to reconnect. */
   loseConnection() {
     act(() => this.reconnectingHandlers.forEach((handler) => handler()))
@@ -77,13 +112,22 @@ export class FakeHubConnection {
 
   /** The server closes the connection for good, giving a reason. */
   closeWith(reason: string) {
-    this.state = 'Disconnected'
-    act(() => this.closeHandlers.forEach((handler) => handler(new Error(`Connection closed with an error. HubException: ${reason}`))))
+    this.close(new Error(`Connection closed with an error. HubException: ${reason}`))
+  }
+
+  /** The connection closes for a reason that is not a refusal, such as a server failure. */
+  closeUnexpectedly() {
+    this.close(new Error('Connection closed with an error.'))
   }
 
   /** The calls the page made to one method. */
   calls(method: string): unknown[][] {
     return this.invocations.filter((invocation) => invocation.method === method).map((invocation) => invocation.args)
+  }
+
+  private close(error: Error) {
+    this.state = 'Disconnected'
+    act(() => this.closeHandlers.forEach((handler) => handler(error)))
   }
 }
 
@@ -97,18 +141,21 @@ export function hub(): FakeHubConnection {
 
 class FakeHubConnectionBuilder {
   private url = ''
+  private retryPolicy: RetryPolicy | undefined
 
   withUrl(url: string) {
     this.url = url
     return this
   }
 
-  withAutomaticReconnect() {
+  withAutomaticReconnect(policy?: RetryPolicy) {
+    this.retryPolicy = policy
     return this
   }
 
   build() {
     FakeHubConnection.current = new FakeHubConnection(this.url)
+    FakeHubConnection.current.retryPolicy = this.retryPolicy
     return FakeHubConnection.current
   }
 }

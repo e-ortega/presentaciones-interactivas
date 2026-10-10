@@ -33,9 +33,13 @@ export type LiveSession = {
   removeParticipant: (attendanceId: string) => Promise<void>
 }
 
-/** Delay before each reconnection attempt. It never gives up: a class can outlast a long outage. */
+/**
+ * Wait before each attempt to connect, by how many have failed in a row. It never gives up:
+ * a class can outlast a long outage. The count starts over when the server sends a snapshot.
+ */
 const retryDelays = [0, 1000, 2000, 5000]
 const longestRetryDelay = 10000
+const retryDelay = (failures: number) => retryDelays[failures] ?? longestRetryDelay
 
 /**
  * Keeps this window in a live session. The server is the source of truth: the hook only
@@ -45,21 +49,43 @@ export function useLiveSession(sessionId: string, role: ClientRole): LiveSession
   const [connection, setConnection] = useState<ConnectionStatus>('connecting')
   const [refusal, setRefusal] = useState<Refusal | null>(null)
   const [session, setSession] = useState<SessionSnapshot | null>(null)
+  // Where the presenter asked to go while the server has not answered yet (see goTo).
+  const [requested, setRequested] = useState<Position | null>(null)
+  const requestsInFlight = useRef(0)
   // The open connection, for the actions below. A ref, not state: changing it must not re-render.
   const hub = useRef<HubConnection | null>(null)
 
   useEffect(() => {
+    // Set when this effect is cleaned up, or when the server refuses this browser:
+    // whatever is still in flight must do nothing more, and nothing reconnects.
+    let finished = false
+    // Attempts that failed since the server last sent a snapshot.
+    let failures = 0
+
+    function refuse(reason: Refusal) {
+      finished = true
+      setRefusal(reason)
+      setConnection('refused')
+    }
+
     const hubConnection = new HubConnectionBuilder()
       .withUrl(`${sessionHubPath}?sessionId=${encodeURIComponent(sessionId)}&role=${role}`)
       .withAutomaticReconnect({
-        nextRetryDelayInMilliseconds: (retry) => retryDelays[retry.previousRetryCount] ?? longestRetryDelay,
+        nextRetryDelayInMilliseconds: (retry) => {
+          // A 401 or 403 while reconnecting (the cookie expired) will not get better by retrying.
+          const reason = refusalIn(retry.retryReason)
+          if (reason !== null) {
+            refuse(reason)
+            return null
+          }
+          return retryDelay(retry.previousRetryCount)
+        },
       })
       .build()
     hub.current = hubConnection
-    // Set when this effect is cleaned up: whatever is still in flight must do nothing more.
-    let abandoned = false
 
     hubConnection.on(serverMessages.sessionSnapshot, (snapshot: SessionSnapshot) => {
+      failures = 0
       setSession(snapshot)
       setConnection('connected')
     })
@@ -76,48 +102,49 @@ export function useLiveSession(sessionId: string, role: ClientRole): LiveSession
       setSession((current) => current && { ...current, attendance }),
     )
     hubConnection.on(serverMessages.removedFromSession, () => {
-      setRefusal('Removed')
-      setConnection('refused')
+      refuse('Removed')
       void hubConnection.stop()
     })
 
     hubConnection.onreconnecting(() => setConnection('reconnecting'))
     // After reconnecting the server sends a new snapshot, which marks the connection as up again.
     hubConnection.onclose((error) => {
-      if (abandoned) {
+      if (finished) {
         return
       }
       const reason = refusalIn(error)
       if (reason !== null) {
-        setRefusal(reason)
-        setConnection('refused')
+        refuse(reason)
         return
       }
-      // Closed for good without a refusal (the retries only stop if the browser is told to): start over.
+      // Closed without a refusal: for example the server failed right after connecting.
+      // Start over, counting it as a failure so a server in trouble is not hammered.
+      failures++
       setConnection('reconnecting')
       void start()
     })
 
     async function start() {
-      // The very first connection is not covered by automatic reconnect, so it is retried here.
-      for (let attempt = 0; ; attempt++) {
-        if (abandoned) {
+      // Neither the first connection nor one closed by the server is covered by automatic
+      // reconnect, so both are retried here.
+      for (;;) {
+        await delay(retryDelay(failures))
+        if (finished) {
           return
         }
         try {
           await hubConnection.start()
           return
         } catch (error) {
-          if (abandoned || hubConnection.state !== HubConnectionState.Disconnected) {
+          if (finished || hubConnection.state !== HubConnectionState.Disconnected) {
             return
           }
           const reason = refusalIn(error instanceof Error ? error : undefined)
           if (reason !== null) {
-            setRefusal(reason)
-            setConnection('refused')
-            return // retrying would get the same answer
+            refuse(reason) // retrying would get the same answer
+            return
           }
-          await delay(retryDelays[attempt] ?? longestRetryDelay)
+          failures++
         }
       }
     }
@@ -125,7 +152,7 @@ export function useLiveSession(sessionId: string, role: ClientRole): LiveSession
     void start()
 
     return () => {
-      abandoned = true
+      finished = true
       hub.current = null
       void hubConnection.stop()
     }
@@ -138,23 +165,33 @@ export function useLiveSession(sessionId: string, role: ClientRole): LiveSession
     return hub.current.invoke(method, ...args)
   }
 
+  /**
+   * Moves the session. The new position is shown at once, so the presenter does not wait for
+   * the round trip on every slide. While any request is on its way the screen shows the last
+   * position asked for, whatever the server echoes in the meantime; when all have been
+   * answered it goes back to showing what the server says, which by then is where the last
+   * accepted request left it. So quick presses are not undone by late answers, and a refused
+   * request simply falls back to the server's position.
+   */
+  async function goTo(position: Position): Promise<void> {
+    requestsInFlight.current++
+    setRequested(position)
+    try {
+      await invoke(hubMethods.goTo, position.slideIndex, position.stepIndex)
+    } finally {
+      requestsInFlight.current--
+      if (requestsInFlight.current === 0) {
+        setRequested(null)
+      }
+    }
+  }
+
   return {
     connection,
     refusal,
-    session,
+    session: session && requested ? { ...session, ...requested } : session,
     startSession: () => invoke(hubMethods.startSession),
-    goTo: async (position) => {
-      // Shown at once, so the presenter does not wait for the round trip on every slide.
-      // The server's SlideChanged then confirms it; if the server refuses, go back.
-      const before = session && { slideIndex: session.slideIndex, stepIndex: session.stepIndex }
-      setSession((current) => current && { ...current, ...position })
-      try {
-        await invoke(hubMethods.goTo, position.slideIndex, position.stepIndex)
-      } catch (error) {
-        setSession((current) => (current && before ? { ...current, ...before } : current))
-        throw error
-      }
-    },
+    goTo,
     endSession: () => invoke(hubMethods.endSession),
     removeParticipant: (attendanceId) => invoke(hubMethods.removeParticipant, attendanceId),
   }
