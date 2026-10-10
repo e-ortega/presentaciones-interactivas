@@ -1,0 +1,60 @@
+name: Dependency audit
+
+# Looks for known vulnerabilities in the dependencies of both stacks.
+#
+# Deliberately NOT a required check for merging: an advisory is published when it is
+# published, not when the code changes, and it would block every pull request at once.
+# It runs every week and whenever the dependencies change, and fails visibly.
+on:
+  schedule:
+    - cron: "0 12 * * 1" # Mondays, 6:00 in Costa Rica
+  pull_request:
+    paths:
+      - "src/web/package.json"
+      - "src/web/package-lock.json"
+      - "**/*.csproj"
+      - "Directory.Build.props"
+      - ".github/workflows/security.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  npm:
+    name: npm audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      # Reads package-lock.json; nothing is installed. Fails on high or critical advisories.
+      - run: npm audit --audit-level=high
+
+  nuget:
+    name: NuGet audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      # `dotnet list package --vulnerable` always exits 0, so it cannot fail a job by itself.
+      # NuGet's own audit runs during restore and reports advisories as warnings NU1901-NU1904;
+      # the normal build keeps them as warnings (Directory.Build.props), and here they become
+      # errors: direct and transitive packages, high and critical only. NU1900 (advisory feed
+      # unreachable) stays a warning so a network hiccup does not look like a vulnerability.
+      - name: Restore with advisories as errors
+        run: >
+          dotnet restore
+          -p:NuGetAudit=true
+          -p:NuGetAuditMode=all
+          -p:NuGetAuditLevel=high
+          -p:WarningsNotAsErrors=NU1900
+      - name: List vulnerable packages
+        if: always()
+        run: dotnet list package --vulnerable --include-transitive

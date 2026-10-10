@@ -77,7 +77,8 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (app.Environment.IsDevelopment())
+// The API description, at /openapi/v1.json. On in development; off in production.
+if (app.Configuration.GetValue<bool>("OpenApi:Enabled"))
 {
     app.MapOpenApi();
 }

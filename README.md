@@ -50,6 +50,8 @@ Con Docker dentro de WSL, correr esos comandos desde la terminal de Ubuntu, en `
 
 Docker Compose **no lee los user-secrets**: en este modo el hash de la clave va en el archivo `.env`, en `ADMIN_ACCESS_KEY_SHA256`. Si se deja vacío, la zona del profesor avisa que no está configurada.
 
+**Antes de cada commit** corren solos unos chequeos rápidos (lint del frontend, formato de C#). Se instalan con el `npm install` de arriba.
+
 **Pruebas:**
 
 ```bash

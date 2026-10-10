@@ -9,7 +9,9 @@
     "lint": "oxlint --type-aware --deny-warnings",
     "preview": "vite preview",
     "test": "vitest run",
-    "generate:api": "npx --yes openapi-typescript@7 http://localhost:5049/openapi/v1.json --output src/api/schema.d.ts"
+    "generate:api": "npx --yes openapi-typescript@7.13.0 src/api/openapi.json --output src/api/schema.d.ts",
+    "prepare": "node husky-install.mjs",
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.1",
@@ -26,7 +28,9 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
+    "husky": "^9.1.7",
     "jsdom": "^30.1.2",
+    "lint-staged": "^17.6.0",
     "oxlint": "^1.81.0",
     "oxlint-tsgolint": "^7.0.2003",
     "typescript": "~6.0.2",

@@ -97,7 +97,7 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 | Datos del servidor | **TanStack Query** para las llamadas REST | Caché, reintentos y estados de carga resueltos |
 | Tiempo real | Un hook `useLiveSession(sessionId, role)` que envuelve `@microsoft/signalr`, maneja la reconexión y expone el estado del último `SessionSnapshot` | Los componentes no tocan SignalR directamente; buen punto para aprender hooks |
 | Estado global | **Sin Redux.** Estado local de React + el hook de sesión | No hace falta en la Fase 1 |
-| Tipos de la API | Generados desde OpenAPI con `openapi-typescript`: `npm run generate:api` con el servidor de desarrollo encendido (D-57) | Los tipos de C# y TypeScript no se desincronizan |
+| Tipos de la API | Generados con `openapi-typescript` desde `src/api/openapi.json`, el contrato guardado en el repo y verificado contra el servidor por una prueba (D-65) | Los tipos de C# y TypeScript no se desincronizan |
 | Textos | `react-i18next`, archivo `es.json` (D-44) | |
 | Estilos | CSS Modules + `tokens.css` (D-46) | Sin librería de componentes: la identidad es propia y los elementos nativos son accesibles |
 | Pruebas | Vitest + Testing Library; lint con oxlint (D-53) | |
@@ -105,6 +105,8 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 ## 7. Pruebas
 
 - **Dominio:** pruebas unitarias con xUnit v3 (D-53).
+- **Arquitectura:** las reglas de dependencias entre `Domain`, `Features` e `Infrastructure` son pruebas (NetArchTest.eNhancedEdition, D-66).
+- **Contrato de la API:** una prueba compara el documento OpenAPI del servidor con `src/web/src/api/openapi.json` (D-65).
 - **API y hub:** pruebas de integración con `WebApplicationFactory` y **SQL Server real en contenedor (Testcontainers)**, o el servidor de `PI_TEST_SQLSERVER` cuando no hay Docker (D-52).
 - **Importación:** los PPTX de prueba son **sintéticos** y los genera el propio código de pruebas (`SyntheticDeck`), con diapositivas ocultas y sin notas: el repo es público y las presentaciones reales de Esteban no se suben. La conversión real con LibreOffice se prueba dentro del contenedor con una prueba de humo en el CI (D-56).
 - **De punta a punta:** un recorrido con Playwright al cerrar el M4 (importar, presentar, unirse, responder, revelar).
@@ -114,6 +116,8 @@ Los nombres de los métodos y los tipos de los mensajes viven en un solo lugar e
 - **Ramas:** `main` protegida con el ruleset `pr_main`: pull request obligatorio, los tres trabajos del CI en verde y solo fusión "squash". Cada hito o tarea va en una rama corta (`feat/m1-import`) con pull request. Commits en formato convencional (`feat:`, `fix:`, `docs:`).
 - **GitHub Actions** en cada pull request: compilar y probar .NET, `npm ci`, lint, pruebas y build del frontend, y la prueba de humo de la imagen Docker.
 - **Verificaciones estrictas (D-60):** en el servidor, todo aviso del compilador o de los analizadores detiene la compilación (`Directory.Build.props`) y el CI comprueba el formato con `dotnet format --verify-no-changes`. En el frontend, `oxlint --type-aware --deny-warnings`. Apagar una regla exige dejar el motivo escrito junto a ella.
+- **Antes del commit (D-64):** hooks de Husky y lint-staged corren el lint y los tipos del frontend y corrigen el formato de los `.cs`. Se instalan solos con `npm install` en `src/web`.
+- **Dependencias (D-67):** el flujo `Dependency audit` busca vulnerabilidades cada lunes y cuando cambian los paquetes, sin bloquear las fusiones; Dependabot propone las actualizaciones.
 - **Revisión antes de fusionar (D-61):** el diff de cada pull request lo revisa alguien o algo distinto de quien lo escribió; los hallazgos se corrigen o se anotan en el pull request. La plantilla `.github/pull_request_template.md` lleva la lista.
 - **Despliegue (M5):** al fusionar en `main`, se construye la imagen, se publica en GitHub Container Registry y se actualiza Container Apps. Autenticación a Azure con **OIDC** (credenciales federadas): sin secretos de Azure guardados en GitHub.
 - **Secretos:** `dotnet user-secrets` en local; secretos de Container Apps en Azure. Nunca en el repo.

@@ -43,6 +43,12 @@ jobs:
           cache: npm
           cache-dependency-path: src/web/package-lock.json
       - run: npm ci
+      # schema.d.ts is generated from openapi.json, which a server test keeps equal to the real
+      # API. If the two files drift apart, someone changed the contract and forgot the types.
+      - name: Check the API types match the contract
+        run: |
+          npm run generate:api
+          git diff --exit-code -- src/api/schema.d.ts
       # Type-aware lint; any warning fails (deprecated APIs, unhandled promises, accessibility).
       - run: npm run lint
       - run: npm test
