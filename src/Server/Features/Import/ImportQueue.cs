@@ -110,7 +110,10 @@ public class ImportWorker(
             {
                 logger.LogError(
                     ex, "Could not look for unfinished imports at startup (attempt {Attempt} of {MaxAttempts})", attempt, MaxAttempts);
-                await Task.Delay(options.Value.RetryDelay, stoppingToken);
+                if (attempt < MaxAttempts)
+                {
+                    await Task.Delay(options.Value.RetryDelay, stoppingToken);
+                }
             }
         }
     }
