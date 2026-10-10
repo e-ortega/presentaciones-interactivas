@@ -20,6 +20,7 @@ Un profesor ya tiene su PowerPoint. Lo pasa por la app y lo presenta de una form
 - **Animaciones:** Esteban casi no las usa, pero cree que otros profesores sí. Aceptó dejarlas fuera de la v1 **solo si agregarlas después no obliga a reconstruir**. De ahí salen la navegación por "diapositiva + paso" y el renderizador intercambiable.
 - **Recorte del MVP:** Claude advirtió que el diseño completo tenía demasiados frentes. Esteban coincidió: Fase 1 = importar, notas, un widget y entrada mínima por código. Lo que más valor da, la IA y la experiencia del estudiante, va en la Fase 2.
 - **Costo:** Esteban pidió mantenerlo simple y económico. De ahí la elección de Container Apps con escala a cero y la oferta gratuita de Azure SQL.
+- **Voz y pantalla compartida:** Esteban no había pensado en la voz. Al ver una clase con Genially en vivo (videollamada + pantalla compartida + estudiantes respondiendo con código) quedó claro que la voz va por la videollamada y que hace falta una ventana limpia para compartir, sin las notas del profesor.
 - **Frontend en React:** Esteban lo eligió porque lo está aprendiendo; el proyecto también le sirve para eso.
 
 ## Alternativas descartadas

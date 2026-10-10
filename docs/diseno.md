@@ -233,4 +233,23 @@ El diseño original asume **un modo virtual**: el profesor usa una sola pantalla
 2. **Dejarlo preparado sin costo**, igual que con las animaciones: cada cliente se conecta a la sesión con un **rol** (`Presenter`, `Participant` y, a futuro, `Display`); el hub emite los eventos al grupo de la sesión y no a "los estudiantes"; revelar resultados es un evento de sesión que cada vista dibuja a su manera. Así, el modo en aula después es agregar una vista y una opción al crear la sesión, sin tocar el backend.
 3. Las maquetas de sala de espera y resultados proyectados ya existen y se reutilizan cuando llegue ese modo.
 
-**Por confirmar del modo virtual:** que la voz va por una videollamada en paralelo. Si los estudiantes siguen la diapositiva en la app, el profesor no necesita compartir pantalla en la llamada.
+### Referencia observada: Genially en vivo (9 oct 2026)
+
+Esteban vio una clase virtual con Genially: el profesor da la clase por videollamada y **comparte pantalla**; los estudiantes entran a `play.genially.com` con un código solo para responder. La pantalla compartida muestra "En vivo", número de participantes, código de acceso, un candado para cerrar la entrada, "Cerrar sesión", un temporizador por pregunta y el conteo de quienes ya respondieron ("37 | Resolver ahora").
+
+Conclusiones:
+
+- **La voz no es problema de la app:** va por la videollamada (Zoom, Teams, Meet), igual que en Genially.
+- **Muchos profesores van a compartir pantalla por costumbre.** Si comparten la vista del presentador, los estudiantes verían sus notas. Necesitan una **ventana limpia para compartir**: exactamente la misma vista de proyección del modo en aula.
+
+### Propuesta revisada (P-09): un solo modo, tres ventanas
+
+En lugar de dos modos, la sesión funciona siempre igual y el profesor decide qué abre:
+
+| Ventana | Quién la ve | Contenido |
+|---|---|---|
+| **Presentador** | Solo el profesor | Diapositiva, guion, controles |
+| **Para compartir o proyectar** (opcional) | La clase, por videollamada o proyector | Sala de espera con código, diapositiva a pantalla completa, resultados revelados. Sin notas ni controles |
+| **Estudiante** | Cada estudiante, en computadora o celular | Diapositiva y pregunta (adaptable) |
+
+Con esto, clase virtual con pantalla compartida, clase virtual sin compartir y clase en aula con proyector son el mismo flujo. La ventana para compartir es barata: reutiliza la vista del estudiante sin el panel de respuesta y ya tiene maquetas. Por eso se propone **incluirla en la Fase 1**.

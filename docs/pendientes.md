@@ -4,8 +4,8 @@ _Última actualización: 9 oct 2026 (noche). Marcados como (Nuevo) los agregados
 
 ## Abiertos
 
-- [ ] **Decidir los modos de uso** (P-09, [diseno.md](diseno.md) §13): Fase 1 solo virtual y modo en aula después, con el backend preparado. De esto depende aprobar el plan de la Fase 1. _(Cambió: antes era "vista de proyección")_
-- [ ] **Confirmar que en el modo virtual la voz va por una videollamada aparte** (Zoom, Teams o Meet). _(Nuevo)_
+- [ ] **Aprobar "un solo modo, tres ventanas"** (P-09 revisada, [diseno.md](diseno.md) §13), con la ventana para compartir o proyectar en la Fase 1. De esto depende aprobar el plan de la Fase 1. _(Cambió)_
+- [ ] **Revisar la competencia** antes de invertir mucho: Genially, Mentimeter, Slido, Kahoot, Pear Deck y Nearpod; los dos últimos ya importan presentaciones. Sirve para afinar el diferenciador. _(Nuevo)_
 - [ ] **Aprobar el plan de la Fase 1** (P-07) una vez resuelto P-09. _(Cambió)_
 - [ ] **Idioma de los documentos de diseño:** `docs/` está en español. ¿Se traduce al inglés por D-34, o se queda en español y solo la documentación técnica nueva va en inglés? _(Nuevo)_
 - [ ] **Interfaz preparada para traducción desde el inicio** (P-10). _(Nuevo)_
@@ -21,6 +21,7 @@ _Última actualización: 9 oct 2026 (noche). Marcados como (Nuevo) los agregados
 - Presentaciones PPTX reales para probar la importación: Esteban las tiene; se piden al llegar al M1.
 - Inicio de sesión del profesor (D-36).
 - Nombre del producto (D-37).
+- Ideas vistas en Genially para fases posteriores: temporizador por pregunta y candado para cerrar la entrada a la sesión.
 
 ## Resueltos
 
