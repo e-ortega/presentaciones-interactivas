@@ -4,8 +4,6 @@ _Última actualización: 9 oct 2026 (noche). Marcados como (Nuevo) los agregados
 
 ## Abiertos
 
-- [ ] **Subir el repo a GitHub** (D-41): correr en Windows, dentro de la carpeta del proyecto, `gh repo create presentaciones-interactivas --public --source . --push`. Antes, decidir el correo de autor de los commits (ver siguiente punto). _(Nuevo)_
-- [ ] **Correo visible en un repo público:** los commits tienen como autor `eortega1793@gmail.com`, que quedaría público. Opción: usar el correo `noreply` de GitHub (Settings › Emails) y reescribir el autor de los dos commits antes del primer push. _(Nuevo)_
 - [ ] **Revisar con una persona abogada el aviso de privacidad** ([legal/aviso-privacidad.md](legal/aviso-privacidad.md)) y completar los datos entre corchetes: responsable, cédula, dirección, correo de contacto, región de Azure y plazo de conservación. _(Cambió: el borrador ya está)_
 - [ ] **Aprobar que los datos de estudiantes nunca vayan a servicios de IA** (P-12). _(Nuevo)_
 - [ ] **Leer la investigación de competencia** ([competencia.md](competencia.md)) y confirmar el posicionamiento: universidades de la región, clase virtual, notas del orador. _(Nuevo)_
@@ -28,7 +26,7 @@ _Última actualización: 9 oct 2026 (noche). Marcados como (Nuevo) los agregados
 
 - [x] Modos de uso → un solo modo, tres ventanas (D-39).
 - [x] Plan de la Fase 1 → aprobado (D-40).
-- [x] Repo en GitHub → público, en la carpeta actual (D-41).
+- [x] Repo en GitHub → público, cuenta personal `e-ortega`, en la carpeta actual (D-41).
 - [x] Voz en clases virtuales → por la videollamada.
 - [x] Revisión de competencia → [competencia.md](competencia.md).
 - [x] Borrador del aviso de consentimiento Ley 8968 → [legal/aviso-privacidad.md](legal/aviso-privacidad.md).

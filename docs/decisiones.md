@@ -44,7 +44,7 @@ Cada decisión con su fecha y el motivo. Si una decisión cambia, no se borra: s
 | D-38 | 2026-10-09 | Se crea el repositorio git local del proyecto (rama `main`) | Pedido de Esteban |
 | D-39 | 2026-10-09 | **Un solo modo, tres ventanas** (antes P-09): presentador, ventana opcional para compartir o proyectar (sin notas ni controles) y estudiante. La ventana para compartir entra en la Fase 1 | Sirve igual para clase virtual con o sin pantalla compartida y para aula con proyector |
 | D-40 | 2026-10-09 | Plan de la Fase 1 aprobado (antes P-07), con la ventana para compartir | Resueltos los modos de uso |
-| D-41 | 2026-10-09 | Repositorio **público** en GitHub; el repo local se queda en `D:\Documents\source\repos` y Esteban lo saca de la sincronización de Drive | Pedido de Esteban |
+| D-41 | 2026-10-09 | Repositorio **público** en GitHub, en la cuenta personal `e-ortega` (no en la cuenta de profesor de la Ulatina); el repo local se queda en `D:\Documents\source\repos` y Esteban lo saca de la sincronización de Drive | Pedido de Esteban |
 
 ## Propuestas en revisión
 
