@@ -73,11 +73,11 @@ Si algo del código contradice `docs/decisiones.md`, gana el documento hasta que
 
 ## Estado actual
 
-M0 terminado. M1 (importación): el servidor está hecho y probado con decks reales; faltan las pantallas de React (ingresar la clave, subir un PPTX, ver el estado). Ver `docs/plan-fase-1.md`.
+M0 y M1 terminados: la app importa un PPTX (imágenes, notas y PDF) y la zona del profesor permite entrar con la clave, subir presentaciones y ver su estado. Siguiente hito: M2, vista del presentador (`docs/plan-fase-1.md`). Ahí se agrega React Router (D-58).
 
 ## Flujo de trabajo
 
-`main` está protegida (ruleset `pr_main`): no se puede subir directo, ni documentación. Cada cambio va en una rama corta (`feat/...`, `fix/...`, `docs/...`) con pull request; se fusiona con "squash" cuando pasan los tres trabajos del CI (`Server (.NET)`, `Web (React)`, `Docker image`). Si se renombra un trabajo en `.github/workflows/ci.yml`, hay que actualizar el ruleset o los pull requests quedan bloqueados.
+`main` está protegida (ruleset `pr_main`): no se puede subir directo, ni documentación. Cada cambio va en una rama corta (`feat/...`, `fix/...`, `docs/...`) con pull request; se fusiona con "squash" cuando pasan los tres trabajos del CI (`Server (.NET)`, `Web (React)`, `Docker image`). Si se renombra un trabajo en `.github/workflows/ci.yml`, hay que actualizar el ruleset o los pull requests quedan bloqueados. Claude puede fusionar sus propios pull requests cuando el CI esté en verde (D-59).
 
 ## Comandos
 
@@ -86,5 +86,6 @@ M0 terminado. M1 (importación): el servidor está hecho y probado con decks rea
 - Contenedores: Docker está en WSL (`Ubuntu-26.04`), no en Windows. Arrancar el servicio con `wsl -u root service docker start` y correr `docker compose` desde `/mnt/d/Documents/source/repos/presentaciones-interactivas`.
 - Importar de verdad necesita LibreOffice, que solo está en la imagen Docker: con `dotnet run` en Windows la subida funciona pero la conversión falla. Para probar una importación, usar Docker Compose.
 - Los decks reales de Esteban se leen desde su carpeta para pruebas manuales; **nunca se copian al repo**, que es público.
+- Tipos de la API: al cambiar un endpoint o un DTO, con el servidor encendido correr `npm run generate:api` en `src/web` y guardar `src/api/schema.d.ts` (D-57).
 - Pruebas: `dotnet test` en la raíz; `npm test` y `npm run lint` en `src/web`.
 - Nueva migración: `dotnet ef migrations add <Name> --project src/Server --output-dir Infrastructure/Data/Migrations`.

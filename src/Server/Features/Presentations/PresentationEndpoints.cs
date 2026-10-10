@@ -36,10 +36,15 @@ public static class PresentationEndpoints
             // Room for the multipart envelope on top of the file itself.
             .WithMetadata(new RequestSizeLimitAttribute(importOptions.MaxFileBytes + 1024 * 1024))
             // The teacher cookie is SameSite=Lax, so another site cannot make this POST.
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            // Produces(...) describes the responses in OpenAPI; the TypeScript types come from there.
+            .Produces<PresentationSummary>(StatusCodes.Status202Accepted)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
 
         group.MapGet("/", List);
-        group.MapGet("/{id:guid}", Get);
+        group.MapGet("/{id:guid}", Get)
+            .Produces<PresentationDetail>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
         group.MapGet("/{id:guid}/pdf", GetPdf);
         group.MapGet("/{id:guid}/slides/{slideIndex:int}/steps/{stepIndex:int}", GetStepImage);
     }

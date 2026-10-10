@@ -7,5 +7,50 @@
     "checking": "Comprobando la conexión con el servidor…",
     "up": "El servidor responde.",
     "down": "No hay conexión con el servidor."
+  },
+  "access": {
+    "checking": "Comprobando el acceso…",
+    "unavailable": "No se pudo comprobar el acceso. Revisá la conexión y recargá la página.",
+    "title": "Zona del profesor",
+    "keyLabel": "Clave de acceso",
+    "submit": "Entrar",
+    "submitting": "Entrando…",
+    "wrongKey": "Esa clave no es correcta.",
+    "tooManyAttempts": "Demasiados intentos. Esperá un minuto y probá de nuevo.",
+    "failed": "No se pudo comprobar la clave. Probá de nuevo."
+  },
+  "presentations": {
+    "title": "Mis presentaciones",
+    "loading": "Cargando presentaciones…",
+    "loadFailed": "No se pudieron cargar las presentaciones.",
+    "empty": "Todavía no hay presentaciones. Subí tu primer PowerPoint.",
+    "slides_one": "{{count}} diapositiva",
+    "slides_other": "{{count}} diapositivas",
+    "status": {
+      "Pending": "En cola para convertir…",
+      "Processing": "Convirtiendo las diapositivas…",
+      "Ready": "Lista",
+      "Failed": "No se pudo convertir"
+    },
+    "failure": {
+      "ConversionFailed": "No pudimos abrir el archivo. Abrilo en PowerPoint, guardalo de nuevo y volvé a subirlo.",
+      "ConversionTimedOut": "La conversión tardó demasiado. Probá con una presentación más liviana.",
+      "SlideCountMismatch": "Las notas y las diapositivas no coincidieron. Guardá el archivo de nuevo en PowerPoint y volvé a subirlo.",
+      "Unexpected": "Ocurrió un error inesperado. Probá de nuevo."
+    }
+  },
+  "upload": {
+    "label": "Subir un PowerPoint (.pptx)",
+    "submit": "Subir presentación",
+    "submitting": "Subiendo…",
+    "error": {
+      "NoFile": "Elegí un archivo primero.",
+      "NotPptx": "Ese archivo no es un .pptx. Si es un .ppt o un .pptm, guardalo como .pptx desde PowerPoint.",
+      "TooLarge": "El archivo pesa más de 100 MB.",
+      "Unreadable": "No pudimos leer ese archivo como una presentación.",
+      "NoVisibleSlides": "La presentación no tiene diapositivas visibles.",
+      "TooManySlides": "La presentación tiene más de 300 diapositivas.",
+      "generic": "No se pudo subir el archivo. Probá de nuevo."
+    }
   }
 }

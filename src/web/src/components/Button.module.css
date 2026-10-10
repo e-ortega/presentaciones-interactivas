@@ -1,0 +1,26 @@
+/* The one button style of the app: ink means "action" (identity principle 3). */
+.button {
+  min-height: 48px;
+  padding: var(--space-2) var(--space-5);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-tinta);
+  color: var(--color-blanco);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--color-tinta-hover);
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--color-tinta);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

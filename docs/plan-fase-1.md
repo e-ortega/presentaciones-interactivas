@@ -45,7 +45,7 @@ _Estado: terminado el 10 oct 2026 (pull request #1)._
 - **Listo cuando:** `docker compose up` levanta todo, la página de React llama a un endpoint de salud y el CI pasa en verde.
 
 ### M1 — Importación (el riesgo principal)
-_Estado (10 oct 2026): servidor hecho en la rama `feat/m1-import` y probado con seis decks reales de Esteban (72 diapositivas: imágenes, notas alineadas y PDF). Faltan las pantallas de React: ingresar la clave, subir un PPTX y ver el estado._
+_Estado: terminado el 10 oct 2026 (pull requests #3 y #4). Probado con seis decks reales de Esteban: 72 diapositivas con imágenes, notas alineadas y PDF._
 
 - Endpoint para subir un PPTX.
 - `LibreOfficeSlideRenderer : ISlideRenderer`:

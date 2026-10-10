@@ -60,6 +60,9 @@ Cada decisión con su fecha y el motivo. Si una decisión cambia, no se borra: s
 | D-54 | 2026-10-10 | Los motivos de fallo de una importación y de rechazo de un archivo viajan como **códigos** (`ConversionTimedOut`, `NotPptx`...), no como texto; la interfaz los traduce | Los textos viven en los archivos de traducción (D-44); el servidor no escribe mensajes para el usuario |
 | D-55 | 2026-10-10 | Las imágenes de las diapositivas son PNG de **1600 px de ancho** (el alto sigue la proporción del deck) | Nítidas en una pantalla Full HD y al proyectar, con unos 100 a 150 KB por diapositiva en los decks de prueba |
 | D-56 | 2026-10-10 | La conversión real con LibreOffice se prueba **dentro del contenedor**, con una prueba de humo que sube un deck sintético a la app en Docker Compose (trabajo `Docker image` del CI). Las demás pruebas usan un renderizador falso | Prueba la imagen que se despliega, con sus fuentes; y las pruebas normales no necesitan LibreOffice instalado |
+| D-57 | 2026-10-10 | Los tipos de TypeScript de la API se generan con `npm run generate:api`, que lee el documento OpenAPI del servidor de desarrollo y escribe `src/web/src/api/schema.d.ts` (se guarda en el repo). Se corre a mano cuando cambia un endpoint | Generarlos en cada compilación arrancaba la app entera y llenaba la salida de errores de conexión; y `openapi-typescript` aún no acepta TypeScript 6, así que se usa con `npx` en vez de instalarlo |
+| D-58 | 2026-10-10 | React Router se agrega en el M2, cuando exista una segunda pantalla. Por ahora la app tiene una sola: la zona del profesor | No agregar piezas antes de necesitarlas; y deja un concepto menos por aprender en este hito |
+| D-59 | 2026-10-10 | Claude puede fusionar sus propios pull requests cuando los tres trabajos del CI estén en verde | Aprobado por Esteban; con `main` protegida, esperar cada fusión frenaba los ciclos autónomos |
 
 ## Propuestas en revisión
 
