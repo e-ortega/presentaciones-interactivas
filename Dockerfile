@@ -22,7 +22,7 @@ RUN dotnet publish src/Server/Server.csproj -c Release -o /app --no-restore
 #    - LibreOffice Impress converts the PPTX to PDF; poppler-utils (pdftoppm) turns pages into PNG.
 #    - Fonts metric-compatible with the Office ones, so text keeps its place:
 #      Carlito for Calibri, Caladea for Cambria, Liberation for Arial and Times New Roman.
-FROM mcr.microsoft.com/dotnet/aspnet:10.0
+FROM mcr.microsoft.com/dotnet/aspnet:11.0
 RUN apt-get update  && apt-get install -y --no-install-recommends       libreoffice-impress poppler-utils       fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation fonts-dejavu-core  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app ./
