@@ -10,7 +10,7 @@ COPY src/web/ ./
 RUN npm run build
 
 # 2. Publish the server with the React build as its static files.
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 WORKDIR /src
 COPY src/Server/Server.csproj src/Server/
 RUN dotnet restore src/Server/Server.csproj
